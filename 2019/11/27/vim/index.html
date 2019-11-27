@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="ubuntu,网络配置," />
+  <meta name="keywords" content="ubuntu," />
 
 
 
@@ -79,15 +79,15 @@
 
 
 
-<meta name="description" content="Ubuntu网络配置对平时命令行配置网络进行一下总结 使用ifconfig直接使用命令进行网卡ip、掩码的配置 sudo ifconfig eth0 192.168.1.2 netmask 255.255.255.0 #将eth0的ip配置为192.168.1.2使用网卡配置文件编辑&#x2F;etc&#x2F;network&#x2F;interfaces文件进行配置 #在文件中添加 auto eth0 iface eth0">
-<meta name="keywords" content="ubuntu,网络配置">
+<meta name="description" content="vim的使用当远程连接服务器进行代码或文本的修改时，vim就成了我的首选。以下介绍下我个人使用vim的心得。 vim安装首先是安装vim sudo apt-get update            #一般不需要这步             sudo apt-get install vimvim配置vim的强大之处在于可以通过vimscript自由地配置vim，有些大神甚至将vim配置成了IDE。">
+<meta name="keywords" content="ubuntu">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Ubuntu网络配置">
-<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;11&#x2F;19&#x2F;network_config&#x2F;index.html">
+<meta property="og:title" content="vim使用">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;11&#x2F;27&#x2F;vim&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="Ubuntu网络配置对平时命令行配置网络进行一下总结 使用ifconfig直接使用命令进行网卡ip、掩码的配置 sudo ifconfig eth0 192.168.1.2 netmask 255.255.255.0 #将eth0的ip配置为192.168.1.2使用网卡配置文件编辑&#x2F;etc&#x2F;network&#x2F;interfaces文件进行配置 #在文件中添加 auto eth0 iface eth0">
+<meta property="og:description" content="vim的使用当远程连接服务器进行代码或文本的修改时，vim就成了我的首选。以下介绍下我个人使用vim的心得。 vim安装首先是安装vim sudo apt-get update            #一般不需要这步             sudo apt-get install vimvim配置vim的强大之处在于可以通过vimscript自由地配置vim，有些大神甚至将vim配置成了IDE。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-11-20T23:31:29.749Z">
+<meta property="og:updated_time" content="2019-11-27T06:56:31.507Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -118,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="https//twdlll.github.io/2019/11/19/network_config/"/>
+  <link rel="canonical" href="https//twdlll.github.io/2019/11/27/vim/"/>
 
 
 
 
 
-  <title>Ubuntu网络配置 | Twd's Home</title>
+  <title>vim使用 | Twd's Home</title>
   
 
 
@@ -241,7 +241,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2019/11/19/network_config/">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2019/11/27/vim/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Twd">
@@ -258,7 +258,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Ubuntu网络配置</h1>
+          <h1 class="post-title" itemprop="name headline">vim使用</h1>
         
 
         <div class="post-meta">
@@ -270,8 +270,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-19T00:00:00+08:00">
-                2019-11-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-27T00:00:00+08:00">
+                2019-11-27
               </time>
             
 
@@ -286,8 +286,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2019-11-21T07:31:29+08:00">
-                2019-11-21
+              <time title="更新于" itemprop="dateModified" datetime="2019-11-27T14:56:31+08:00">
+                2019-11-27
               </time>
             
           </span>
@@ -342,21 +342,66 @@
       
 
       
-        <h1 id="Ubuntu网络配置"><a href="#Ubuntu网络配置" class="headerlink" title="Ubuntu网络配置"></a>Ubuntu网络配置</h1><p>对平时命令行配置网络进行一下总结</p>
-<h2 id="使用ifconfig"><a href="#使用ifconfig" class="headerlink" title="使用ifconfig"></a>使用ifconfig</h2><p>直接使用命令进行网卡ip、掩码的配置</p>
-<pre><code>sudo ifconfig eth0 192.168.1.2 netmask 255.255.255.0
-#将eth0的ip配置为192.168.1.2</code></pre><h2 id="使用网卡配置文件"><a href="#使用网卡配置文件" class="headerlink" title="使用网卡配置文件"></a>使用网卡配置文件</h2><p>编辑/etc/network/interfaces文件进行配置</p>
-<pre><code>#在文件中添加
-auto eth0
-iface eth0 inet static
-address 192.168.1.2
-netmask 255.255.255.0
-gateway 192.168.1.1</code></pre><p>然后保存重启机器，有些博客说是只需要重启网络服务，但是我之前尝试了下好像不行。</p>
-<h2 id="后续路由配置"><a href="#后续路由配置" class="headerlink" title="后续路由配置"></a>后续路由配置</h2><p>配置好网络地址之后，最后检查下路由表，确保能通</p>
-<pre><code>route -n        #显示不解析的路由表
-sudo route del/add default gw a.b.c.d dev eth0    #设置从eth0出且网关为a.b.c.d的默认路由
-sudo route del/add -net a.b.c.d/24 dev eth0        #对a.b.c.d/24网络，从eth0口出
-sudo route del/add -host a.b.c.d dev eth0        #对a.b.c.d的主机，从eth0出</code></pre>
+        <h1 id="vim的使用"><a href="#vim的使用" class="headerlink" title="vim的使用"></a>vim的使用</h1><p>当远程连接服务器进行代码或文本的修改时，vim就成了我的首选。以下介绍下我个人使用vim的心得。</p>
+<h2 id="vim安装"><a href="#vim安装" class="headerlink" title="vim安装"></a>vim安装</h2><p>首先是安装vim</p>
+<pre><code>sudo apt-get update            #一般不需要这步            
+sudo apt-get install vim</code></pre><h2 id="vim配置"><a href="#vim配置" class="headerlink" title="vim配置"></a>vim配置</h2><p>vim的强大之处在于可以通过vimscript自由地配置vim，有些大神甚至将vim配置成了IDE。<br>vim配置文件有两个，均需自己主动创建。</p>
+<ul>
+<li>~/.vimrc：针对当前用户</li>
+<li>/etc/vimrc：针对所有用户</li>
+</ul>
+<p>我个人的vim配置如下：</p>
+<pre><code>syntax on
+syntax enable
+set backgrount=dark
+set nocompatible
+set nu
+set cursorline
+filetype on
+set autoindent
+set smartindent
+filetype indent on
+set softtabstop=4
+set shiftwidth=4
+set smarttab
+set mouse=a
+set showmatch
+set encoding=utf-8</code></pre><p>基本上这样的设置已经够用了</p>
+<h2 id="vim使用"><a href="#vim使用" class="headerlink" title="vim使用"></a>vim使用</h2><p>关于vim的四种模式就不一一介绍了，下面介绍一下vim的一些常用命令：</p>
+<ul>
+<li>正常模式下：<ul>
+<li>ctrl+f下翻一屏，ctrl+b上翻一屏</li>
+<li>ctrl+d下翻半屏，ctrl+u上翻半屏</li>
+<li>zz将当前行移动到屏幕中央，zt移动到屏幕顶端，zb移动到屏幕底部</li>
+<li>o在下方插入一行，O在上方插入一行。</li>
+<li>/xxx在后面的文本中查找xxx，？xxx在前面的文本中查找xxx</li>
+<li>n向后查找下一个，N向前查找下一个</li>
+<li><blockquote>
+<blockquote>
+<p>向右缩进一个shiftwidth，&lt;&lt;向左缩进一个shiftwidth。</p>
+</blockquote>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>命令模式下<ul>
+<li>:n移动到第n行，:$移到到最后一行</li>
+<li>:s/old/new用new替换当前行第一个old</li>
+<li>:s/old/new/g用new替换当前行所有old</li>
+<li>:n1,n2s/old/new/g用new替换n1行到n2行的所有old</li>
+<li>:%s/old/new/g用new替换文件中所有的old</li>
+<li>:%s/^/add/g在每一行首部添加add</li>
+<li>:%s/$/add/g在每一行尾部添加add</li>
+<li>:%s/old/new/g（c|i)加c代表需要确认，加i代表忽略大小写</li>
+<li>:%g/pattern/command比如给:%g/^xyz/normal dd</li>
+</ul>
+</li>
+<li>可视模式：<ul>
+<li>y复制，p在光标之后粘贴，P在光标之前粘贴。</li>
+</ul>
+</li>
+</ul>
+
       
     </div>
     
@@ -375,8 +420,6 @@ sudo route del/add -host a.b.c.d dev eth0        #对a.b.c.d的主机，从eth0�
           
             <a href="/tags/ubuntu/" rel="tag"><i class="fa fa-tag"></i>ubuntu</a>
           
-            <a href="/tags/%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE/" rel="tag"><i class="fa fa-tag"></i>网络配置</a>
-          
         </div>
       
 
@@ -388,8 +431,8 @@ sudo route del/add -host a.b.c.d dev eth0        #对a.b.c.d的主机，从eth0�
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/11/19/ssh/" rel="next" title="SSH的妙用">
-                <i class="fa fa-chevron-left"></i> SSH的妙用
+              <a href="/2019/11/19/network_config/" rel="next" title="Ubuntu网络配置">
+                <i class="fa fa-chevron-left"></i> Ubuntu网络配置
               </a>
             
           </div>
@@ -397,10 +440,6 @@ sudo route del/add -host a.b.c.d dev eth0        #对a.b.c.d的主机，从eth0�
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/11/27/vim/" rel="prev" title="vim使用">
-                vim使用 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -536,7 +575,7 @@ sudo route del/add -host a.b.c.d dev eth0        #对a.b.c.d的主机，从eth0�
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ubuntu网络配置"><span class="nav-number">1.</span> <span class="nav-text">Ubuntu网络配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用ifconfig"><span class="nav-number">1.1.</span> <span class="nav-text">使用ifconfig</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用网卡配置文件"><span class="nav-number">1.2.</span> <span class="nav-text">使用网卡配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续路由配置"><span class="nav-number">1.3.</span> <span class="nav-text">后续路由配置</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#vim的使用"><span class="nav-number">1.</span> <span class="nav-text">vim的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vim安装"><span class="nav-number">1.1.</span> <span class="nav-text">vim安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim配置"><span class="nav-number">1.2.</span> <span class="nav-text">vim配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim使用"><span class="nav-number">1.3.</span> <span class="nav-text">vim使用</span></a></li></ol></li></ol></div>
             
 
           </div>
