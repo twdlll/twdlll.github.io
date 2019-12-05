@@ -91,7 +91,7 @@
 <meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;lease.png">
 <meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;consistency_model.png">
 <meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;gfsdemo_result.png">
-<meta property="og:updated_time" content="2019-12-05T12:34:55.418Z">
+<meta property="og:updated_time" content="2019-12-05T15:03:49.067Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;gfs&#x2F;gfs_architecture.png">
 
@@ -291,7 +291,7 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2019-12-05T20:34:55+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2019-12-05T23:03:49+08:00">
                 2019-12-05
               </time>
             
@@ -367,24 +367,22 @@
 </li>
 </ul>
 <ul>
-<li><p>优点：</p>
-<ul>
+<li>优点：<ul>
 <li>当chunk size较大时，可以减少client和master的交互次数。比如client申请读read(‘1.txt’, 0), read(‘1.txt’, 4096), read(‘1.txt’, 128000),这三次读请求都在1.txt中的第一个chunk，所以实质上client只与master进行了一起交互，即请求1.txt的第一个chunk的位置信息。</li>
 <li>chunk越大，那么在该chunk上执行的操作也就越多，那么可以通过持久性TCP连接来减少网络开销。</li>
 <li>减少了存储在master中的metadata的大小。比如所有文件大小总和是2560M，如果将chunk size设为32M，则需要80个chunk，也就是80个对应metadata；将chunk size设为64M，则只需要40个chunk，metadata的数量减少了一半。越少的metadata就意味着能将其直接放在master的内存，这样能加快master对client请求的响应速度。</li>
 </ul>
 </li>
-<li><p>缺点：</p>
-<ul>
-<li>chunk size越大，也就是说很多小文件可能只有一个chunk，那么如果多个client同时访问这个文件，那么存有该chunk的chunkserver将面临高额的负载，即hot spots问题。对于这个问题，google的做法是对于这种chunk进行更多的备份，并且使批处理队列系统错开应用程序的启动时间。另外，google也认为允许client从其他client读取数据可能会是一个长期方法。<h4 id="Metadata"><a href="#Metadata" class="headerlink" title="Metadata"></a>Metadata</h4>GFS master存储着三种metadata：  </li>
+<li>缺点：<ul>
+<li>chunk size越大，也就是说很多小文件可能只有一个chunk，那么如果多个client同时访问这个文件，那么存有该chunk的chunkserver将面临高额的负载，即hot spots问题。对于这个问题，google的做法是对于这种chunk进行更多的备份，并且使批处理队列系统错开应用程序的启动时间。另外，google也认为允许client从其他client读取数据可能会是一个长期方法。</li>
 </ul>
 </li>
-<li><p>文件和chunk的namespaces：是文件系统的逻辑元数据，包括层级目录结构以及访问控制等</p>
-</li>
-<li><p>文件到chunk的映射关系：通过文件名查找到对应的chunks</p>
-</li>
-<li><p>每个chunk的位置信息：有几个副本，这些副本在哪些chunkserver上  </p>
-</li>
+</ul>
+<h4 id="Metadata"><a href="#Metadata" class="headerlink" title="Metadata"></a>Metadata</h4><p>GFS master存储着三种metadata：  </p>
+<ul>
+<li>文件和chunk的namespaces：是文件系统的逻辑元数据，包括层级目录结构以及访问控制等</li>
+<li>文件到chunk的映射关系：通过文件名查找到对应的chunks</li>
+<li>每个chunk的位置信息：有几个副本，这些副本在哪些chunkserver上  </li>
 </ul>
 <p>对于前两者，master会记录到操作日志并复制到远端以保证其持久化。操作日志会存储在master和多台远程机器上，只有当operation log在master和远程机器上都写入成功后，master才会响应client的请求。<br>关于chunk的位置信息，master并不做持久化保存，因为chunkserver很容易出现宕机等故障。在每次master重启或者有新的chunkserver加入时，会要求对应的chunkserver汇报其包含的chunk信息。<br>对于metadata，master将其全部存在内存中，这样做的好处在于读取和更新metadata的速度很快。至于master的内存会不会成为系统的瓶颈，因为一个64MB的chunk的metadata不会超过64B，因此64G内存的master可容纳1Gchunk的metadata，如果内存真的成为瓶颈，也可以通过增加内存来解决。</p>
 <h3 id="System-Interactions"><a href="#System-Interactions" class="headerlink" title="System Interactions"></a>System Interactions</h3><p>这部分主要讲解GFS的交互过程。</p>
