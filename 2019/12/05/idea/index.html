@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="ubuntu,ssh," />
+  <meta name="keywords" content="idea," />
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="SSH的妙用Secure Shell(安全外壳协议，简称SSH)是一种加密的网络传输协议，可在网络中建立安全隧道来实现SSH客户端与服务器之间的连接。反正好用就完事了。下面介绍一下SSH的使用，以下命令均在ubuntu下测试通过。 SSH的安装虽然可以只安装SSH客户端，但还是建议同时安装SSH服务端。安装命令如下： sudo apt-get install openssh-server">
-<meta name="keywords" content="ubuntu,ssh">
+<meta name="description" content="idea目录结构idea的目录结构分为五部分：  Sources:这个目录下主要存放源代码。 Tests:这个目录下也存放着源代码，只不过是测试源代码。 Resources:这个目录下存放着资源文件，包括图片和xml等。 Test Resources:这个目录下存放着测试所需要的资源文件。 Excluded:排除该文件夹，使该目录下的源码失效，不参与编译。  如何将目录设置为指定类型有两种方法：">
+<meta name="keywords" content="idea">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SSH的妙用">
-<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;11&#x2F;19&#x2F;ssh&#x2F;index.html">
+<meta property="og:title" content="idea常见问题">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;12&#x2F;05&#x2F;idea&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="SSH的妙用Secure Shell(安全外壳协议，简称SSH)是一种加密的网络传输协议，可在网络中建立安全隧道来实现SSH客户端与服务器之间的连接。反正好用就完事了。下面介绍一下SSH的使用，以下命令均在ubuntu下测试通过。 SSH的安装虽然可以只安装SSH客户端，但还是建议同时安装SSH服务端。安装命令如下： sudo apt-get install openssh-server">
+<meta property="og:description" content="idea目录结构idea的目录结构分为五部分：  Sources:这个目录下主要存放源代码。 Tests:这个目录下也存放着源代码，只不过是测试源代码。 Resources:这个目录下存放着资源文件，包括图片和xml等。 Test Resources:这个目录下存放着测试所需要的资源文件。 Excluded:排除该文件夹，使该目录下的源码失效，不参与编译。  如何将目录设置为指定类型有两种方法：">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;images&#x2F;ssh&#x2F;ssh.png">
-<meta property="og:updated_time" content="2019-12-07T13:50:44.543Z">
+<meta property="og:image" content="&#x2F;images&#x2F;idea&#x2F;idea_dirs.png">
+<meta property="og:updated_time" content="2019-12-07T13:55:02.619Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;ssh&#x2F;ssh.png">
+<meta name="twitter:image" content="&#x2F;images&#x2F;idea&#x2F;idea_dirs.png">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https//twdlll.github.io/2019/11/19/ssh/"/>
+  <link rel="canonical" href="https//twdlll.github.io/2019/12/05/idea/"/>
 
 
 
 
 
-  <title>SSH的妙用 | Twd's Home</title>
+  <title>idea常见问题 | Twd's Home</title>
   
 
 
@@ -243,7 +243,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2019/11/19/ssh/">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2019/12/05/idea/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Twd">
@@ -260,7 +260,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">SSH的妙用</h1>
+          <h1 class="post-title" itemprop="name headline">idea常见问题</h1>
         
 
         <div class="post-meta">
@@ -272,8 +272,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-19T00:00:00+08:00">
-                2019-11-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-05T00:00:00+08:00">
+                2019-12-05
               </time>
             
 
@@ -288,7 +288,7 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2019-12-07T21:50:44+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2019-12-07T21:55:02+08:00">
                 2019-12-07
               </time>
             
@@ -349,40 +349,28 @@
       
 
       
-        <h1 id="SSH的妙用"><a href="#SSH的妙用" class="headerlink" title="SSH的妙用"></a>SSH的妙用</h1><p>Secure Shell(安全外壳协议，简称SSH)是一种加密的网络传输协议，可在网络中建立安全隧道来实现SSH客户端与服务器之间的连接。<br>反正好用就完事了。下面介绍一下SSH的使用，以下命令均在ubuntu下测试通过。</p>
-<h2 id="SSH的安装"><a href="#SSH的安装" class="headerlink" title="SSH的安装"></a>SSH的安装</h2><p>虽然可以只安装SSH客户端，但还是建议同时安装SSH服务端。安装命令如下：</p>
-<pre><code>sudo apt-get install openssh-server        #安装服务端
-sudo apt-get install openssh-client        #安装客户端</code></pre><h2 id="SSH服务端启动"><a href="#SSH服务端启动" class="headerlink" title="SSH服务端启动"></a>SSH服务端启动</h2><p>如果希望别人能通过SSH连接到你的服务器，那么首先要开启sshd服务。<br>先检查一下是否已经开启sshd服务：<br><img src="/images/ssh/ssh.png" alt=""><br>如果没开则开启sshd服务：</p>
-<pre><code>sudo /etc/init.d/ssh restart</code></pre><h2 id="SSH正向连接"><a href="#SSH正向连接" class="headerlink" title="SSH正向连接"></a>SSH正向连接</h2><p>正向连接的应用场景是B开启sshd服务，A使用ssh连接B。<br>连接命令如下：</p>
-<pre><code>ssh -p xxx username@ip
-# p指定的是ssh连接的端口,默认是22
-# username是ssh服务器的用户名
-# ip是ssh服务器的ip地址
-
-ssh twd@192.168.1.2</code></pre><h2 id="SSH反向连接"><a href="#SSH反向连接" class="headerlink" title="SSH反向连接"></a>SSH反向连接</h2><p>为什么需要反向连接呢？假设A为内网机器，B为外网机器，那么A正向连接到B是可行的，但是从B正向连接到A是不行的，因为B根本无法通过A的内网ip找到A。所以就需要反向连接：<br>首先在A中输入以下命令</p>
-<pre><code>ssh -fNTR 8888:localhost:22 user_b@ip_b #是将B主机的8888端口转发到A主机的22端口</code></pre><p>在B主机中输入</p>
-<pre><code>ssh -p 8888 user_a@localhost    #注意是user_a</code></pre><p>就可以连上了。  </p>
-<h2 id="SSH反向连接的维持"><a href="#SSH反向连接的维持" class="headerlink" title="SSH反向连接的维持"></a>SSH反向连接的维持</h2><p>SSH是会超时关闭的。所以需要有一种方法维持隧道的连接：<br>安装autossh</p>
-<pre><code>sudo apt-get install autossh</code></pre><p>在A中输入</p>
-<pre><code>autossh -p 22 -M 6777 -NR 8888:localhost:22 user_b@ip_b        #-M用于监听隧道的状态</code></pre><p>在B中输入以下命令，即可连接</p>
-<pre><code>ssh -p 8888 user_a@localhost    #注意是user_a</code></pre><h2 id="SSH配置文件"><a href="#SSH配置文件" class="headerlink" title="SSH配置文件"></a>SSH配置文件</h2><p>SSH有很多配置选项，可以从以下文件配置：</p>
-<pre><code>用户配置文件~/.ssh/config
-系统配置文件/etc/ssh/ssh_config</code></pre><p>具体配置我就不多说了，记得配置修改后重启ssh服务：</p>
-<pre><code>sudo /etc/init.d/ssh restart</code></pre><h2 id="SSH筛选用户"><a href="#SSH筛选用户" class="headerlink" title="SSH筛选用户"></a>SSH筛选用户</h2><p>可通过修改/etc/hosts.allow和/etc/hosts.deny两个文件进行修改</p>
-<pre><code>#在/etc/hosts.allow中添加
-sshd:ALL            #允许所有人连接
-sshd:192.168.3.2    #允许192.168.3.2连接</code></pre><p>在/etc/hosts.deny中也是同理，修改完成后还是要重启ssh服务。</p>
-<h2 id="SSH可能出现的问题"><a href="#SSH可能出现的问题" class="headerlink" title="SSH可能出现的问题"></a>SSH可能出现的问题</h2><p>有的时候会出现连不上ssh的情况，大概有以下几种情况：  </p>
+        <h1 id="idea目录结构"><a href="#idea目录结构" class="headerlink" title="idea目录结构"></a>idea目录结构</h1><p><img src="/images/idea/idea_dirs.png" alt=""><br>idea的目录结构分为五部分：</p>
+<ul>
+<li>Sources:这个目录下主要存放源代码。</li>
+<li>Tests:这个目录下也存放着源代码，只不过是测试源代码。</li>
+<li>Resources:这个目录下存放着资源文件，包括图片和xml等。</li>
+<li>Test Resources:这个目录下存放着测试所需要的资源文件。</li>
+<li>Excluded:排除该文件夹，使该目录下的源码失效，不参与编译。</li>
+</ul>
+<p>如何将目录设置为指定类型有两种方法：</p>
 <ol>
-<li>服务器端的sshd服务未开启（重启ssh服务即可）</li>
-<li>ssh访问受限，即服务器上的ssh只对部分ip开放（修改配置文件）</li>
-<li>防火墙关闭了ssh的端口</li>
+<li>选定文件夹，右键选择Mark Directory as, 然后选择指定文件夹。</li>
+<li>打开file选项，选择Project Structure，然后在modules选项卡中就可以进行标记。</li>
 </ol>
-<p>针对第三种情况，直接配置iptables比较复杂，这里推荐使用ufw（uncomplicated firewall，简单防火墙)。<br>ufw大部分情况下只需要以下三行命令即可：</p>
-<pre><code>sudo apt-get install ufw
-sudo ufw enable            #启动防火墙
-sudo ufw default deny    #默认全部拒绝</code></pre><p>需要打开ssh的22端口时：</p>
-<pre><code>sudo ufw allow 22</code></pre>
+<p>idea的目录结构跟maven的对应关系为：idea的Sources和Resources目录会转入target/classes目录，Tests和Test Resources目录会转入target/test-classes目录。</p>
+<h1 id="源发行版-8-需要目标发行版1-8"><a href="#源发行版-8-需要目标发行版1-8" class="headerlink" title="源发行版 8 需要目标发行版1.8"></a>源发行版 8 需要目标发行版1.8</h1><p>版本问题，检查下列设置：</p>
+<ul>
+<li>Project Structure中的Project SDK和Project language level一致</li>
+<li>Project Structure中Modules的language level一致。</li>
+<li>Settings下的Java Compiler中的Target bytecode version一致。</li>
+<li>pom.xml中的maven.compiler.source和maven.compiler.target一致</li>
+</ul>
+
       
     </div>
     
@@ -399,9 +387,7 @@ sudo ufw default deny    #默认全部拒绝</code></pre><p>需要打开ssh的22
       
         <div class="post-tags">
           
-            <a href="/tags/ubuntu/" rel="tag"><i class="fa fa-tag"></i>ubuntu</a>
-          
-            <a href="/tags/ssh/" rel="tag"><i class="fa fa-tag"></i>ssh</a>
+            <a href="/tags/idea/" rel="tag"><i class="fa fa-tag"></i>idea</a>
           
         </div>
       
@@ -414,15 +400,15 @@ sudo ufw default deny    #默认全部拒绝</code></pre><p>需要打开ssh的22
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2019/12/04/gfs/" rel="next" title="GFS分析">
+                <i class="fa fa-chevron-left"></i> GFS分析
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/11/19/network_config/" rel="prev" title="Ubuntu网络配置">
-                Ubuntu网络配置 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -558,7 +544,7 @@ sudo ufw default deny    #默认全部拒绝</code></pre><p>需要打开ssh的22
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSH的妙用"><span class="nav-number">1.</span> <span class="nav-text">SSH的妙用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH的安装"><span class="nav-number">1.1.</span> <span class="nav-text">SSH的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH服务端启动"><span class="nav-number">1.2.</span> <span class="nav-text">SSH服务端启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH正向连接"><span class="nav-number">1.3.</span> <span class="nav-text">SSH正向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接"><span class="nav-number">1.4.</span> <span class="nav-text">SSH反向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接的维持"><span class="nav-number">1.5.</span> <span class="nav-text">SSH反向连接的维持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH配置文件"><span class="nav-number">1.6.</span> <span class="nav-text">SSH配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH筛选用户"><span class="nav-number">1.7.</span> <span class="nav-text">SSH筛选用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH可能出现的问题"><span class="nav-number">1.8.</span> <span class="nav-text">SSH可能出现的问题</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#idea目录结构"><span class="nav-number">1.</span> <span class="nav-text">idea目录结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源发行版-8-需要目标发行版1-8"><span class="nav-number">2.</span> <span class="nav-text">源发行版 8 需要目标发行版1.8</span></a></li></ol></div>
             
 
           </div>
