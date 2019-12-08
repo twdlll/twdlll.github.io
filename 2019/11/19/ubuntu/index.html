@@ -88,7 +88,7 @@
 <meta property="og:description" content="Ubuntu网络配置对平时命令行配置网络进行一下总结 使用ifconfig直接使用命令进行网卡ip、掩码的配置 sudo ifconfig eth0 192.168.1.2 netmask 255.255.255.0 #将eth0的ip配置为192.168.1.2使用网卡配置文件编辑&#x2F;etc&#x2F;network&#x2F;interfaces文件进行配置 #在文件中添加 auto eth0 iface eth0">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;ubuntu&#x2F;ssh&#x2F;ssh.png">
-<meta property="og:updated_time" content="2019-12-08T04:27:10.091Z">
+<meta property="og:updated_time" content="2019-12-08T16:52:38.056Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;ubuntu&#x2F;ssh&#x2F;ssh.png">
 
@@ -288,8 +288,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2019-12-08T12:27:10+08:00">
-                2019-12-08
+              <time title="更新于" itemprop="dateModified" datetime="2019-12-09T00:52:38+08:00">
+                2019-12-09
               </time>
             
           </span>
@@ -356,9 +356,22 @@
 <pre><code>#在文件中添加
 auto eth0
 iface eth0 inet static
-address 192.168.1.2
+address 192.168.33.2
 netmask 255.255.255.0
-gateway 192.168.1.1</code></pre><p>然后保存重启机器，有些博客说是只需要重启网络服务，但是我之前尝试了下好像不行。</p>
+network 192.168.33.0
+boardcast 192.168.33.255
+gateway 192.168.33.1
+up route add default gw 192.168.33.1 # 可在网卡启动时添加路由表项
+dns-nameservers 192.168.33.3</code></pre><p>对于ubuntu Server版可直接sudo /etc/init.d/networking restart更新网卡配置。而对于ubuntu Desktop版则会发现直接重启网络服务并不会改变网卡的配置，原因是跟NetworkManager的配置产生了冲突。  </p>
+<pre><code># /etc/NetworkManager/NetworkManager.conf如下
+[main]
+plugins=ifupdown,keyfile,ofono
+dns=dnsmasq
+
+no-auto-default=xx:xx:xx:xx:xx:xx,
+
+[ifupdown]
+managed=true</code></pre><p>只需要在no-auto-default=后面去掉对应eth0的网卡mac，然后sudo service network-manager restart就可以更新到配置（有时候需要多试几次，所以在重启完最好查看下网卡ip等，看是否已经更新）。另外不建议修改成managed=false，毕竟对于桌面版，NetworkManager的确还是挺方便的。</p>
 <h2 id="后续路由配置"><a href="#后续路由配置" class="headerlink" title="后续路由配置"></a>后续路由配置</h2><p>配置好网络地址之后，最后检查下路由表，确保能通</p>
 <pre><code>route -n        #显示不解析的路由表
 sudo route del/add default gw a.b.c.d dev eth0    #设置从eth0出且网关为a.b.c.d的默认路由
