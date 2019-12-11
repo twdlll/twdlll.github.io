@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MapReduce," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="MapReduce分析之前介绍了Google的GFS，链接为GFS 分析，现在介绍另外一驾马车MapReduce。  MapReduce编程模型MapReduce首先是一个编程模型，通过Map和Reduce函数，利用一个(key1, value1)的输入集合来产生（key2, value2)的输出集合。注意，这里的输入和输出集合的key不一定相同，特意用key1和key2标注出来了。map函数将输">
+<meta name="keywords" content="MapReduce">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MapReduce">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;12&#x2F;11&#x2F;mapreduce&#x2F;index.html">
+<meta property="og:site_name" content="Twd&#39;s Home">
+<meta property="og:description" content="MapReduce分析之前介绍了Google的GFS，链接为GFS 分析，现在介绍另外一驾马车MapReduce。  MapReduce编程模型MapReduce首先是一个编程模型，通过Map和Reduce函数，利用一个(key1, value1)的输入集合来产生（key2, value2)的输出集合。注意，这里的输入和输出集合的key不一定相同，特意用key1和key2标注出来了。map函数将输">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="&#x2F;images&#x2F;mapreduce&#x2F;execution_overview.png">
+<meta property="og:image" content="&#x2F;images&#x2F;mapreduce&#x2F;map_reduce.png">
+<meta property="og:updated_time" content="2019-12-11T14:26:56.085Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="&#x2F;images&#x2F;mapreduce&#x2F;execution_overview.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https//twdlll.github.io/2019/12/11/mapreduce/"/>
+
+
+
+
+
+  <title>MapReduce | Twd's Home</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Twd's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2019/12/11/mapreduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Twd">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Twd's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MapReduce</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-11T00:00:00+08:00">
+                2019-12-11
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2019-12-11T22:26:56+08:00">
+                2019-12-11
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index">
+                    <span itemprop="name">分布式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="MapReduce分析"><a href="#MapReduce分析" class="headerlink" title="MapReduce分析"></a>MapReduce分析</h1><p>之前介绍了Google的GFS，链接为<a href="https://twdlll.github.io/2019/12/04/gfs/#more" target="_blank" rel="noopener">GFS 分析</a>，现在介绍另外一驾马车MapReduce。 </p>
+<h2 id="MapReduce编程模型"><a href="#MapReduce编程模型" class="headerlink" title="MapReduce编程模型"></a>MapReduce编程模型</h2><p>MapReduce首先是一个编程模型，通过Map和Reduce函数，利用一个(key1, value1)的输入集合来产生（key2, value2)的输出集合。注意，这里的输入和输出集合的key不一定相同，特意用key1和key2标注出来了。map函数将输入集合变为中间集合，reduce函数将中间集合变为输出集合。下面使用一个MapReduce论文上的例子来进行说明：</p>
+<pre><code>map(String key, String value):
+    // key : document name
+    // value : document contents
+    for each word w in value:
+        EmitIntermediate(w, &quot;1&quot;);
+
+reduce(String key, Iterator values):
+    // key : a word
+    // values : a list of counts
+    int result = 0;
+    for each v in values:
+        result += ParseInt(v);
+    Emit(AsString(result));</code></pre><p>这个例子是统计多个文档中每个单词出现的次数，假设现有两个文件1.txt和2.txt，他们的内容如下：</p>
+<pre><code>1.txt : hello world hello world world
+2.txt : world hello world hello hello</code></pre><p>那个输入集合就是{(1.txt, 1.txt content), (2.txt, 2.txt content)},MapReduce的处理流程如下：</p>
+<ol>
+<li>map函数将输入集合转化为中间集合，中间集合内容为：{(“hello”, [“1”, “1”, “1”, “1”, “1”]), (“world”, [“1”, “1”, “1”, “1”, “1”]}</li>
+<li>reduce函数对中间集合进行遍历，得到输出集合{(“hello”, “5”), (“world”, “5”)}</li>
+</ol>
+<h2 id="MapReduce流程"><a href="#MapReduce流程" class="headerlink" title="MapReduce流程"></a>MapReduce流程</h2><p><img src="/images/mapreduce/execution_overview.png" alt=""><br>MapReduce的整体流程如上图所示（图片来源于MapReduce论文）：  </p>
+<ol>
+<li>用户程序首先调用MapReduce库将输入文件分为M个数据片段，每个数据片段的大小一般为16MB到64MB。然后在集群中创建大量的程序副本。</li>
+<li>这些程序副本中有一个非常特殊，它就是master。剩下的都是worker，执行由master分配的任务（包括M个map任务和R个reduce任务）。map会将一个map任务或reduce任务分配给空闲的worker。</li>
+<li>被分配到map任务的worker读取对应数据片段的内容（M个map任务和M个数据片段一一对应），从输入的数据片段中解析出key/value pair，然后传给用户定义的map函数进行执行，将中间结果缓存在内存中。</li>
+<li>缓存中的中间结果key/value pair通过分区函数分为R个区域，之后周期性地写入到本地磁盘。缓存的key/value pair在本地磁盘上的存储位置将被传给master，由master将这些位置告知给reduce worder。</li>
+<li>reduce worker收到master发来的数据存储信息后，使用rpc从map worker上读取这些缓存数据。当reduce worker读取了所有的中间数据后，通过对key进行排序使得具有相同key值的数据聚合在一起。由于许多不同的key值会映射到相同的reduce任务上，因此必须进行排序。如果中间数据太大无法在内存中完成排序，就需要在外部进行排序。</li>
+<li>reduce worker程序遍历中间数据后，对于每个唯一的key和其对应的中间value的集合交给用户定义的reduce函数进行执行。reduce函数的输出将被追加到所属分区的输出文件。</li>
+<li>所有map和reduce任务完成后，master唤醒用户程序，此时mapreduce才算调用完成。</li>
+</ol>
+<p>完成任务后，最后的结果仍是存放在R个输出文件中的（对应R个reduce任务）。一般情况下，这些输出文件不需要合并为一个文件。</p>
+<h2 id="MapReduce细节"><a href="#MapReduce细节" class="headerlink" title="MapReduce细节"></a>MapReduce细节</h2><p>这一部分主要是以问题形式来深入了解MapReduce的实现细节。</p>
+<h3 id="对M-R的划分"><a href="#对M-R的划分" class="headerlink" title="对M,R的划分"></a>对M,R的划分</h3><p>M指的是对输入数据划分为M块，并且对map过程划分为M个任务。R值的是对中间数据划分为R个分区，并且对reduce过程划分为R个。<br>论文中对M和R的考虑是，M和R应当比集群中worker的机器数量要多，这样每台机器都能执行大量不同任务来提高集群的动态负载均衡能力。合适的M，需要使得每一个独立任务都是处理16M到64M的输入数据（这样也能对每个map任务得到的中间结果缓存在内存中）。R值通常由用户指定，通常使用对应的分区函数（比如hash(key’) mod R）来对中间数据进行划分，从而输送至R个reduce任务。google通常会在2000台worker机器上，执行M=200000，R=5000的MapReduce任务。<br>这里我觉得对于M有更多的细节考虑：不恰当的划分过程可能会产生数据倾斜现象。比如有10个文件（其中1个10G，另外9个都是1G）要划分成10个块，完成单词统计，那么按文件数量来划分就会出现某个map任务要处理10G数据，远超其他map任务。所以按照实际的数据量来划分显然更恰当，但是在划分过程中需要注意划分的正确性，比如某次划分刚好将一个单词分成了两半，那么就会影响最后结果的正确性。</p>
+<h3 id="map任务和reduce任务是并行么？"><a href="#map任务和reduce任务是并行么？" class="headerlink" title="map任务和reduce任务是并行么？"></a>map任务和reduce任务是并行么？</h3><p>我对论文的理解是map和reduce之间不并行。回顾整个MapReduce的工作流程，可以看到reduce任务是读到所有属于该分区的中间数据中，才开始计算，如下图所示：<br><img src="/images/mapreduce/map_reduce.png" alt=""><br>这里以之前的例子细致说明了map任务和reduce任务的执行过程。图中略去了map任务向master汇报，再由master通知reduce的过程。这种工作模式的缺点在于map任务和reduce任务并不能同时执行，因为每个reduce任务都在等待特定分区的中间数据，而每个map任务都有可能有该分区的数据，所以需要一直等待所有map任务完成为止。map任务之间相互并行，每个map任务完成时，都会向master汇报分区数据对应的存储位置。master会将这些位置信息告诉给相应的reduce任务。<br>我认为这样设计可能是因为MapReduce完成的时间取决于最后一个map任务完成的时间和最后一个reduce任务完成的时间（因为map之间并行，reduce之间并行），并且这样设计实现起来也较为简单，如果考虑reduce和map之间的并行，需要考虑更加复杂的情况。</p>
+<h3 id="combiner函数的作用"><a href="#combiner函数的作用" class="headerlink" title="combiner函数的作用"></a>combiner函数的作用</h3><p>combiner函数的执行位置可见上图，一般等同于reduce函数。因为map生成的中间数据中key可能会有很大重复，所以相当于map先在本地进行一次reduce函数，压缩数据，从而节省了网络带宽资源。</p>
+<h3 id="输入数据是怎么送达worker机器"><a href="#输入数据是怎么送达worker机器" class="headerlink" title="输入数据是怎么送达worker机器"></a>输入数据是怎么送达worker机器</h3><p>其实MapReduce最好建立在GFS的基础上，这样本身GFS的每个chunk为64MB，且分布在不同的机器上，刚好可以当做map worker。当然也可以将原始数据划分后，通过网络送达到map worker，但是整个执行流程会很依赖于网络带宽。</p>
+<h3 id="master的作用"><a href="#master的作用" class="headerlink" title="master的作用"></a>master的作用</h3><p>master会存储每个map和reduce任务的状态（空闲、工作中或完成），以及worker机器的标识。并且其作为map和reduce的桥梁，将会把各个分区的位置信息传递给reduce任务。</p>
+<h3 id="work故障如何处理"><a href="#work故障如何处理" class="headerlink" title="work故障如何处理"></a>work故障如何处理</h3><p>master会定期ping worker，以此来判断worker的存活。一旦一定时间内没收到worker的回复，master就会认为这个worker已经死掉，然后这个work执行的map/reduce任务将会被重新标记为初始状态，交由其他worker完成。</p>
+<h3 id="落伍者"><a href="#落伍者" class="headerlink" title="落伍者"></a>落伍者</h3><p>影响一个MapReduce的总执行时间最通常的因素是“落伍者”：在运算过程中，如果有一台机器花了很久的时间才完成最后几个map或reduce任务，导致mapreduce操作的总执行时间超过预期。针对此，MapReduce的处理策略是当一个MapReduce操作接近完成的时候，master调度备用（backup）任务进程来执行剩下的且处于处理中状态（in-progress）的任务。无论是最初的执行进程、还是备用（backup）任务进程完成了任务，都会标记这个任务已经完成。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MapReduce/" rel="tag"><i class="fa fa-tag"></i>MapReduce</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/05/idea/" rel="next" title="idea相关">
+                <i class="fa fa-chevron-left"></i> idea相关
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar/me.jpg"
+                alt="Twd" />
+            
+              <p class="site-author-name" itemprop="name">Twd</p>
+              <p class="site-description motion-element" itemprop="description">There is no royal road to learning.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MapReduce分析"><span class="nav-number">1.</span> <span class="nav-text">MapReduce分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MapReduce编程模型"><span class="nav-number">1.1.</span> <span class="nav-text">MapReduce编程模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MapReduce流程"><span class="nav-number">1.2.</span> <span class="nav-text">MapReduce流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MapReduce细节"><span class="nav-number">1.3.</span> <span class="nav-text">MapReduce细节</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#对M-R的划分"><span class="nav-number">1.3.1.</span> <span class="nav-text">对M,R的划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map任务和reduce任务是并行么？"><span class="nav-number">1.3.2.</span> <span class="nav-text">map任务和reduce任务是并行么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#combiner函数的作用"><span class="nav-number">1.3.3.</span> <span class="nav-text">combiner函数的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输入数据是怎么送达worker机器"><span class="nav-number">1.3.4.</span> <span class="nav-text">输入数据是怎么送达worker机器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#master的作用"><span class="nav-number">1.3.5.</span> <span class="nav-text">master的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#work故障如何处理"><span class="nav-number">1.3.6.</span> <span class="nav-text">work故障如何处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#落伍者"><span class="nav-number">1.3.7.</span> <span class="nav-text">落伍者</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Twd</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
