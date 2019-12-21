@@ -79,16 +79,16 @@
 
 
 
-<meta name="description" content="Ubuntu网络配置对平时命令行配置网络进行一下总结 使用ifconfig直接使用命令进行网卡ip、掩码的配置 sudo ifconfig eth0 192.168.1.2 netmask 255.255.255.0 #将eth0的ip配置为192.168.1.2使用网卡配置文件编辑&#x2F;etc&#x2F;network&#x2F;interfaces文件进行配置 #在文件中添加 auto eth0 iface eth0">
+<meta name="description" content="Ubuntu内核更换1.查看当前安装的内核 dpkg -l | grep linux-image2.查看可以更新的内核版本 sudo apt-get search linux-image3.安装新内核 sudo apt-get install linux-image-3.16.0-30-generic linux-image-extra-3.16.0-30-generic4.更新grub引导 su">
 <meta name="keywords" content="ubuntu">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Ubuntu相关">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;11&#x2F;19&#x2F;ubuntu&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="Ubuntu网络配置对平时命令行配置网络进行一下总结 使用ifconfig直接使用命令进行网卡ip、掩码的配置 sudo ifconfig eth0 192.168.1.2 netmask 255.255.255.0 #将eth0的ip配置为192.168.1.2使用网卡配置文件编辑&#x2F;etc&#x2F;network&#x2F;interfaces文件进行配置 #在文件中添加 auto eth0 iface eth0">
+<meta property="og:description" content="Ubuntu内核更换1.查看当前安装的内核 dpkg -l | grep linux-image2.查看可以更新的内核版本 sudo apt-get search linux-image3.安装新内核 sudo apt-get install linux-image-3.16.0-30-generic linux-image-extra-3.16.0-30-generic4.更新grub引导 su">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;ubuntu&#x2F;ssh&#x2F;ssh.png">
-<meta property="og:updated_time" content="2019-12-08T16:52:38.056Z">
+<meta property="og:updated_time" content="2019-12-20T08:01:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;ubuntu&#x2F;ssh&#x2F;ssh.png">
 
@@ -288,8 +288,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2019-12-09T00:52:38+08:00">
-                2019-12-09
+              <time title="更新于" itemprop="dateModified" datetime="2019-12-20T16:01:24+08:00">
+                2019-12-20
               </time>
             
           </span>
@@ -349,7 +349,15 @@
       
 
       
-        <h1 id="Ubuntu网络配置"><a href="#Ubuntu网络配置" class="headerlink" title="Ubuntu网络配置"></a>Ubuntu网络配置</h1><p>对平时命令行配置网络进行一下总结</p>
+        <h1 id="Ubuntu内核更换"><a href="#Ubuntu内核更换" class="headerlink" title="Ubuntu内核更换"></a>Ubuntu内核更换</h1><p>1.查看当前安装的内核</p>
+<pre><code>dpkg -l | grep linux-image</code></pre><p>2.查看可以更新的内核版本</p>
+<pre><code>sudo apt-get search linux-image</code></pre><p>3.安装新内核</p>
+<pre><code>sudo apt-get install linux-image-3.16.0-30-generic linux-image-extra-3.16.0-30-generic</code></pre><p>4.更新grub引导</p>
+<pre><code>sudo update-grub</code></pre><p>5.设置grub配置，就可以在开机时选择内核了，当然也可以直接选择启动的内核。</p>
+<pre><code>/etc/default/grub
+GRUB_HIDDEN_TIMEOUT=10
+GRUB_HIDDEN_TIMEOUT_QUIET=false</code></pre><p>6.重启后选择内核，进入系统后安装内核头文件</p>
+<pre><code>sudo apt-get install linux-headers-$(uname -r) build-essential</code></pre><h1 id="Ubuntu网络配置"><a href="#Ubuntu网络配置" class="headerlink" title="Ubuntu网络配置"></a>Ubuntu网络配置</h1><p>对平时命令行配置网络进行一下总结</p>
 <h2 id="使用ifconfig"><a href="#使用ifconfig" class="headerlink" title="使用ifconfig"></a>使用ifconfig</h2><p>直接使用命令进行网卡ip、掩码的配置</p>
 <pre><code>sudo ifconfig eth0 192.168.1.2 netmask 255.255.255.0
 #将eth0的ip配置为192.168.1.2</code></pre><h2 id="使用网卡配置文件"><a href="#使用网卡配置文件" class="headerlink" title="使用网卡配置文件"></a>使用网卡配置文件</h2><p>编辑/etc/network/interfaces文件进行配置</p>
@@ -447,8 +455,12 @@ ssh twd@192.168.1.2</code></pre><h2 id="SSH反向连接"><a href="#SSH反向连�
 <pre><code>sudo apt-get install autossh</code></pre><p>在A中输入</p>
 <pre><code>autossh -p 22 -M 6777 -NR 8888:localhost:22 user_b@ip_b        #-M用于监听隧道的状态</code></pre><p>在B中输入以下命令，即可连接</p>
 <pre><code>ssh -p 8888 user_a@localhost    #注意是user_a</code></pre><h2 id="SSH配置文件"><a href="#SSH配置文件" class="headerlink" title="SSH配置文件"></a>SSH配置文件</h2><p>SSH有很多配置选项，可以从以下文件配置：</p>
-<pre><code>用户配置文件~/.ssh/config
-系统配置文件/etc/ssh/ssh_config</code></pre><p>具体配置我就不多说了，记得配置修改后重启ssh服务：</p>
+<pre><code>客户端 /etc/ssh/ssh_config
+服务端 /etc/ssh/sshd_config</code></pre><p>这里简单提一个常用的配置，即通过心跳包维持ssh的连接，在sshd_config文件中添加：</p>
+<pre><code>ClientAliveInterval 30
+ClientAliveCountMax 3</code></pre><p>其意思就是每隔30秒由服务端向客户端发送一个心跳包，当未响应的心跳包达到3时，就断开连接。如果没有服务端权限，可在客户端设置：</p>
+<pre><code>TCPKeepAlive yes
+ServerAliveInterval 30</code></pre><p>其他配置就不多说了，记得配置修改后重启ssh服务：</p>
 <pre><code>sudo /etc/init.d/ssh restart</code></pre><h2 id="SSH筛选用户"><a href="#SSH筛选用户" class="headerlink" title="SSH筛选用户"></a>SSH筛选用户</h2><p>可通过修改/etc/hosts.allow和/etc/hosts.deny两个文件进行修改</p>
 <pre><code>#在/etc/hosts.allow中添加
 sshd:ALL            #允许所有人连接
@@ -637,7 +649,7 @@ sudo ufw default deny    #默认全部拒绝</code></pre><p>需要打开ssh的22
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ubuntu网络配置"><span class="nav-number">1.</span> <span class="nav-text">Ubuntu网络配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用ifconfig"><span class="nav-number">1.1.</span> <span class="nav-text">使用ifconfig</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用网卡配置文件"><span class="nav-number">1.2.</span> <span class="nav-text">使用网卡配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续路由配置"><span class="nav-number">1.3.</span> <span class="nav-text">后续路由配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vim的使用"><span class="nav-number">2.</span> <span class="nav-text">vim的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vim安装"><span class="nav-number">2.1.</span> <span class="nav-text">vim安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim配置"><span class="nav-number">2.2.</span> <span class="nav-text">vim配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim使用"><span class="nav-number">2.3.</span> <span class="nav-text">vim使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSH的使用"><span class="nav-number">3.</span> <span class="nav-text">SSH的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH的安装"><span class="nav-number">3.1.</span> <span class="nav-text">SSH的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH服务端启动"><span class="nav-number">3.2.</span> <span class="nav-text">SSH服务端启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH正向连接"><span class="nav-number">3.3.</span> <span class="nav-text">SSH正向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接"><span class="nav-number">3.4.</span> <span class="nav-text">SSH反向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接的维持"><span class="nav-number">3.5.</span> <span class="nav-text">SSH反向连接的维持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH配置文件"><span class="nav-number">3.6.</span> <span class="nav-text">SSH配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH筛选用户"><span class="nav-number">3.7.</span> <span class="nav-text">SSH筛选用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH可能出现的问题"><span class="nav-number">3.8.</span> <span class="nav-text">SSH可能出现的问题</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ubuntu内核更换"><span class="nav-number">1.</span> <span class="nav-text">Ubuntu内核更换</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ubuntu网络配置"><span class="nav-number">2.</span> <span class="nav-text">Ubuntu网络配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用ifconfig"><span class="nav-number">2.1.</span> <span class="nav-text">使用ifconfig</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用网卡配置文件"><span class="nav-number">2.2.</span> <span class="nav-text">使用网卡配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续路由配置"><span class="nav-number">2.3.</span> <span class="nav-text">后续路由配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vim的使用"><span class="nav-number">3.</span> <span class="nav-text">vim的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vim安装"><span class="nav-number">3.1.</span> <span class="nav-text">vim安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim配置"><span class="nav-number">3.2.</span> <span class="nav-text">vim配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim使用"><span class="nav-number">3.3.</span> <span class="nav-text">vim使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSH的使用"><span class="nav-number">4.</span> <span class="nav-text">SSH的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH的安装"><span class="nav-number">4.1.</span> <span class="nav-text">SSH的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH服务端启动"><span class="nav-number">4.2.</span> <span class="nav-text">SSH服务端启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH正向连接"><span class="nav-number">4.3.</span> <span class="nav-text">SSH正向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接"><span class="nav-number">4.4.</span> <span class="nav-text">SSH反向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接的维持"><span class="nav-number">4.5.</span> <span class="nav-text">SSH反向连接的维持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH配置文件"><span class="nav-number">4.6.</span> <span class="nav-text">SSH配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH筛选用户"><span class="nav-number">4.7.</span> <span class="nav-text">SSH筛选用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH可能出现的问题"><span class="nav-number">4.8.</span> <span class="nav-text">SSH可能出现的问题</span></a></li></ol></li></ol></div>
             
 
           </div>
