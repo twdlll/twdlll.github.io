@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="sdn,pof," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="动机写这个项目主要是因为两个原因：  这个项目的前身(pnpl-c)是实验室的祖传项目，是用C语言写的，自己后来也在这个原型上面进行过一些扩展。在使用过程中，我发现了pnpl-c存在的一些问题，包括一些bug和没有妥善考虑的地方，所以想写一版更加完善的pnpl。并且，因为自己的主要开发语言是java，也想用一个所以想用java对pnpl-c进行重写。 自己的毕业论文准备做容错控制器，所以想在pnp">
+<meta name="keywords" content="sdn,pof">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PNPL（POF控制器）">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;03&#x2F;07&#x2F;pnpl&#x2F;index.html">
+<meta property="og:site_name" content="Twd&#39;s Home">
+<meta property="og:description" content="动机写这个项目主要是因为两个原因：  这个项目的前身(pnpl-c)是实验室的祖传项目，是用C语言写的，自己后来也在这个原型上面进行过一些扩展。在使用过程中，我发现了pnpl-c存在的一些问题，包括一些bug和没有妥善考虑的地方，所以想写一版更加完善的pnpl。并且，因为自己的主要开发语言是java，也想用一个所以想用java对pnpl-c进行重写。 自己的毕业论文准备做容错控制器，所以想在pnp">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="&#x2F;images&#x2F;pnpl&#x2F;pnpl_architecture.png">
+<meta property="og:image" content="&#x2F;images&#x2F;pnpl&#x2F;policy.png">
+<meta property="og:image" content="&#x2F;images&#x2F;pnpl&#x2F;start.png">
+<meta property="og:image" content="&#x2F;images&#x2F;pnpl&#x2F;mininet.png">
+<meta property="og:updated_time" content="2020-03-07T13:13:06.780Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="&#x2F;images&#x2F;pnpl&#x2F;pnpl_architecture.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https//twdlll.github.io/2020/03/07/pnpl/"/>
+
+
+
+
+
+  <title>PNPL（POF控制器） | Twd's Home</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Twd's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/03/07/pnpl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Twd">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Twd's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PNPL（POF控制器）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-07T00:00:00+08:00">
+                2020-03-07
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-03-07T21:13:06+08:00">
+                2020-03-07
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%88%91%E7%9A%84%E7%BB%8F%E5%8E%86/" itemprop="url" rel="index">
+                    <span itemprop="name">我的经历</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h1><p>写这个项目主要是因为两个原因：</p>
+<ol>
+<li>这个项目的前身(pnpl-c)是实验室的祖传项目，是用C语言写的，自己后来也在这个原型上面进行过一些扩展。在使用过程中，我发现了pnpl-c存在的一些问题，包括一些bug和没有妥善考虑的地方，所以想写一版更加完善的pnpl。并且，因为自己的主要开发语言是java，也想用一个所以想用java对pnpl-c进行重写。</li>
+<li>自己的毕业论文准备做容错控制器，所以想在pnpl-c的功能基础上扩展容错能力，包括应对拓扑变化，流表管理,控制器单点故障等。</li>
+</ol>
+<p>基于这两个原因，就有了pnpl-java这个项目，以下简称pnpl。</p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>pnpl是一个应用于SDN（Software Defined Networking）领域的控制器，使用POF（Protocol-Oblivious Forwarding）协议管理POF交换机。<br>可能大家不太清楚SDN到底什么，我在这里简单介绍一下。</p>
+<ul>
+<li>当前传统计算机网络以大量的路由器、交换机和其他网络设备作为物理基础设施，并在其上支撑着各种复杂的协议。每次适配新协议，网络运营商就需要重新配置网络设备，十分繁琐且容易出错。也因为这个原因，从TCP/IP协议族诞生以来，之后网络新协议的研究变得迟缓僵化，难以发展。</li>
+<li>SDN则是将交换设备从变为可编程交换机，将控制与转发分离。可编程交换机负责转发数据包，而具体的转发行为则由控制器下发。也就是说，一开始交换机并没有支持任何协议的功能，只有当控制器下发流表后，交换机才能对数据包进行流表匹配，从而执行特定的转发动作。</li>
+</ul>
+<p>可以看到，SDN是灵活的，通过向交换机下发新流表就可以使网络适配新协议，配置轻松简单。另外，相对于传统网络的分布式架构（每个网络设备都是单独个体，单独处理流入的数据包），SDN是集中式架构，能提供网络的统一视图，对于网络资源的分配和优化具有巨大的潜力。<br>个人认为，将传统网络全部替换为SDN网络是不现实的，SDN的最合适的应用场景还是数据中心（Fackbook和Google都在他们的数据中心使用了SDN网络），不管是流量工程还是某些特殊场景，都可以通过灵活配置得以实现。<br>而POF协议是一种SDN控制器与交换机之间的交互协议，其最大特点就是将数据包中的各个域都表达为（offset，length），使得交换机能够处理自定义协议。</p>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p>pnpl可以通过用户提供的数据包头部规范和策略来处理自定义协议，具体可看<a href="https://www.sciencedirect.com/science/article/abs/pii/S138912861830968X" target="_blank" rel="noopener">PNPL论文</a></p>
+<h2 id="pnpl"><a href="#pnpl" class="headerlink" title="pnpl"></a>pnpl</h2><p><img src="/images/pnpl/pnpl_architecture.png" alt=""><br>pnpl的架构如图所示，自底向上分别是：</p>
+<ul>
+<li>最底层是网络通信，这里使用netty来简化网络编程，主要负责将收到的字节流转化为不同类型的POF消息。</li>
+<li>Switch代表和控制器连接的交换机，保留该交换机的流表信息，并且执行特定的策略。</li>
+<li>全局组件主要分为：<ul>
+<li>Network：维护虚拟网络元素，如交换机、主机和链路，形成网络拓扑的统一视图。</li>
+<li>LinkDiscovery：负责一开始的拓扑创建和后续的拓扑更新。</li>
+<li>HostDiscovery：负责发现和交换机相连的主机。</li>
+<li>POF Protocol：POF协议库，封装了POF协议相关的类。</li>
+<li>Parser：解析用户提供的头部规范，提取出头部信息。</li>
+</ul>
+</li>
+</ul>
+<h2 id="用户"><a href="#用户" class="headerlink" title="用户"></a>用户</h2><p>对于用户来说，需要提供头部规范和策略：</p>
+<h3 id="头部规范"><a href="#头部规范" class="headerlink" title="头部规范"></a>头部规范</h3><pre><code>header ipv4;
+header ipv6;
+header arp;
+header icmp;
+header igmp;
+header tcp;
+header udp;
+
+header ethernet {
+    fields {
+        dl_dst : 48;
+        dl_src : 48;
+        dl_type : 16;
+    }
+    next select (dl_type) {
+        case 0x5555: sdnp;
+        case 0x0800: ipv4;
+        case 0x0806: arp;
+        case 0x86dd: ipv6;
+    }
+}
+
+header ipv4 {
+    fields {
+        __ver : 4;
+        __ihl : 4;
+        __tos : 8;
+        __len : 16;
+        __id : 16;
+        __flag : 3;
+        __off : 13;
+        __ttl : 8;
+        nw_proto : 8;
+        __sum : 16;
+        nw_src : 32;
+        nw_dst : 32;
+        __opt : *;
+    }
+    length : ihl &lt;&lt; 2;
+    checksum : sum;
+    next select (nw_proto) {
+        case 0x01 : icmp;
+        case 0x02 : igmp;
+        case 0x06 : tcp;
+        case 0x11 : udp;
+    }
+}
+
+start ethernet;</code></pre><p>以上是一个简单的头部规范，指明了每个头部所包含的域、头部长度和上层支持的协议等，并且规定了起始头部为ethernet。Parser能对头部规范进行词法分析、语法分析，进而解析各个头部信息以及上下层关系。</p>
+<h3 id="策略"><a href="#策略" class="headerlink" title="策略"></a>策略</h3><pre><code>public class Ipv4Forward extends AbstractPolicyAdapter {
+    @Override
+    protected List&lt;Hop&gt; f() {
+        gotoNextHeader();
+        gotoNextHeader();
+        String header = readHeaderName();
+        if (header.equals(&quot;ipv4&quot;)) {
+            Value srcIp = readPacketField(&quot;nw_src&quot;);
+            Value dstIp = readPacketField(&quot;nw_dst&quot;);
+            if (srcIp == null || dstIp == null) {
+                return null;
+            } else {
+                return getPath(getHost(srcIp.intValue()), getHost(dstIp.intValue()));
+            }
+        }
+        return null;
+    }
+}</code></pre><p>用户通过编写继承于AbstractPolicyAdapter的策略类，即可调用pnpl提供的api来处理网络数据包，上述代码中的gotoNextHeader和readPacketField分别是进入下一层头部和读取头部中某个域的功能，getHost则是获取某个主机，getPath则是计算两台主机之间的路径，通过这些API，自定义策略就能对数据包完成处理。<br><img src="/images/pnpl/policy.png" alt=""><br>Ipv4Forward的继承关系如图所示，其中AbstractNetworkApiContext主要提供获取网络实体（如Switch、Host）的api和获取网络对象间路径的api等，AbstractPacketApiContext则是提供对数据包操作的api，如进入下个头部和读取特定域的api等，AbstractPolicyAdapter则是提供了一个模板方法，用于将用户提供的f函数转化为流表规则下发给交换机。</p>
+<h1 id="运行流程"><a href="#运行流程" class="headerlink" title="运行流程"></a>运行流程</h1><p>整个pnpl的运行关键步骤如下所示：</p>
+<ol>
+<li>监测交换机的连接，开始进行POF协议的握手，将POF交换机抽象为Switch对象，后续的消息上报都由该对象进行处理。</li>
+<li>Switch启动工作后，首先向LinkDiscovery注册其上的端口，由LinkDiscovery开始链路发现工作。<ol>
+<li>LinkDiscovery记录端口信息，并根据端口信息构建LLDP报文，再发送给交换机从该端口发出构建的LLDP报文。</li>
+<li>当Switch收到LLDP报文后，交由LinkDiscovery进行处理，通过对LLDP报文进行解析得到该报文的源交换机和源端口，从而构建出（交换机，端口）-（交换机，端口）的链路，并注册到Network中。</li>
+<li>每个端口注册到LinkDiscovery后都会进行三次链路发现，若无任何回应，则会认为该端口无连接到其他交换机的链路，后续的链路更新方法可自由定义，较普通的方法是周期性地向各个端口发送LLDP报文。</li>
+</ol>
+</li>
+<li>Switch若是收到ARP报文后，则会交由HostDiscovery进行处理。<ol>
+<li>若是ARP请求报文，则先注册host到Network里，然后查询network中是否存在ARP请求的目标主机：<ol>
+<li>若有，则构建ARP响应报文。</li>
+<li>若没有，则在网络中洪泛ARP请求。</li>
+</ol>
+</li>
+<li>若是ARP响应报文，则注册host到network中。</li>
+</ol>
+</li>
+<li>收到普通数据包（非LLDP和ARP),则交由AbstractPolicyAdapter进行处理：<ol>
+<li>首先查询TraceTree，若有对应的分支，并且该分支的流表已被删除，则根据该分支下发流表。</li>
+<li>若无TraceTree分支，说明该数据包为第一次处理，则准备调用用户策略进行处理：<ol>
+<li>预处理工作，清空events列表。</li>
+<li>用户策略中每次调用pnpl的api，则会生成对应的event，加入到events中。</li>
+<li>将events列表转化为TraceTree分支。</li>
+<li>解析TraceTree分支并下发流表规则至对应的POF交换机。</li>
+<li>将TraceTree分支加入到该Switch的TraceTree中。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p>pnpl启动(日志系统使用的是SLF4J+logback）：<br><img src="/images/pnpl/start.png" alt=""><br>mininet运行pofswitch：<br><img src="/images/pnpl/mininet.png" alt=""><br>可以看到两个host能相互ping通。</p>
+<h1 id="尚需改进和扩展"><a href="#尚需改进和扩展" class="headerlink" title="尚需改进和扩展"></a>尚需改进和扩展</h1><ol>
+<li>pnpl的处理速度较慢，对于部分代码需要优化。</li>
+<li>对于每次下发的流表需要记录，当相关的拓扑发生变化时，主动删除这部分流表，使网络功能保持正常。</li>
+<li>使pnpl形成分布式集群，包括主控制器的选举和TraceTree恢复，从而具有应对控制器单点故障的能力。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/sdn/" rel="tag"><i class="fa fa-tag"></i>sdn</a>
+          
+            <a href="/tags/pof/" rel="tag"><i class="fa fa-tag"></i>pof</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/11/mapreduce/" rel="next" title="MapReduce">
+                <i class="fa fa-chevron-left"></i> MapReduce
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar/me.jpg"
+                alt="Twd" />
+            
+              <p class="site-author-name" itemprop="name">Twd</p>
+              <p class="site-description motion-element" itemprop="description">There is no royal road to learning.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#动机"><span class="nav-number">1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#架构"><span class="nav-number">3.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pnpl"><span class="nav-number">3.1.</span> <span class="nav-text">pnpl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户"><span class="nav-number">3.2.</span> <span class="nav-text">用户</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#头部规范"><span class="nav-number">3.2.1.</span> <span class="nav-text">头部规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#策略"><span class="nav-number">3.2.2.</span> <span class="nav-text">策略</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#运行流程"><span class="nav-number">4.</span> <span class="nav-text">运行流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#尚需改进和扩展"><span class="nav-number">5.</span> <span class="nav-text">尚需改进和扩展</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Twd</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
