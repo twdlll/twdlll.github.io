@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="jdk,容器," />
+  <meta name="keywords" content="onos," />
 
 
 
@@ -79,18 +79,22 @@
 
 
 
-<meta name="description" content="以下源码均来自于jdk8。 从Abstract类看容器除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。  Iterable可以看到，Iterable接口位于最顶层，其声明的方法有：  Iterator&amp;lt;T&amp;gt; iterator() void forEach(Consumer&amp;lt;? super T&amp;gt; action) Spliterato">
-<meta name="keywords" content="jdk,容器">
+<meta name="description" content="可以说onos是我遇到过最难编译运行的开源项目了，整个过程花了我好长时间，在此记录一下，希望对后来人有所帮助。 安装环境我是在虚拟机中安装onos的。虚拟机硬件：8G内存、4CPU（单核）、40G磁盘空间虚拟机系统：ubuntu-16.04.6-desktop-amd64 安装依赖ONOS-Wiki上列举的依赖有：git, zip, curl, unzip, python, python3, bz">
+<meta name="keywords" content="onos">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JDK源码之util">
-<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;03&#x2F;14&#x2F;jdk_util&#x2F;index.html">
+<meta property="og:title" content="onos之安装编译">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;03&#x2F;17&#x2F;onos1&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="以下源码均来自于jdk8。 从Abstract类看容器除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。  Iterable可以看到，Iterable接口位于最顶层，其声明的方法有：  Iterator&amp;lt;T&amp;gt; iterator() void forEach(Consumer&amp;lt;? super T&amp;gt; action) Spliterato">
+<meta property="og:description" content="可以说onos是我遇到过最难编译运行的开源项目了，整个过程花了我好长时间，在此记录一下，希望对后来人有所帮助。 安装环境我是在虚拟机中安装onos的。虚拟机硬件：8G内存、4CPU（单核）、40G磁盘空间虚拟机系统：ubuntu-16.04.6-desktop-amd64 安装依赖ONOS-Wiki上列举的依赖有：git, zip, curl, unzip, python, python3, bz">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;images&#x2F;jdk_util&#x2F;AbstractClass.png">
-<meta property="og:updated_time" content="2020-03-13T17:00:32.506Z">
+<meta property="og:image" content="&#x2F;images&#x2F;onos1&#x2F;download.png">
+<meta property="og:image" content="&#x2F;images&#x2F;onos1&#x2F;npm.png">
+<meta property="og:image" content="&#x2F;images&#x2F;onos1&#x2F;build_success.png">
+<meta property="og:image" content="&#x2F;images&#x2F;onos1&#x2F;onos_terminal.png">
+<meta property="og:image" content="&#x2F;images&#x2F;onos1&#x2F;onos_gui.png">
+<meta property="og:updated_time" content="2020-03-16T19:11:29.815Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;jdk_util&#x2F;AbstractClass.png">
+<meta name="twitter:image" content="&#x2F;images&#x2F;onos1&#x2F;download.png">
 
 
 
@@ -120,13 +124,13 @@
 
 
 
-  <link rel="canonical" href="https//twdlll.github.io/2020/03/14/jdk_util/"/>
+  <link rel="canonical" href="https//twdlll.github.io/2020/03/17/onos1/"/>
 
 
 
 
 
-  <title>JDK源码之util | Twd's Home</title>
+  <title>onos之安装编译 | Twd's Home</title>
   
 
 
@@ -243,7 +247,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/03/14/jdk_util/">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/03/17/onos1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Twd">
@@ -260,7 +264,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">JDK源码之util</h1>
+          <h1 class="post-title" itemprop="name headline">onos之安装编译</h1>
         
 
         <div class="post-meta">
@@ -272,8 +276,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-14T00:00:00+08:00">
-                2020-03-14
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-17T00:00:00+08:00">
+                2020-03-17
               </time>
             
 
@@ -288,8 +292,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-03-14T01:00:32+08:00">
-                2020-03-14
+              <time title="更新于" itemprop="dateModified" datetime="2020-03-17T03:11:29+08:00">
+                2020-03-17
               </time>
             
           </span>
@@ -307,8 +311,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jdk%E6%BA%90%E7%A0%81/" itemprop="url" rel="index">
-                    <span itemprop="name">jdk源码</span>
+                  <a href="/categories/sdn/" itemprop="url" rel="index">
+                    <span itemprop="name">sdn</span>
                   </a>
                 </span>
 
@@ -349,83 +353,48 @@
       
 
       
-        <p>以下源码均来自于jdk8。</p>
-<h1 id="从Abstract类看容器"><a href="#从Abstract类看容器" class="headerlink" title="从Abstract类看容器"></a>从Abstract类看容器</h1><p><img src="/images/jdk_util/AbstractClass.png" alt=""><br>除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。 </p>
-<h2 id="Iterable"><a href="#Iterable" class="headerlink" title="Iterable"></a>Iterable</h2><p>可以看到，Iterable接口位于最顶层，其声明的方法有：</p>
-<ul>
-<li><code>Iterator&lt;T&gt; iterator()</code></li>
-<li><code>void forEach(Consumer&lt;? super T&gt; action)</code></li>
-<li><code>Spliterator&lt;T&gt; spliterator()</code></li>
-</ul>
-<p>forEach方法主要是为了适应jdk8函数式编程；spliterator方法则是利用多线程并发处理，从而加快遍历速度。但是，我们今天着重要讲的是Iterator接口。</p>
-<pre><code>public interface Iterator&lt;E&gt; {
-    boolean hasNext();
-    E next();
-    void remove();
-    void forEachRemaining(Consumer&lt;? super E&gt; action);
-}</code></pre><p>Iterator接口可以说是所有容器的一个核心部分，往大了说就是采用了迭代器模式，提供给用户一种简单的遍历方法，但却不暴露内部的实现细节。具体来讲就是，我们能够用一种简单且通用的方法来遍历容器内部的元素。</p>
-<pre><code>/********   1   ********/
-Iterator&lt;Integer&gt; it = list.iterator();
-while (it.hasNext()) {
-    System.out.println(it.next());
-    // it.remove()
-}
+        <p>可以说onos是我遇到过最难编译运行的开源项目了，整个过程花了我好长时间，在此记录一下，希望对后来人有所帮助。</p>
+<h1 id="安装环境"><a href="#安装环境" class="headerlink" title="安装环境"></a>安装环境</h1><p>我是在虚拟机中安装onos的。<br>虚拟机硬件：8G内存、4CPU（单核）、40G磁盘空间<br>虚拟机系统：ubuntu-16.04.6-desktop-amd64</p>
+<h1 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h1><p>ONOS-Wiki上列举的依赖有：git, zip, curl, unzip, python, python3, bzip2。<br>对于这些依赖，可直接使用<code>sudo apt install *</code>来下载，必要时可直接将源更换为阿里云。<br>另外还需要安装jdk，我选择的是jdk8，通过手动下载并设置环境变量：</p>
+<pre><code>在/etc/profile中添加
+export JAVA_HOME=/usr/lib/jvm/jdk1.8.0_231
+export JRE_HOME=${JAVA_HOME}/jre
+export CLASSPATH=${JAVA_HOME}/lib:${JRE_HOME}/lib:.
+export PATH=${PATH}:${JAVA_HOME}/bin</code></pre><p>记得<code>source /etc/profile</code><br>还需要安装bazel，这里直接使用二进制压缩包进行安装。<br>根据<a href="https://github.com/bazelbuild/bazel/releases" target="_blank" rel="noopener">https://github.com/bazelbuild/bazel/releases</a>，选择合适的bazel版本（我的是bazel1.0.0）进行下载，然后命令行运行。</p>
+<pre><code>chmod +x bazel-1.0.0-installer-linux-x86_64.sh
+./bazel-1.0.0-installer-linx-x86_64.sh --user</code></pre><p>即在~/bin目录下就生成了bazel。</p>
+<h1 id="下载onos"><a href="#下载onos" class="headerlink" title="下载onos"></a>下载onos</h1><p>ONOS-Wiki推荐的是<code>git clone https://gerrit.onosproject.org/onos</code>但是其实这个仓库已经过时了，使用<code>git clone https://github.com/opennetworkinglab/onos.git</code><br>我是使用onos2.3.0进行编译的</p>
+<pre><code># 创建基于2.3.0的新分支，用于后续开发
+git checkout -b dev 2.3.0</code></pre><h1 id="编译onos"><a href="#编译onos" class="headerlink" title="编译onos"></a>编译onos</h1><p>首先需执行以下命令</p>
+<pre><code>vim ~/.bashrc
 
-/********   2   ********/
-for (int i: list) {
-    System.out.println(i);
-}</code></pre><p>第一种做法是显式调用Iterator方法进行遍历，第二种则是java提供的语法糖，但实质也是将其转化为Iterator方法再进行执行。</p>
-<h2 id="Collection"><a href="#Collection" class="headerlink" title="Collection"></a>Collection</h2><p>Collection主要提供了一般集合需要提供的方法，包括是否为空，添加新元素，删除元素、转为数组等。</p>
-<h2 id="AbstractCollection"><a href="#AbstractCollection" class="headerlink" title="AbstractCollection"></a>AbstractCollection</h2><p>AbstractCollection是所有后续AbstractList、AbstractSet等的父类，其大多数方法主要是通过迭代器实现的。源码有几个有趣的地方。</p>
-<pre><code>public boolean addAll(Collection&lt;? extends E&gt; c) {
-    boolean modified = false;
-    for (E e : c)
-        if (add(e))
-            modified = true;
-    return modified;
-}</code></pre><p>第一个有趣之处在于只要正确添加第一个元素，那么返回的永远是true。<br>第二个则是源码中<code>MAX_ARRAY_SIZE=Integer.MAX_VALUE - 8</code>，并且注释里写了这样设置是因为有些JVM会在数组里保存头部信息。hugeCapacity方法用于在将集合转数组时，若数组容量不够且满足一定条件时就会被调用。</p>
-<pre><code>private static int hugeCapacity(int minCapacity) {
-    if (minCapacity &lt; 0) // overflow
-        throw new OutOfMemoryError
-            (&quot;Required array size too large&quot;);
-    return (minCapacity &gt; MAX_ARRAY_SIZE) ?
-        Integer.MAX_VALUE :
-        MAX_ARRAY_SIZE;
-}</code></pre><p>但是其源码中却出现了返回Integer.MAX_VALUE的可能。个人对此的猜想是，上层方法调用hugeCapacity方法时，minCapacity参数不会大于MAX_ARRAY_SIZE。</p>
-<h2 id="AbstractList"><a href="#AbstractList" class="headerlink" title="AbstractList"></a>AbstractList</h2><p>AbstractSet和AbstractQueue的源码比较简单，没多少东西，所以我们只讲AbstractList。AbstractList提供了一种Iterator的实现Itr（除此之外，还有一种ListIterator的实现ListItr），Itr里有一个成员变量expectedModCount，与AbstractList的成员变量modCount相互关联。具体的做法是：</p>
-<ol>
-<li>在创建Itr对象时，会将该对象的expectedModCount置为和modCount一致。</li>
-<li>每次调用Itr对象的next和remove方法时，都会检查expectedModCount是否等于modCount：<ol>
-<li>若相等，则表明这段时间AbstractList对象未被修改，则可以正确执行</li>
-<li>若不相等，则抛出运行时异常</li>
-</ol>
-</li>
-<li>对于使用Itr对象进行遍历时，只有Itr对象的remove方法才是合法的。</li>
-</ol>
-<p>这种机制保证了使用Iterator遍历List时不能修改List。</p>
-<h2 id="AbstractMap"><a href="#AbstractMap" class="headerlink" title="AbstractMap"></a>AbstractMap</h2><p>AbstraceMap实现Map接口，主要提供了两种Map.Entry的实现：</p>
-<ul>
-<li>SimpleEntry：可变Entry</li>
-<li>SimpleImmutableEntry：不可变Entry</li>
-</ul>
-<h1 id="具体的容器实现"><a href="#具体的容器实现" class="headerlink" title="具体的容器实现"></a>具体的容器实现</h1><p>接下来介绍几个具体容器的实现细节。</p>
-<h2 id="ArrayList"><a href="#ArrayList" class="headerlink" title="ArrayList"></a>ArrayList</h2><p>其内部存储结构其实就是elementData数组，具体的实现细节有：</p>
-<ul>
-<li>未指定初始容量，那么elementData的初始容量为0，在第一次进行add后容量变为10。</li>
-<li>在数组扩容时，每次以1.5倍扩张</li>
-</ul>
-<h2 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h2><p>HashMap的内部存储结构是哈希桶数组，其具体细节有：</p>
-<ul>
-<li>初始的加载因子为0.75，哈希桶数量为16。</li>
-<li>不直接使用key的hashcode，而是对hashcode进一步处理，得到真正可用的hash值（个人其实不太理解为何要进行这一步处理，因为hash应该取决于元素本身的hashcode方法，查了一些资料，说是尽量让高低位都参与运算，可能对于后续查找数组中的哈希桶有帮助）</li>
-<li>每次调用put方法时，都会先找到对应的哈希桶（计算得到的hash值&amp;哈希桶数量-1），然后遍历桶上的链表，看key是否已存在：<ul>
-<li>若key存在，则替换该key的value值</li>
-<li>若key不存在，则进行尾插，但是若该链表元素数量超过树化限制（8），则会将该链表转化为红黑树。</li>
-</ul>
-</li>
-<li>当HashMap的元素数量大于threshold（加载因子*hash桶数量）时，并且重新调整内部node的位置。</li>
-</ul>
-<h2 id="HashSet"><a href="#HashSet" class="headerlink" title="HashSet"></a>HashSet</h2><p>其实质就是HashMap，只是Value部分全都由一个内置的Object对象替代。</p>
+# 在最后添加
+export ONOS_ROOT=~/onos
+source ${ONOS_ROOT}/tools/dev/bash_profile
+
+# 退出后执行文件
+source ~/.bashrc</code></pre><p>然后就可以使用<code>bazel build onos</code>进行编译，但是此时就会出现很多问题。</p>
+<h2 id="bazel下载依赖包过慢"><a href="#bazel下载依赖包过慢" class="headerlink" title="bazel下载依赖包过慢"></a>bazel下载依赖包过慢</h2><p>bazel下载一些github上的依赖包实在太慢了。总是会出现以下情况：<br><img src="/images/onos1/download.png" alt="">有些博客说网络不太好就多试几次，事实证明根本没用，还是要直面这个问题的。  </p>
+<h3 id="使用代理"><a href="#使用代理" class="headerlink" title="使用代理"></a>使用代理</h3><p>查阅了很多资料，说是bazel可以用HTTP_PROXY变量来使用代理，具体如下：</p>
+<pre><code>export HTTP_PROXY=http://127.0.0.1:1080
+bazel build onos --action_env=HTTP_PROXY=$HTTP_PROXY</code></pre><p>我在虚拟机上用v2ray搭建了一个客户端，但是直接使用是失败的。建议使用v2ray开1080端口的本地socks5代理，然后再通过工具将http代理转化为socks代理。这里推荐http-proxy-to-socks。</p>
+<pre><code># 需要nodejs环境
+npm install -g http-proxy-to-socks  
+
+# 开启http代理，将8080端口的http代理数据转化为socks代理数据，发送到1080端口
+hpts -s localhost:1080 -p 8080</code></pre><h3 id="手动下载依赖"><a href="#手动下载依赖" class="headerlink" title="手动下载依赖"></a>手动下载依赖</h3><p>由于bazel编译失败会打印下载失败的url，可以直接通过该url下载依赖包。将下载的依赖包存入一个目录，比如~/deps，然后编译：</p>
+<pre><code>bazel build --distdir ~/deps onos</code></pre><p>我选择的就是这种方法，之后可继续编译。</p>
+<h2 id="npm-install特别慢"><a href="#npm-install特别慢" class="headerlink" title="npm install特别慢"></a>npm install特别慢</h2><p><img src="/images/onos1/npm.png" alt="">可以看到npm安装很慢，主要是因为访问不了外网。<br>网上资料说可以更换淘宝库来解决，即如下：</p>
+<pre><code># onos/web/gui/BUILD
+找到name = &quot;_onos-gui-npm-build&quot;的genrule
+在cmd中倒数第5行$$NPM $$NPM_ARGS install后面加上
+--registry https://registry.npm.taobao.org
+
+找到name = &quot;_onos-gui-npm-build&quot;的genrule（其实我没找到）
+在cmd中倒数第5行$$ROOT/$$NPM $$NPM_ARGS run build --no-cache后加上
+--registry https://registry.npm.taobao.org</code></pre><p>实际使用并没有效果，最后还是使用了上述的双重代理方法。<br>除了这些问题之外，还可能出现内存不足的情况，可通过增加交换分区来解决。<br>历经千辛万苦，编译成功…<br><img src="/images/onos1/build_success.png" alt=""></p>
+<h1 id="运行onos"><a href="#运行onos" class="headerlink" title="运行onos"></a>运行onos</h1><p>在onos目录下<code>bazel run onos-local</code>,并打开另一终端执行<code>onos localhost</code>，运行成功:<br><img src="/images/onos1/onos_terminal.png" alt=""><br>或者使用web-gui，在浏览器（使用chrome，火狐似乎不兼容）中输入<a href="http://localhost:8181/onos/ui，用户名onos，密码rocks，即可出现gui：" target="_blank" rel="noopener">http://localhost:8181/onos/ui，用户名onos，密码rocks，即可出现gui：</a><br><img src="/images/onos1/onos_gui.png" alt=""></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://wiki.onosproject.org/display/ONOS/Developer+Quick+Start" target="_blank" rel="noopener">ONOS-Wiki</a><br><a href="https://chentingz.github.io/2019/10/28/%E3%80%8CONOS%20x%20Mininet%E3%80%8D%E4%BB%8E0%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83/#0x00-%E5%89%8D%E8%A8%80" target="_blank" rel="noopener">搭建onos和mininet环境</a><br><a href="https://blog.csdn.net/daihanglai7622/article/details/88642998" target="_blank" rel="noopener">编译onos的各种问题</a></p>
 
       
     </div>
@@ -443,9 +412,7 @@ for (int i: list) {
       
         <div class="post-tags">
           
-            <a href="/tags/jdk/" rel="tag"><i class="fa fa-tag"></i>jdk</a>
-          
-            <a href="/tags/%E5%AE%B9%E5%99%A8/" rel="tag"><i class="fa fa-tag"></i>容器</a>
+            <a href="/tags/onos/" rel="tag"><i class="fa fa-tag"></i>onos</a>
           
         </div>
       
@@ -458,8 +425,8 @@ for (int i: list) {
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/03/07/competition/" rel="next" title="第五届中间件性能挑战赛">
-                <i class="fa fa-chevron-left"></i> 第五届中间件性能挑战赛
+              <a href="/2020/03/14/jdk_util/" rel="next" title="JDK源码之util">
+                <i class="fa fa-chevron-left"></i> JDK源码之util
               </a>
             
           </div>
@@ -467,10 +434,6 @@ for (int i: list) {
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/03/17/onos1/" rel="prev" title="onos之安装编译">
-                onos之安装编译 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -606,7 +569,7 @@ for (int i: list) {
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#从Abstract类看容器"><span class="nav-number">1.</span> <span class="nav-text">从Abstract类看容器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Iterable"><span class="nav-number">1.1.</span> <span class="nav-text">Iterable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Collection"><span class="nav-number">1.2.</span> <span class="nav-text">Collection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractCollection"><span class="nav-number">1.3.</span> <span class="nav-text">AbstractCollection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractList"><span class="nav-number">1.4.</span> <span class="nav-text">AbstractList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractMap"><span class="nav-number">1.5.</span> <span class="nav-text">AbstractMap</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#具体的容器实现"><span class="nav-number">2.</span> <span class="nav-text">具体的容器实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ArrayList"><span class="nav-number">2.1.</span> <span class="nav-text">ArrayList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap"><span class="nav-number">2.2.</span> <span class="nav-text">HashMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashSet"><span class="nav-number">2.3.</span> <span class="nav-text">HashSet</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装环境"><span class="nav-number">1.</span> <span class="nav-text">安装环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装依赖"><span class="nav-number">2.</span> <span class="nav-text">安装依赖</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#下载onos"><span class="nav-number">3.</span> <span class="nav-text">下载onos</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译onos"><span class="nav-number">4.</span> <span class="nav-text">编译onos</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#bazel下载依赖包过慢"><span class="nav-number">4.1.</span> <span class="nav-text">bazel下载依赖包过慢</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用代理"><span class="nav-number">4.1.1.</span> <span class="nav-text">使用代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手动下载依赖"><span class="nav-number">4.1.2.</span> <span class="nav-text">手动下载依赖</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#npm-install特别慢"><span class="nav-number">4.2.</span> <span class="nav-text">npm install特别慢</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#运行onos"><span class="nav-number">5.</span> <span class="nav-text">运行onos</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
