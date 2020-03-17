@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="jdk,容器," />
+  <meta name="keywords" content="jdk,集合," />
 
 
 
@@ -79,16 +79,16 @@
 
 
 
-<meta name="description" content="以下源码均来自于jdk8。 从Abstract类看容器除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。  Iterable可以看到，Iterable接口位于最顶层，其声明的方法有：  Iterator&amp;lt;T&amp;gt; iterator() void forEach(Consumer&amp;lt;? super T&amp;gt; action) Spliterato">
-<meta name="keywords" content="jdk,容器">
+<meta name="description" content="以下源码均来自于jdk8。 从Abstract类看集合除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。  Iterable可以看到，Iterable接口位于最顶层，其声明的方法有：  Iterator&amp;lt;T&amp;gt; iterator() void forEach(Consumer&amp;lt;? super T&amp;gt; action) Spliterato">
+<meta name="keywords" content="jdk,集合">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JDK源码之util">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;03&#x2F;14&#x2F;jdk_util&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="以下源码均来自于jdk8。 从Abstract类看容器除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。  Iterable可以看到，Iterable接口位于最顶层，其声明的方法有：  Iterator&amp;lt;T&amp;gt; iterator() void forEach(Consumer&amp;lt;? super T&amp;gt; action) Spliterato">
+<meta property="og:description" content="以下源码均来自于jdk8。 从Abstract类看集合除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。  Iterable可以看到，Iterable接口位于最顶层，其声明的方法有：  Iterator&amp;lt;T&amp;gt; iterator() void forEach(Consumer&amp;lt;? super T&amp;gt; action) Spliterato">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;jdk_util&#x2F;AbstractClass.png">
-<meta property="og:updated_time" content="2020-03-13T17:00:32.506Z">
+<meta property="og:updated_time" content="2020-03-17T06:43:12.356Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;jdk_util&#x2F;AbstractClass.png">
 
@@ -288,8 +288,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-03-14T01:00:32+08:00">
-                2020-03-14
+              <time title="更新于" itemprop="dateModified" datetime="2020-03-17T14:43:12+08:00">
+                2020-03-17
               </time>
             
           </span>
@@ -350,7 +350,7 @@
 
       
         <p>以下源码均来自于jdk8。</p>
-<h1 id="从Abstract类看容器"><a href="#从Abstract类看容器" class="headerlink" title="从Abstract类看容器"></a>从Abstract类看容器</h1><p><img src="/images/jdk_util/AbstractClass.png" alt=""><br>除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。 </p>
+<h1 id="从Abstract类看集合"><a href="#从Abstract类看集合" class="headerlink" title="从Abstract类看集合"></a>从Abstract类看集合</h1><p><img src="/images/jdk_util/AbstractClass.png" alt=""><br>除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。 </p>
 <h2 id="Iterable"><a href="#Iterable" class="headerlink" title="Iterable"></a>Iterable</h2><p>可以看到，Iterable接口位于最顶层，其声明的方法有：</p>
 <ul>
 <li><code>Iterator&lt;T&gt; iterator()</code></li>
@@ -363,7 +363,7 @@
     E next();
     void remove();
     void forEachRemaining(Consumer&lt;? super E&gt; action);
-}</code></pre><p>Iterator接口可以说是所有容器的一个核心部分，往大了说就是采用了迭代器模式，提供给用户一种简单的遍历方法，但却不暴露内部的实现细节。具体来讲就是，我们能够用一种简单且通用的方法来遍历容器内部的元素。</p>
+}</code></pre><p>Iterator接口可以说是所有集合的一个核心部分，往大了说就是采用了迭代器模式，提供给用户一种简单的遍历方法，但却不暴露内部的实现细节。具体来讲就是，我们能够用一种简单且通用的方法来遍历集合内部的元素。</p>
 <pre><code>/********   1   ********/
 Iterator&lt;Integer&gt; it = list.iterator();
 while (it.hasNext()) {
@@ -408,7 +408,7 @@ for (int i: list) {
 <li>SimpleEntry：可变Entry</li>
 <li>SimpleImmutableEntry：不可变Entry</li>
 </ul>
-<h1 id="具体的容器实现"><a href="#具体的容器实现" class="headerlink" title="具体的容器实现"></a>具体的容器实现</h1><p>接下来介绍几个具体容器的实现细节。</p>
+<h1 id="具体的集合实现"><a href="#具体的集合实现" class="headerlink" title="具体的集合实现"></a>具体的集合实现</h1><p>接下来介绍几个具体集合的实现细节。</p>
 <h2 id="ArrayList"><a href="#ArrayList" class="headerlink" title="ArrayList"></a>ArrayList</h2><p>其内部存储结构其实就是elementData数组，具体的实现细节有：</p>
 <ul>
 <li>未指定初始容量，那么elementData的初始容量为0，在第一次进行add后容量变为10。</li>
@@ -445,7 +445,7 @@ for (int i: list) {
           
             <a href="/tags/jdk/" rel="tag"><i class="fa fa-tag"></i>jdk</a>
           
-            <a href="/tags/%E5%AE%B9%E5%99%A8/" rel="tag"><i class="fa fa-tag"></i>容器</a>
+            <a href="/tags/%E9%9B%86%E5%90%88/" rel="tag"><i class="fa fa-tag"></i>集合</a>
           
         </div>
       
@@ -606,7 +606,7 @@ for (int i: list) {
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#从Abstract类看容器"><span class="nav-number">1.</span> <span class="nav-text">从Abstract类看容器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Iterable"><span class="nav-number">1.1.</span> <span class="nav-text">Iterable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Collection"><span class="nav-number">1.2.</span> <span class="nav-text">Collection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractCollection"><span class="nav-number">1.3.</span> <span class="nav-text">AbstractCollection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractList"><span class="nav-number">1.4.</span> <span class="nav-text">AbstractList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractMap"><span class="nav-number">1.5.</span> <span class="nav-text">AbstractMap</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#具体的容器实现"><span class="nav-number">2.</span> <span class="nav-text">具体的容器实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ArrayList"><span class="nav-number">2.1.</span> <span class="nav-text">ArrayList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap"><span class="nav-number">2.2.</span> <span class="nav-text">HashMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashSet"><span class="nav-number">2.3.</span> <span class="nav-text">HashSet</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#从Abstract类看集合"><span class="nav-number">1.</span> <span class="nav-text">从Abstract类看集合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Iterable"><span class="nav-number">1.1.</span> <span class="nav-text">Iterable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Collection"><span class="nav-number">1.2.</span> <span class="nav-text">Collection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractCollection"><span class="nav-number">1.3.</span> <span class="nav-text">AbstractCollection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractList"><span class="nav-number">1.4.</span> <span class="nav-text">AbstractList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractMap"><span class="nav-number">1.5.</span> <span class="nav-text">AbstractMap</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#具体的集合实现"><span class="nav-number">2.</span> <span class="nav-text">具体的集合实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ArrayList"><span class="nav-number">2.1.</span> <span class="nav-text">ArrayList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap"><span class="nav-number">2.2.</span> <span class="nav-text">HashMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashSet"><span class="nav-number">2.3.</span> <span class="nav-text">HashSet</span></a></li></ol></li></ol></div>
             
 
           </div>
