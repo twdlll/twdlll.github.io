@@ -94,7 +94,7 @@
 <meta property="og:image" content="&#x2F;images&#x2F;onos1&#x2F;onos_gui.png">
 <meta property="og:image" content="&#x2F;images&#x2F;onos1&#x2F;mininet.png">
 <meta property="og:image" content="&#x2F;images&#x2F;onos1&#x2F;topo.png">
-<meta property="og:updated_time" content="2020-03-17T12:52:14.661Z">
+<meta property="og:updated_time" content="2020-03-18T03:52:27.323Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;onos1&#x2F;download.png">
 
@@ -294,8 +294,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-03-17T20:52:14+08:00">
-                2020-03-17
+              <time title="更新于" itemprop="dateModified" datetime="2020-03-18T11:52:27+08:00">
+                2020-03-18
               </time>
             
           </span>
@@ -365,7 +365,7 @@ export CLASSPATH=${JAVA_HOME}/lib:${JRE_HOME}/lib:.
 export PATH=${PATH}:${JAVA_HOME}/bin</code></pre><p>记得<code>source /etc/profile</code><br>还需要安装bazel，这里直接使用二进制压缩包进行安装。<br>根据<a href="https://github.com/bazelbuild/bazel/releases" target="_blank" rel="noopener">https://github.com/bazelbuild/bazel/releases</a>，选择合适的bazel版本（我的是bazel1.0.0）进行下载，然后命令行运行。</p>
 <pre><code>chmod +x bazel-1.0.0-installer-linux-x86_64.sh
 ./bazel-1.0.0-installer-linx-x86_64.sh --user</code></pre><p>即在~/bin目录下就生成了bazel。</p>
-<h1 id="下载onos"><a href="#下载onos" class="headerlink" title="下载onos"></a>下载onos</h1><p>ONOS-Wiki推荐的是<code>git clone https://gerrit.onosproject.org/onos</code>但是其实这个仓库已经过时了，使用<code>git clone https://github.com/opennetworkinglab/onos.git</code><br>我是使用onos2.3.0进行编译的</p>
+<h1 id="下载onos"><a href="#下载onos" class="headerlink" title="下载onos"></a>下载onos</h1><p>ONOS-Wiki推荐的是<code>git clone https://gerrit.onosproject.org/onos</code>但是其实也可以使用<code>git clone https://github.com/opennetworkinglab/onos.git</code><br>我是使用onos2.3.0进行编译的</p>
 <pre><code># 创建基于2.3.0的新分支，用于后续开发
 git checkout -b dev 2.3.0</code></pre><h1 id="编译onos"><a href="#编译onos" class="headerlink" title="编译onos"></a>编译onos</h1><p>首先需执行以下命令</p>
 <pre><code>vim ~/.bashrc
