@@ -88,7 +88,7 @@
 <meta property="og:description" content="Ubuntu内核更换1.查看当前安装的内核 dpkg -l | grep linux-image2.查看可以更新的内核版本 sudo apt-get search linux-image3.安装新内核 sudo apt-get install linux-image-3.16.0-30-generic linux-image-extra-3.16.0-30-generic4.更新grub引导 su">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;ubuntu&#x2F;ssh&#x2F;ssh.png">
-<meta property="og:updated_time" content="2019-12-20T08:01:24.000Z">
+<meta property="og:updated_time" content="2020-03-22T10:03:20.803Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;ubuntu&#x2F;ssh&#x2F;ssh.png">
 
@@ -288,8 +288,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2019-12-20T16:01:24+08:00">
-                2019-12-20
+              <time title="更新于" itemprop="dateModified" datetime="2020-03-22T18:03:20+08:00">
+                2020-03-22
               </time>
             
           </span>
@@ -475,7 +475,11 @@ sshd:192.168.3.2    #允许192.168.3.2连接</code></pre><p>在/etc/hosts.deny�
 <pre><code>sudo apt-get install ufw
 sudo ufw enable            #启动防火墙
 sudo ufw default deny    #默认全部拒绝</code></pre><p>需要打开ssh的22端口时：</p>
-<pre><code>sudo ufw allow 22</code></pre>
+<pre><code>sudo ufw allow 22</code></pre><h1 id="VMware-Ubuntu蓝屏"><a href="#VMware-Ubuntu蓝屏" class="headerlink" title="VMware Ubuntu蓝屏"></a>VMware Ubuntu蓝屏</h1><p>今天打开VMware虚拟机突然蓝屏了，但是一开始能登录，所以估计是非正常关机损坏了虚拟机的图形化界面。</p>
+<pre><code>sudo apt install xserver-xorg-lts-utopic
+sudo dpkg-reconfigure xserver-xorg-lts-utopic 
+reboot</code></pre><p>中途可能会出现依赖不完整</p>
+<pre><code>sudo apt -f install</code></pre>
       
     </div>
     
@@ -649,7 +653,7 @@ sudo ufw default deny    #默认全部拒绝</code></pre><p>需要打开ssh的22
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ubuntu内核更换"><span class="nav-number">1.</span> <span class="nav-text">Ubuntu内核更换</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ubuntu网络配置"><span class="nav-number">2.</span> <span class="nav-text">Ubuntu网络配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用ifconfig"><span class="nav-number">2.1.</span> <span class="nav-text">使用ifconfig</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用网卡配置文件"><span class="nav-number">2.2.</span> <span class="nav-text">使用网卡配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续路由配置"><span class="nav-number">2.3.</span> <span class="nav-text">后续路由配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vim的使用"><span class="nav-number">3.</span> <span class="nav-text">vim的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vim安装"><span class="nav-number">3.1.</span> <span class="nav-text">vim安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim配置"><span class="nav-number">3.2.</span> <span class="nav-text">vim配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim使用"><span class="nav-number">3.3.</span> <span class="nav-text">vim使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSH的使用"><span class="nav-number">4.</span> <span class="nav-text">SSH的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH的安装"><span class="nav-number">4.1.</span> <span class="nav-text">SSH的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH服务端启动"><span class="nav-number">4.2.</span> <span class="nav-text">SSH服务端启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH正向连接"><span class="nav-number">4.3.</span> <span class="nav-text">SSH正向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接"><span class="nav-number">4.4.</span> <span class="nav-text">SSH反向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接的维持"><span class="nav-number">4.5.</span> <span class="nav-text">SSH反向连接的维持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH配置文件"><span class="nav-number">4.6.</span> <span class="nav-text">SSH配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH筛选用户"><span class="nav-number">4.7.</span> <span class="nav-text">SSH筛选用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH可能出现的问题"><span class="nav-number">4.8.</span> <span class="nav-text">SSH可能出现的问题</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ubuntu内核更换"><span class="nav-number">1.</span> <span class="nav-text">Ubuntu内核更换</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ubuntu网络配置"><span class="nav-number">2.</span> <span class="nav-text">Ubuntu网络配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用ifconfig"><span class="nav-number">2.1.</span> <span class="nav-text">使用ifconfig</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用网卡配置文件"><span class="nav-number">2.2.</span> <span class="nav-text">使用网卡配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后续路由配置"><span class="nav-number">2.3.</span> <span class="nav-text">后续路由配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vim的使用"><span class="nav-number">3.</span> <span class="nav-text">vim的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vim安装"><span class="nav-number">3.1.</span> <span class="nav-text">vim安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim配置"><span class="nav-number">3.2.</span> <span class="nav-text">vim配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim使用"><span class="nav-number">3.3.</span> <span class="nav-text">vim使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SSH的使用"><span class="nav-number">4.</span> <span class="nav-text">SSH的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH的安装"><span class="nav-number">4.1.</span> <span class="nav-text">SSH的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH服务端启动"><span class="nav-number">4.2.</span> <span class="nav-text">SSH服务端启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH正向连接"><span class="nav-number">4.3.</span> <span class="nav-text">SSH正向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接"><span class="nav-number">4.4.</span> <span class="nav-text">SSH反向连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH反向连接的维持"><span class="nav-number">4.5.</span> <span class="nav-text">SSH反向连接的维持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH配置文件"><span class="nav-number">4.6.</span> <span class="nav-text">SSH配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH筛选用户"><span class="nav-number">4.7.</span> <span class="nav-text">SSH筛选用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSH可能出现的问题"><span class="nav-number">4.8.</span> <span class="nav-text">SSH可能出现的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VMware-Ubuntu蓝屏"><span class="nav-number">5.</span> <span class="nav-text">VMware Ubuntu蓝屏</span></a></li></ol></div>
             
 
           </div>
