@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="onos," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一直对onos的编译运行过程很是迷惑，这次就花了些时间仔细研究了一下。 Bazel基本概念在探究onos的整体编译结构前，先要了解一下Bazel的几个基本概念： Workspace工作区是项目的根目录，每个工作区都有一个WORKSPACE（或WORKSPACE.bazel）文件（可以无内容）。每个工作区相互独立，也就是说工作区A的子目录下有个工作区B，则编译A的时候并不会编译B。 Reposito">
+<meta name="keywords" content="onos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="onos之探究编译运行">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;03&#x2F;24&#x2F;onos2&#x2F;index.html">
+<meta property="og:site_name" content="Twd&#39;s Home">
+<meta property="og:description" content="一直对onos的编译运行过程很是迷惑，这次就花了些时间仔细研究了一下。 Bazel基本概念在探究onos的整体编译结构前，先要了解一下Bazel的几个基本概念： Workspace工作区是项目的根目录，每个工作区都有一个WORKSPACE（或WORKSPACE.bazel）文件（可以无内容）。每个工作区相互独立，也就是说工作区A的子目录下有个工作区B，则编译A的时候并不会编译B。 Reposito">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-24T15:08:59.574Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https//twdlll.github.io/2020/03/24/onos2/"/>
+
+
+
+
+
+  <title>onos之探究编译运行 | Twd's Home</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Twd's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/03/24/onos2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Twd">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Twd's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">onos之探究编译运行</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-24T00:00:00+08:00">
+                2020-03-24
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-03-24T23:08:59+08:00">
+                2020-03-24
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sdn/" itemprop="url" rel="index">
+                    <span itemprop="name">sdn</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一直对onos的编译运行过程很是迷惑，这次就花了些时间仔细研究了一下。</p>
+<h1 id="Bazel基本概念"><a href="#Bazel基本概念" class="headerlink" title="Bazel基本概念"></a>Bazel基本概念</h1><p>在探究onos的整体编译结构前，先要了解一下Bazel的几个基本概念：</p>
+<h2 id="Workspace"><a href="#Workspace" class="headerlink" title="Workspace"></a>Workspace</h2><p>工作区是项目的根目录，每个工作区都有一个WORKSPACE（或WORKSPACE.bazel）文件（可以无内容）。每个工作区相互独立，也就是说工作区A的子目录下有个工作区B，则编译A的时候并不会编译B。</p>
+<h2 id="Repositories"><a href="#Repositories" class="headerlink" title="Repositories"></a>Repositories</h2><p>所有的代码都由仓库管理，它包含了所有待构建的源文件、数据和构建脚本。当前代码仓库（工作区所在目录）由@标识，外部仓库由@external_repository标识。对于外部仓库，一定要在当前WORKSPACE文件中进行声明（如http_archive、local_repository、new_local_repository等）</p>
+<h2 id="Packages"><a href="#Packages" class="headerlink" title="Packages"></a>Packages</h2><p>仓库中管理代码的基本单位是包。包由相关文件和它们之间的依赖说明组成的。一个包必须包含BUILD或BUILD.bazel文件。需要注意的是，在一个包中递归包含该目录下的所有文件，但是若某个子目录也含有BUILD文件，则该子目录独立为一个新包。</p>
+<h2 id="Targets"><a href="#Targets" class="headerlink" title="Targets"></a>Targets</h2><p>包中含有一个或多个目标。大多数目标主要是files或是rules（package group不常见）。</p>
+<ul>
+<li>files又可细分为两种：Source file（源文件）和Generated file（生成文件，编译时根据特殊的规则得到）</li>
+<li>rules定义了输入和输出间的关系（包括必要的从输入到输出的步骤）。输出永远是生成文件，而输入可能是源文件或生成文件。注意：一个rule的输出可能是另一个rule的输入。另外，规则生成的文件永远与规则属于同一个包。</li>
+</ul>
+<h2 id="Labels"><a href="#Labels" class="headerlink" title="Labels"></a>Labels</h2><p>每个目标只能属于一个包，目标的名字就是标签，并且每个标签只能表示一个包。比如：  </p>
+<pre><code>@repo_name//@package_name:target_name
+比如@myrepo//my/app/main:app_binary</code></pre><p>也就是myrepo工作区下my/app/main包中的app_binary目标，通常情况下可省略开头的@myrepo。关于标签的一些小语法如下：  </p>
+<pre><code>//my/app  ===  //my/app:app
+
+# 在my/app中的BUILD文件中，对于该文件中的其他目标
+//my/app  ===  :app  === app
+一般来讲文件会省略冒号，rules则不会。  </code></pre><h2 id="Rules"><a href="#Rules" class="headerlink" title="Rules"></a>Rules</h2><p>规则规定了输入输出之间的关系以及构建输出的步骤。Rules可以生成编译后的可执行文件、库、测试执行文件或其他支持的输出。比如：</p>
+<pre><code>cc_binary(
+    name = &quot;my_app&quot;,
+    src = [&quot;my_app.cc&quot;],
+    deps = [
+        &quot;//absl/base&quot;,
+        &quot;//absl/string&quot;,
+    ],
+)</code></pre><p>可以看到这个C++库my_app的源文件是my_app.cc,其依赖于//absl/base:base和//absl/string:string。当然有些规则是依赖于具体的语言的。</p>
+<h2 id="BUILD-files"><a href="#BUILD-files" class="headerlink" title="BUILD files"></a>BUILD files</h2><p>BUILD文件采用<a href="https://docs.bazel.build/versions/master/skylark/language.html" target="_blank" rel="noopener">Starlark语言</a>。Build文件中各个变量的声明顺序是随意的，也就是说，变量可以在使用后声明。并且BUILD文件不能包含函数定义、for语句和if语句，函数定义只能出现在.bzl文件中。另外，*args和**kwargs不能出现在BUILD文件中，需要显示声明参数。</p>
+<h2 id="bazel其他细节"><a href="#bazel其他细节" class="headerlink" title="bazel其他细节"></a>bazel其他细节</h2><p>其他细节可参考<a href="https://blog.gmem.cc/bazel-study-note" target="_blank" rel="noopener">https://blog.gmem.cc/bazel-study-note</a>或官网<a href="https://docs.bazel.build/versions/master/build-ref.html" target="_blank" rel="noopener">https://docs.bazel.build/versions/master/build-ref.html</a>。</p>
+<h1 id="onos之编译运行"><a href="#onos之编译运行" class="headerlink" title="onos之编译运行"></a>onos之编译运行</h1><p>源码版本为onos2.3.0</p>
+<h2 id="WORKSAPCE文件"><a href="#WORKSAPCE文件" class="headerlink" title="WORKSAPCE文件"></a>WORKSAPCE文件</h2><p>WORKSPACE文件是用来给当前工作区引入外部依赖的。可以看到onos目录下的WORKSPACE文件，也确实导入外部仓库，如bazel_skylib、build_bazel_rules_nodejs等，当然也调用了一些函数。需要注意的是：</p>
+<pre><code>load(&quot;@bazel_tools//tools/build_defs/repo:http.bzl&quot;, &quot;http_archive&quot;)</code></pre><blockquote>
+<p>load能够加载扩展文件的某些符号到当前的工作环境，注意此时第一个参数:后面不是目标名，而是.bzl文件，后面的参数才是要加载的符号。符号包括规则、函数或常量。</p>
+</blockquote>
+<p>其中的bazel_tools是内置仓库，相应目录为/home/user_name/.cache/bazel/_bazel_user_name/install/xxxx…x/_embedded_binaries/embedded_tools。<br>另外就是调用一些函数进行环境准备。</p>
+<h2 id="BUILD文件"><a href="#BUILD文件" class="headerlink" title="BUILD文件"></a>BUILD文件</h2><p>现在打开onos目录下的BUILD文件，探究它是怎么编译的。</p>
+<pre><code>load(&quot;//tools/build/bazel:variables.bzl&quot;, &quot;ONOS_VERSION&quot;)</code></pre><p>首先加载ONOS_VERSION，为2.3.0。</p>
+<pre><code>load(
+    &quot;//tools/build/bazel:modules.bzl&quot;,
+    &quot;CORE&quot;,
+    &quot;FEATURES&quot;,
+    &quot;apps&quot;,
+    &quot;extensions&quot;,
+    &quot;profiles&quot;,
+)</code></pre><p>从tools/build/bazel包下的modules.bzl中加载CORE、FEATURES等。需要注意三个函数的作用：</p>
+<ol>
+<li>apps：负责在很多XXX_MAP中筛选出符合条件的key。</li>
+<li>extensions：从PROTOCOL_MAP和PROVIDER_MAP中筛选出符合条件的key。</li>
+<li>profiles：根据给定的参数批量生成本地config_setting。</li>
+</ol>
+<p>接下来通过profiles生成三个config_setting。</p>
+<pre><code>profiles([
+    &quot;minimal&quot;,
+    &quot;seba&quot;,
+    &quot;stratum&quot;,
+])</code></pre><p>这三个配置的作用就是控制打包的范围。</p>
+<pre><code>filegroup(
+    name = &quot;onos&quot;,
+    srcs = CORE + [
+        &quot;//tools/build/conf:onos-build-conf&quot;,
+        &quot;:onos-package-admin&quot;,
+        &quot;:onos-package-test&quot;,
+        &quot;:onos-package&quot;,
+    ] + select({
+        &quot;:minimal_profile&quot;: extensions(&quot;minimal&quot;) + apps(&quot;minimal&quot;),
+        &quot;:seba_profile&quot;: extensions(&quot;seba&quot;) + apps(&quot;seba&quot;),
+        &quot;:stratum_profile&quot;: extensions(&quot;stratum&quot;) + apps(&quot;stratum&quot;),
+        &quot;//conditions:default&quot;: extensions() + apps(),
+    }),
+    visibility = [&quot;//visibility:public&quot;],
+)</code></pre><p>filegroup是为一组目标指定一个名字，方便bazel监控文件变化。其中select()根据配置选择不同的目标：</p>
+<pre><code>bazel build onos-package --define profile=minimal #以最小形式打包</code></pre><p>默认情况下完整打包。之后是几个打包规则，如：  </p>
+<pre><code># 这里仅举例onos-karaf打包规则
+genrule(
+    name = &quot;onos-karaf&quot;,
+    srcs = [
+        KARAF,
+        BRANDING,
+    ] + glob([
+        &quot;tools/package/bin/*&quot;,
+        &quot;tools/package/etc/*&quot;,
+        &quot;tools/package/init/*&quot;,
+        &quot;tools/package/runtime/bin/*&quot;,
+    ]),
+    outs = [&quot;karaf.zip&quot;],
+    cmd = &quot;$(location tools/package/onos-prep-karaf) $(location karaf.zip) $(location %s) %s $(location %s) &apos;&apos; tools/package&quot; %
+      (KARAF, ONOS_VERSION, BRANDING),
+    tools = [&quot;tools/package/onos-prep-karaf&quot;],
+)</code></pre><blockquote>
+<p>genrule是通过用户自定义的bash命令生成一个或多个文件。</p>
+</blockquote>
+<p>分别打包karaf.zip、onos.tar.gz、onos-admin.tar.gz和onos-test.tar.gz。</p>
+<pre><code>alias(
+    name = &quot;onos-local&quot;,
+    actual = select({
+        &quot;:run_with_absolute_javabase&quot;:     &quot;:onos-local_absolute-javabase&quot;,
+        &quot;//conditions:default&quot;: &quot;:onos-    local_current-jdk&quot;,
+    }),
+)</code></pre><p>之后则是onos-local目标，这里会根据启动参数选择jdk进行运行，默认采用bazel自带的jdk。</p>
+<pre><code>genrule(
+    name = &quot;onos-local_current-jdk&quot;,
+    srcs = [
+        &quot;:onos-local-base&quot;,
+        &quot;//tools/build/jdk:current_jdk_tar&quot;,
+    ],
+    outs = [&quot;onos-runner_current-jdk&quot;],
+    cmd = &quot;sed \&quot;s#JDK_TAR=#JDK_TAR=$(location //tools/build/jdk:current_jdk_tar)#\&quot; &quot; +
+      &quot;$(location :onos-local-base) &gt; $(location onos-runner_current-jdk); &quot;,
+    executable = True,
+    output_to_bindir = True,
+    visibility = [&quot;//visibility:private&quot;],
+)</code></pre><p>所以最后的运行的是onos-runner_current-jdk，executable表示输出可否运行，output_to_bindir则是将输出文件放在bin目录下。</p>
+<h2 id="onos-runner-current-jdk文件"><a href="#onos-runner-current-jdk文件" class="headerlink" title="onos-runner_current-jdk文件"></a>onos-runner_current-jdk文件</h2><p>该文件由很多bash命令组成，主要过程是：</p>
+<ol>
+<li>杀死正在运行的实例</li>
+<li>使用ABSOLUTE_JAVABASE作为JAVA_HOME或是将JDK_TAR解压使用。</li>
+<li>如果之前的onos不存在或者和现在的md5摘要不同，则重新解压，并配置一些参数和准备工作。</li>
+<li>进入ONOS_DIR目录，并执行./bin/onos-service</li>
+</ol>
+<h2 id="onos-service文件"><a href="#onos-service文件" class="headerlink" title="onos-service文件"></a>onos-service文件</h2><p>该文件主要是解析参数，并且在需要预激活的app目录下生成active文件，最后启动karaf。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/onos/" rel="tag"><i class="fa fa-tag"></i>onos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/20/karaf/" rel="next" title="初始Karaf">
+                <i class="fa fa-chevron-left"></i> 初始Karaf
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar/me.jpg"
+                alt="Twd" />
+            
+              <p class="site-author-name" itemprop="name">Twd</p>
+              <p class="site-description motion-element" itemprop="description">There is no royal road to learning.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Bazel基本概念"><span class="nav-number">1.</span> <span class="nav-text">Bazel基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Workspace"><span class="nav-number">1.1.</span> <span class="nav-text">Workspace</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Repositories"><span class="nav-number">1.2.</span> <span class="nav-text">Repositories</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Packages"><span class="nav-number">1.3.</span> <span class="nav-text">Packages</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Targets"><span class="nav-number">1.4.</span> <span class="nav-text">Targets</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Labels"><span class="nav-number">1.5.</span> <span class="nav-text">Labels</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rules"><span class="nav-number">1.6.</span> <span class="nav-text">Rules</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BUILD-files"><span class="nav-number">1.7.</span> <span class="nav-text">BUILD files</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bazel其他细节"><span class="nav-number">1.8.</span> <span class="nav-text">bazel其他细节</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#onos之编译运行"><span class="nav-number">2.</span> <span class="nav-text">onos之编译运行</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#WORKSAPCE文件"><span class="nav-number">2.1.</span> <span class="nav-text">WORKSAPCE文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BUILD文件"><span class="nav-number">2.2.</span> <span class="nav-text">BUILD文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#onos-runner-current-jdk文件"><span class="nav-number">2.3.</span> <span class="nav-text">onos-runner_current-jdk文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#onos-service文件"><span class="nav-number">2.4.</span> <span class="nav-text">onos-service文件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Twd</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
