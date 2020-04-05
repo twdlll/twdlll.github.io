@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="MyBatis," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="大致流程MyBatis的基本使用流程为：  创建SqlSessionFactory 创建SqlSession 通过SqlSession创建Mapper代理 使用Mapper代理执行Mapper接口方法。  下面将针对这四步进行源码解析。源码版本为3.3.0。 创建SqlSessionFactorySqlSessionFactory顾名思义，就是用来创建SqlSession的。创建语句也很简单 Sq">
+<meta name="keywords" content="MyBatis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MyBatis源码解析">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;04&#x2F;05&#x2F;mybatis&#x2F;index.html">
+<meta property="og:site_name" content="Twd&#39;s Home">
+<meta property="og:description" content="大致流程MyBatis的基本使用流程为：  创建SqlSessionFactory 创建SqlSession 通过SqlSession创建Mapper代理 使用Mapper代理执行Mapper接口方法。  下面将针对这四步进行源码解析。源码版本为3.3.0。 创建SqlSessionFactorySqlSessionFactory顾名思义，就是用来创建SqlSession的。创建语句也很简单 Sq">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-05T10:05:53.592Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https//twdlll.github.io/2020/04/05/mybatis/"/>
+
+
+
+
+
+  <title>MyBatis源码解析 | Twd's Home</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Twd's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/04/05/mybatis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Twd">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Twd's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MyBatis源码解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-05T00:00:00+08:00">
+                2020-04-05
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-04-05T18:05:53+08:00">
+                2020-04-05
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java-Web/" itemprop="url" rel="index">
+                    <span itemprop="name">Java Web</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="大致流程"><a href="#大致流程" class="headerlink" title="大致流程"></a>大致流程</h1><p>MyBatis的基本使用流程为：</p>
+<ul>
+<li>创建SqlSessionFactory</li>
+<li>创建SqlSession</li>
+<li>通过SqlSession创建Mapper代理</li>
+<li>使用Mapper代理执行Mapper接口方法。</li>
+</ul>
+<p>下面将针对这四步进行源码解析。源码版本为3.3.0。</p>
+<h1 id="创建SqlSessionFactory"><a href="#创建SqlSessionFactory" class="headerlink" title="创建SqlSessionFactory"></a>创建SqlSessionFactory</h1><p>SqlSessionFactory顾名思义，就是用来创建SqlSession的。创建语句也很简单</p>
+<pre><code>SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);</code></pre><p>其中build方法就是读取xml配置并生成Configuration对象，并将其赋给SqlSessionFactory对象。这里仅展示两个核心方法：</p>
+<pre><code>public Configuration parse() {
+    if (parsed) {
+          throw new BuilderException(&quot;Each XMLConfigBuilder can only be used once.&quot;);
+    }
+    parsed = true;
+    // 开始解析，从configuration根结点开始
+    parseConfiguration(parser.evalNode(&quot;/configuration&quot;));
+    return configuration;
+  }
+
+  private void parseConfiguration(XNode root) {
+    try {
+          // 解析是有先后顺序的，所以写xml的时候需要注意子结点的顺序
+          propertiesElement(root.evalNode(&quot;properties&quot;));
+          typeAliasesElement(root.evalNode(&quot;typeAliases&quot;));
+          pluginElement(root.evalNode(&quot;plugins&quot;));
+        ...
+    } catch (Exception e) {
+          throw new BuilderException(&quot;Error parsing SQL Mapper Configuration. Cause: &quot; + e, e);
+    }
+  }</code></pre><h1 id="创建SqlSession"><a href="#创建SqlSession" class="headerlink" title="创建SqlSession"></a>创建SqlSession</h1><p>SqlSession是mybatis的核心，既可以执行SQL并返回结果，也可以获取Mapper对象。创建语句为：</p>
+<pre><code>SqlSession sqlSession = sqlSessionFactory.openSession();</code></pre><p>再往里看：</p>
+<pre><code>private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
+    // 这里的Transaction是对DB一个connection的包装
+    // 处理connection的生命周期，即创建，准备，提交/回滚和关闭。
+    Transaction tx = null;
+    try {
+        // 找到配置的默认environment，具体可以看xml中的environments结点的default属性
+        final Environment environment = configuration.getEnvironment();
+        final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
+        tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+        // Executor是执行的实体
+        final Executor executor = configuration.newExecutor(tx, execType);
+        return new DefaultSqlSession(configuration, executor, autoCommit);
+    } catch (Exception e) {
+          closeTransaction(tx); // may have fetched a connection so lets call close()
+          throw ExceptionFactory.wrapException(&quot;Error opening session.  Cause: &quot; + e, e);
+    } finally {
+          ErrorContext.instance().reset();
+    }
+  }</code></pre><p>代码逻辑也比较简单，需要注意的是直到这里，还是没有真正建立JDBC连接。</p>
+<h1 id="获得Mapper代理"><a href="#获得Mapper代理" class="headerlink" title="获得Mapper代理"></a>获得Mapper代理</h1><p>Mapper代理的获得也很简洁：</p>
+<pre><code>XXXMapper mapper = sqlSession.getMapper(XXXMapper.class);</code></pre><p>那么Mapper代理是如何获得的呢，总结来说就是通过JDK动态代理生成的，具体如下</p>
+<pre><code>public &lt;T&gt; T getMapper(Class&lt;T&gt; type, SqlSession sqlSession) {
+    /* 
+    ** knownMappers的类型是Map&lt;Class&lt;?&gt;, MapperProxyFactory&lt;?&gt;&gt;
+    ** 内部存储的是Mapper类型和相应的Mapper代理工厂
+    ** 这些Mapper类型都是在xml文件中的mappers结点定义的
+    */
+    final MapperProxyFactory&lt;T&gt; mapperProxyFactory = (MapperProxyFactory&lt;T&gt;) knownMappers.get(type);
+    if (mapperProxyFactory == null) {
+          throw new BindingException(&quot;Type &quot; + type + &quot; is not known to the MapperRegistry.&quot;);
+    }
+    try {
+          return mapperProxyFactory.newInstance(sqlSession);
+    } catch (Exception e) {
+          throw new BindingException(&quot;Error getting mapper instance. Cause: &quot; + e, e);
+    }
+  }
+
+public T newInstance(SqlSession sqlSession) {
+    // mapperProxy的invoke方法很关键
+    final MapperProxy&lt;T&gt; mapperProxy = new MapperProxy&lt;T&gt;(sqlSession, mapperInterface, methodCache);
+    return newInstance(mapperProxy);
+  }
+
+protected T newInstance(MapperProxy&lt;T&gt; mapperProxy) {
+    // 返回最后的代理对象
+    return (T) Proxy.newProxyInstance(mapperInterface.getClassLoader(), new Class[] { mapperInterface }, mapperProxy);
+  }</code></pre><p>关于这部分，其实一开始有个小疑问，既然MyBatis把缓存发挥到了极致，那为什么不缓存MapperProxy和Mapper代理对象呢？我个人觉得原因可能是：由于SqlSession不是线程安全的，所以较合适的作用域是方法作用域。既然是方法作用域，也就不会多次调用getMapper方法，所以做不做缓存也就无所谓了。</p>
+<h1 id="执行Mapper接口方法"><a href="#执行Mapper接口方法" class="headerlink" title="执行Mapper接口方法"></a>执行Mapper接口方法</h1><p>执行Mapper方法<code>xxxMapper.selectById(1L);</code>其内部执行过程相当复杂。  </p>
+<h2 id="调用MapperProxy的invoke方法："><a href="#调用MapperProxy的invoke方法：" class="headerlink" title="调用MapperProxy的invoke方法："></a>调用MapperProxy的invoke方法：</h2><pre><code>public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    // 判断是否是Object声明的方法，若是就直接调用
+    if (Object.class.equals(method.getDeclaringClass())) {
+          try {
+            return method.invoke(this, args);
+          } catch (Throwable t) {
+            throw ExceptionUtil.unwrapThrowable(t);
+          }
+    }
+    // 得到method对应的MapperMethod对象
+    final MapperMethod mapperMethod = cachedMapperMethod(method);
+    // 由该method对象执行具体动作
+    return mapperMethod.execute(sqlSession, args);
+  }</code></pre><h2 id="mapperMethod是怎么来的？"><a href="#mapperMethod是怎么来的？" class="headerlink" title="mapperMethod是怎么来的？"></a>mapperMethod是怎么来的？</h2><p>先从缓存中查找有没有对应的MapperMethod对象，若没有，则新建并存入缓存。</p>
+<pre><code>private MapperMethod cachedMapperMethod(Method method) {
+    MapperMethod mapperMethod = methodCache.get(method);
+    if (mapperMethod == null) {
+          mapperMethod = new MapperMethod(mapperInterface, method, sqlSession.getConfiguration());
+          methodCache.put(method, mapperMethod);
+    }
+    return mapperMethod;
+  }</code></pre><h2 id="mapperMethod如何执行的"><a href="#mapperMethod如何执行的" class="headerlink" title="mapperMethod如何执行的"></a>mapperMethod如何执行的</h2><p>注意：以下代码并不是连续的，这里只选了相对关键的代码。</p>
+<pre><code>public Object execute(SqlSession sqlSession, Object[] args) {
+    /* 这里不贴出具体的代码，主要过程如下：
+    ** 1. 判断当前method的SQL类型：insert、update、delete or select
+    ** 2. 将参数转化为SQL参数
+    ** 3. 执行
+    */
+    ...
+    // 因为我debug的是select具体id的记录，所以最后执行的是以下语句
+    result = sqlSession.selectOne(command.getName(), param);
+    ...
+    return result;
+}</code></pre><p>接下来一步步debug，直到：</p>
+<pre><code>public &lt;E&gt; List&lt;E&gt; selectList(String statement, Object parameter, RowBounds rowBounds) {
+    try {
+        // MappedStatement与具体的接口方法相关，并且MappedStatement由Configuration持有，也可以说是SqlSessionFactory持有
+        MappedStatement ms = configuration.getMappedStatement(statement);
+        // 由执行器进行查询
+        return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
+    } catch (Exception e) {
+          throw ExceptionFactory.wrapException(&quot;Error querying database.  Cause: &quot; + e, e);
+    } finally {
+          ErrorContext.instance().reset();
+    }
+  }</code></pre><p>接下来继续debug…</p>
+<pre><code>public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
+  throws SQLException {
+    // 之前已经说了ms由SqlSessionFactory持有
+    // 所以此处的cache为二级缓存
+    Cache cache = ms.getCache();
+    if (cache != null) {
+        flushCacheIfRequired(ms);
+        if (ms.isUseCache() &amp;&amp; resultHandler == null) {
+            ensureNoOutParams(ms, parameterObject, boundSql);
+            // 若开启了二级缓存，则会先去二级缓存中查找
+            @SuppressWarnings(&quot;unchecked&quot;)
+            List&lt;E&gt; list = (List&lt;E&gt;) tcm.getObject(cache, key);
+            if (list == null) {
+                list = delegate.&lt;E&gt; query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+                // 最后将结果放入二级缓存中
+                tcm.putObject(cache, key, list); // issue #578 and #116
+            }
+            return list;
+          }
+    }
+    // 由于我没有开启二级缓存，所以执行该方法
+    return delegate.&lt;E&gt; query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+  }</code></pre><p>继续debug…</p>
+<pre><code>public &lt;E&gt; List&lt;E&gt; query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
+    ErrorContext.instance().resource(ms.getResource()).activity(&quot;executing a query&quot;).object(ms.getId());
+    if (closed) {
+          throw new ExecutorException(&quot;Executor was closed.&quot;);
+    }
+    if (queryStack == 0 &amp;&amp; ms.isFlushCacheRequired()) {
+          clearLocalCache();
+    }
+    List&lt;E&gt; list;
+    try {
+        queryStack++;
+        // 从一级缓存中查找是否命中
+        list = resultHandler == null ? (List&lt;E&gt;) localCache.getObject(key) : null;
+        if (list != null) {
+            // 命中
+            handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
+        } else {
+            // 未命中，所以需要真正对数据库进行查询
+            list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
+          }
+    } finally {
+          queryStack--;
+    }
+    ...
+}</code></pre><p>往下debug n步会发现：</p>
+<pre><code>public &lt;E&gt; List&lt;E&gt; doQuery(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+    Statement stmt = null;
+    try {
+        Configuration configuration = ms.getConfiguration();
+        StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);
+        // 真正的数据库连接是在该方法内创建的（实际上还嵌套了好几层）
+        // 创建连接也需要进行几个过程
+        // 1. 当前是否有空闲连接，有的话直接拿来用
+        // 2. 当前的活跃连接是否达到最大连接数，若没有则创建新连接
+        // 3. 判断是否有超时的连接，若有，则重新创建连接（内部的真正连接其实没变），只是换了个壳，另外还需要对过期连接进行回滚（如果没有设定自动提交）
+        // 4. 等待直到获取连接（当等待次数达到阈值时，抛出异常）
+        stmt = prepareStatement(handler, ms.getStatementLog());
+        return handler.&lt;E&gt;query(stmt, resultHandler);
+    } finally {
+        closeStatement(stmt);
+    }
+  }</code></pre><p>接下来就是根据连接进行查询了。  </p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>由于这部分内容有点多，稍微进行一下总结，在执行Mapper接口方法时：</p>
+<ol>
+<li>先判断是否有该方法的MapperMethod对象存在。<ol>
+<li>若没有，则创建。</li>
+</ol>
+</li>
+<li>在MapperMethod对象执行方法时。<ol>
+<li>参数转化等。</li>
+<li>先查询二级缓存（若开启），命中则返回。</li>
+<li>再查询一级缓存，命中则返回。</li>
+<li>执行数据库操作，根据当前连接池情况获得连接，并执行操作，返回结果。</li>
+</ol>
+</li>
+</ol>
+<h1 id="MyBatis-xml模板"><a href="#MyBatis-xml模板" class="headerlink" title="MyBatis xml模板"></a>MyBatis xml模板</h1><p>以下提供了一些MyBatis会使用到的xml配置文件</p>
+<h2 id="mybatis-config-xml"><a href="#mybatis-config-xml" class="headerlink" title="mybatis-config.xml"></a>mybatis-config.xml</h2><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE configuration
+    PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+    &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+&lt;configuration&gt;
+    &lt;settings&gt;
+        &lt;setting name=&quot;mapUnderscoreToCamelCase&quot; value=&quot;true&quot;/&gt;
+    &lt;/settings&gt;
+    &lt;typeAliases&gt;
+        &lt;package name=&quot;com.twd.test1&quot;/&gt;
+    &lt;/typeAliases&gt;
+
+    &lt;environments default=&quot;development&quot;&gt;
+        &lt;environment id=&quot;development&quot;&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;/&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;com.mysql.jdbc.Driver&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://localhost:3306/mybatis&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;root&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;twdlll&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+    &lt;mappers&gt;
+        &lt;package name=&quot;com.twd.test2.mapper&quot;/&gt;
+    &lt;/mappers&gt;
+&lt;/configuration&gt;</code></pre><h2 id="mapper-xml"><a href="#mapper-xml" class="headerlink" title="mapper.xml"></a>mapper.xml</h2><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE mapper
+    PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+    &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+&lt;mapper namespace=&quot;com.twd.test2.mapper.UserMapper&quot;&gt;
+    &lt;resultMap id=&quot;userMap&quot; type=&quot;com.twd.test2.model.SysUser&quot;&gt;
+        &lt;id property=&quot;id&quot; column=&quot;id&quot;/&gt;
+        &lt;result property=&quot;userName&quot; column=&quot;user_name&quot;/&gt;
+        &lt;result property=&quot;userPassword&quot; column=&quot;user_password&quot;/&gt;
+        &lt;result property=&quot;userEmail&quot; column=&quot;user_email&quot;/&gt;
+        &lt;result property=&quot;userInfo&quot; column=&quot;user_info&quot;/&gt;
+        &lt;result property=&quot;headImg&quot; column=&quot;head_img&quot;/&gt;
+        &lt;result property=&quot;createTime&quot; column=&quot;create_time&quot; jdbcType=&quot;TIMESTAMP&quot;/&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectById&quot; resultMap=&quot;userMap&quot;&gt;
+        select * from sys_user where id = #{id}
+    &lt;/select&gt;
+    &lt;select id=&quot;selectAll&quot; resultType=&quot;com.twd.test2.model.SysUser&quot;&gt;
+        select * from sys_user
+    &lt;/select&gt;
+    &lt;insert id=&quot;insert&quot;&gt;
+        insert into sys_user
+        values(#{id}, #{userName}, #{userPassword}, #{userEmail},
+        #{userInfo}, #{headImg, jdbcType=BLOB},
+        #{createTime, jdbcType=TIMESTAMP})
+    &lt;/insert&gt;
+    &lt;insert id=&quot;insertReturnId&quot; useGeneratedKeys=&quot;true&quot; keyProperty=&quot;id&quot;&gt;
+        insert into sys_user(
+        user_name, user_password, user_email, user_info,
+        head_img, create_time
+        )
+        values(
+            #{userName}, #{userPassword}, #{userEmail},
+            #{userInfo}, #{headImg, jdbcType=BLOB},
+            #{createTime, jdbcType=TIMESTAMP}
+        )
+    &lt;/insert&gt;
+    &lt;select id=&quot;selectByUser&quot; resultType=&quot;com.twd.test2.model.SysUser&quot;&gt;
+        select id, user_name userName, user_password userPassword, user_email userEmail,
+                user_info userInfo, head_img headImg, create_time createTime
+        from sys_user
+        where 1 = 1
+        &lt;if test=&quot;userName != null and userName != &apos;&apos;&quot;&gt;
+            and user_name like concat(&apos;%&apos;, #{userName}, &apos;%&apos;)
+        &lt;/if&gt;
+        &lt;if test=&quot;userEmail != null and userEmail != &apos;&apos;&quot;&gt;
+            and user_email = #{userEmail}
+        &lt;/if&gt;
+    &lt;/select&gt;
+&lt;/mapper&gt;</code></pre>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MyBatis/" rel="tag"><i class="fa fa-tag"></i>MyBatis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/28/onos_device_core/" rel="next" title="onos设备子系统之Core">
+                <i class="fa fa-chevron-left"></i> onos设备子系统之Core
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar/me.jpg"
+                alt="Twd" />
+            
+              <p class="site-author-name" itemprop="name">Twd</p>
+              <p class="site-description motion-element" itemprop="description">There is no royal road to learning.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#大致流程"><span class="nav-number">1.</span> <span class="nav-text">大致流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建SqlSessionFactory"><span class="nav-number">2.</span> <span class="nav-text">创建SqlSessionFactory</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建SqlSession"><span class="nav-number">3.</span> <span class="nav-text">创建SqlSession</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#获得Mapper代理"><span class="nav-number">4.</span> <span class="nav-text">获得Mapper代理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#执行Mapper接口方法"><span class="nav-number">5.</span> <span class="nav-text">执行Mapper接口方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#调用MapperProxy的invoke方法："><span class="nav-number">5.1.</span> <span class="nav-text">调用MapperProxy的invoke方法：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mapperMethod是怎么来的？"><span class="nav-number">5.2.</span> <span class="nav-text">mapperMethod是怎么来的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mapperMethod如何执行的"><span class="nav-number">5.3.</span> <span class="nav-text">mapperMethod如何执行的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.4.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MyBatis-xml模板"><span class="nav-number">6.</span> <span class="nav-text">MyBatis xml模板</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#mybatis-config-xml"><span class="nav-number">6.1.</span> <span class="nav-text">mybatis-config.xml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mapper-xml"><span class="nav-number">6.2.</span> <span class="nav-text">mapper.xml</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Twd</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
