@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="jdk,集合," />
+  <meta name="keywords" content="netty," />
 
 
 
@@ -79,18 +79,16 @@
 
 
 
-<meta name="description" content="以下源码均来自于jdk8。 从Abstract类看集合除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。  Iterable可以看到，Iterable接口位于最顶层，其声明的方法有：  Iterator&amp;lt;T&amp;gt; iterator() void forEach(Consumer&amp;lt;? super T&amp;gt; action) Spliterato">
-<meta name="keywords" content="jdk,集合">
+<meta name="description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 EventLoopGroup bossGroup = new NioEventLoopGroup(1); E">
+<meta name="keywords" content="netty">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JDK源码之util">
-<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;03&#x2F;14&#x2F;jdk_util&#x2F;index.html">
+<meta property="og:title" content="Netty源码解析">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;04&#x2F;11&#x2F;netty&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="以下源码均来自于jdk8。 从Abstract类看集合除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。  Iterable可以看到，Iterable接口位于最顶层，其声明的方法有：  Iterator&amp;lt;T&amp;gt; iterator() void forEach(Consumer&amp;lt;? super T&amp;gt; action) Spliterato">
+<meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 EventLoopGroup bossGroup = new NioEventLoopGroup(1); E">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;images&#x2F;jdk_util&#x2F;AbstractClass.png">
-<meta property="og:updated_time" content="2020-04-06T12:41:39.621Z">
+<meta property="og:updated_time" content="2020-04-10T16:11:38.485Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;jdk_util&#x2F;AbstractClass.png">
 
 
 
@@ -120,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="https//twdlll.github.io/2020/03/14/jdk_util/"/>
+  <link rel="canonical" href="https//twdlll.github.io/2020/04/11/netty/"/>
 
 
 
 
 
-  <title>JDK源码之util | Twd's Home</title>
+  <title>Netty源码解析 | Twd's Home</title>
   
 
 
@@ -243,7 +241,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/03/14/jdk_util/">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/04/11/netty/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Twd">
@@ -260,7 +258,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">JDK源码之util</h1>
+          <h1 class="post-title" itemprop="name headline">Netty源码解析</h1>
         
 
         <div class="post-meta">
@@ -272,8 +270,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-14T00:00:00+08:00">
-                2020-03-14
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-11T00:00:00+08:00">
+                2020-04-11
               </time>
             
 
@@ -288,8 +286,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-06T20:41:39+08:00">
-                2020-04-06
+              <time title="更新于" itemprop="dateModified" datetime="2020-04-11T00:11:38+08:00">
+                2020-04-11
               </time>
             
           </span>
@@ -349,83 +347,148 @@
       
 
       
-        <p>以下源码均来自于jdk8。</p>
-<h1 id="从Abstract类看集合"><a href="#从Abstract类看集合" class="headerlink" title="从Abstract类看集合"></a>从Abstract类看集合</h1><p><img src="/images/jdk_util/AbstractClass.png" alt=""><br>除了AbstractMap直接继承于Map接口，其余Abstract类构成了如上的类继承图。 </p>
-<h2 id="Iterable"><a href="#Iterable" class="headerlink" title="Iterable"></a>Iterable</h2><p>可以看到，Iterable接口位于最顶层，其声明的方法有：</p>
-<ul>
-<li><code>Iterator&lt;T&gt; iterator()</code></li>
-<li><code>void forEach(Consumer&lt;? super T&gt; action)</code></li>
-<li><code>Spliterator&lt;T&gt; spliterator()</code></li>
-</ul>
-<p>forEach方法主要是为了适应jdk8函数式编程；spliterator方法则是利用多线程并发处理，从而加快遍历速度。但是，我们今天着重要讲的是Iterator接口。</p>
-<pre><code>public interface Iterator&lt;E&gt; {
-    boolean hasNext();
-    E next();
-    void remove();
-    void forEachRemaining(Consumer&lt;? super E&gt; action);
-}</code></pre><p>Iterator接口可以说是所有集合的一个核心部分，往大了说就是采用了迭代器模式，提供给用户一种简单的遍历方法，但却不暴露内部的实现细节。具体来讲就是，我们能够用一种简单且通用的方法来遍历集合内部的元素。</p>
-<pre><code>/********   1   ********/
-Iterator&lt;Integer&gt; it = list.iterator();
-while (it.hasNext()) {
-    System.out.println(it.next());
-    // it.remove()
-}
+        <p>之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。</p>
+<h1 id="netty启动"><a href="#netty启动" class="headerlink" title="netty启动"></a>netty启动</h1><p>这里仅介绍服务器端的启动过程（客户端的启动比较简单）。</p>
+<pre><code>EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+EventLoopGroup workerGroup = new NioEventLoopGroup();
+final EchoServerHandler serverHandler = new EchoServerHandler();
+try {
+    ServerBootstrap b = new ServerBootstrap();
+    b.group(bossGroup, workerGroup)
+     .channel(NioServerSocketChannel.class)
+     .option(ChannelOption.SO_BACKLOG, 100)
+     .handler(new LoggingHandler(LogLevel.INFO))
+     .childHandler(new ChannelInitializer&lt;SocketChannel&gt;() {
+         @Override
+         public void initChannel(SocketChannel ch) throws Exception {
+             ChannelPipeline p = ch.pipeline();                  if (sslCtx != null) {
+                 p.addLast(sslCtx.newHandler(ch.alloc()));
+             }
+             //p.addLast(new LoggingHandler(LogLevel.INFO));
+             p.addLast(serverHandler);
+         }
+     });
 
-/********   2   ********/
-for (int i: list) {
-    System.out.println(i);
-}</code></pre><p>第一种做法是显式调用Iterator方法进行遍历，第二种则是java提供的语法糖，但实质也是将其转化为Iterator方法再进行执行。</p>
-<h2 id="Collection"><a href="#Collection" class="headerlink" title="Collection"></a>Collection</h2><p>Collection主要提供了一般集合需要提供的方法，包括是否为空，添加新元素，删除元素、转为数组等。</p>
-<h2 id="AbstractCollection"><a href="#AbstractCollection" class="headerlink" title="AbstractCollection"></a>AbstractCollection</h2><p>AbstractCollection是所有后续AbstractList、AbstractSet等的父类，其大多数方法主要是通过迭代器实现的。源码有几个有趣的地方。</p>
-<pre><code>public boolean addAll(Collection&lt;? extends E&gt; c) {
-    boolean modified = false;
-    for (E e : c)
-        if (add(e))
-            modified = true;
-    return modified;
-}</code></pre><p>第一个有趣之处在于只要正确添加第一个元素，那么返回的永远是true。<br>第二个则是源码中<code>MAX_ARRAY_SIZE=Integer.MAX_VALUE - 8</code>，并且注释里写了这样设置是因为有些JVM会在数组里保存头部信息。hugeCapacity方法用于在将集合转数组时，若数组容量不够且满足一定条件时就会被调用。</p>
-<pre><code>private static int hugeCapacity(int minCapacity) {
-    if (minCapacity &lt; 0) // overflow
-        throw new OutOfMemoryError
-            (&quot;Required array size too large&quot;);
-    return (minCapacity &gt; MAX_ARRAY_SIZE) ?
-        Integer.MAX_VALUE :
-        MAX_ARRAY_SIZE;
-}</code></pre><p>但是其源码中却出现了返回Integer.MAX_VALUE的可能。个人对此的猜想是，上层方法调用hugeCapacity方法时，minCapacity参数不会大于MAX_ARRAY_SIZE。</p>
-<h2 id="AbstractList"><a href="#AbstractList" class="headerlink" title="AbstractList"></a>AbstractList</h2><p>AbstractSet和AbstractQueue的源码比较简单，没多少东西，所以我们只讲AbstractList。AbstractList提供了一种Iterator的实现Itr（除此之外，还有一种ListIterator的实现ListItr），Itr里有一个成员变量expectedModCount，与AbstractList的成员变量modCount相互关联。具体的做法是：</p>
+    // Start the server.
+    ChannelFuture f = b.bind(PORT).sync();</code></pre><blockquote>
+<p>以上截取自netty-example中的EchoServer的源码。</p>
+</blockquote>
+<p><code>b.group()...</code>部分的代码比较简单，就是设置ServerBootstrap的启动属性。启动的核心方法是<code>bind()</code>。</p>
+<pre><code>public ChannelFuture bind(SocketAddress localAddress) {
+    validate();
+    return doBind(ObjectUtil.checkNotNull(localAddress, &quot;localAddress&quot;));
+}</code></pre><p>首先会将PORT和本地IP进行组合构建InetSocketAddress对象并传入以上方法。可以看到bind的第一步是validate，主要是判断ServerBootstrap对象是否设置一些参数，如group、childgroup、channelFactory和childHandler。</p>
+<pre><code>private ChannelFuture doBind(final SocketAddress localAddress) {
+    final ChannelFuture regFuture = initAndRegister();
+    final Channel channel = regFuture.channel();
+    if (regFuture.cause() != null) {
+        return regFuture;
+    }
+
+    if (regFuture.isDone()) {
+        // 这个时候注册已经成功
+        ChannelPromise promise = channel.newPromise();
+        doBind0(regFuture, channel, localAddress, promise);
+        return promise;
+    } else {
+        // 注册一般都是成功的，但是以防万一
+        final PendingRegistrationPromise promise = new PendingRegistrationPromise(channel);
+        // 添加异步监听
+        regFuture.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                Throwable cause = future.cause();
+                if (cause != null) {
+                    promise.setFailure(cause);
+                } else {
+                    promise.registered();
+                    doBind0(regFuture, channel, localAddress, promise);
+                }
+            }
+        });
+        return promise;
+    }
+}</code></pre><p>在介绍前，这里先讲解一下netty的几个概念：</p>
+<ul>
+<li>NioEventLoopGroup可以理解为线程池，其中的每个EventLoop都对应一个线程。</li>
+<li>每个EventLoop都有一个selector</li>
+<li>worker线程池中的每个channel都对应一个客户端连接。</li>
+<li>所有的channel都是在对应的EventLoop中运行的，是n:1的关系。也就是说一个EventLoop中能运行多个channel，但一个channel只能运行在一个EventLoop中。</li>
+<li>一个channel对应一个ChannelPipeline，ChannelPipeline中包含多个ChannelHandlerContext，每个ChannelHandlerContext都对应一个ChannelHandler。</li>
+</ul>
+<p>接下来会忘以上代码中抽几个核心点进行讲解：</p>
 <ol>
-<li>在创建Itr对象时，会将该对象的expectedModCount置为和modCount一致。</li>
-<li>每次调用Itr对象的next和remove方法时，都会检查expectedModCount是否等于modCount：<ol>
-<li>若相等，则表明这段时间AbstractList对象未被修改，则可以正确执行</li>
-<li>若不相等，则抛出运行时异常</li>
+<li>initAndRegister()：主要是创建并注册channel<ol>
+<li>创建channel<ol>
+<li>默认以使用反射创建NioServerSocketChannel，其实是对ServerSocketChannel的一种包装。</li>
+<li>创建对应该channel的pipeline，并且创建两个ChannelHandlerContext（head和tail）</li>
+<li>会设置感兴趣的类型（OP_ACCEPT），并设置为非阻塞。</li>
 </ol>
 </li>
-<li>对于使用Itr对象进行遍历时，只有Itr对象的remove方法才是合法的。</li>
+<li>初始化channel<ol>
+<li>设置channel选项和属性</li>
+<li>向pipeline中添加ChannelInitializer（简称为CL1，不是b.childHandler中的那个），由于此时channel尚未注册，所以将CL1作为task添加到等待执行队列中（当channel完成注册后执行）。</li>
 </ol>
-<p>这种机制保证了使用Iterator遍历List时不能修改List。</p>
-<h2 id="AbstractMap"><a href="#AbstractMap" class="headerlink" title="AbstractMap"></a>AbstractMap</h2><p>AbstraceMap实现Map接口，主要提供了两种Map.Entry的实现：</p>
+</li>
+<li>注册channel<ol>
+<li>从boss线程池中选择一个EventLoop进行注册。</li>
+<li>如果当前线程就是选择的EventLoop，就直接进行注册；如果不是，就向EventLoop提交一个注册任务。</li>
+<li>需要注意的是channel注册时，并没有设置OP_ACCEPT事件。</li>
+<li>注册成功后，唤醒等待执行的任务，即上文提到过的CL1。</li>
+<li>CL1先往pipeline中添加LoggingHandler，再添加一个ServerBootstrapAcceptor。</li>
+<li>唤醒注册成功的ChannelPromise的监听者，简称B，下文会提到。</li>
+<li>唤醒pipeline中各个ChannelHandler的channelRegistered方法。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>doBind0()：由B调用，从tail到head依次唤醒ChannelContext的bind方法，注意head会真正执行bind地址，即<code>javaChannel().bind(localAddress, config.getBacklog());</code>。绑定完成后，会从head开始执行channelActive方法。</li>
+<li>激活channel：待其余context的channelActive方法执行完毕，执行head的readIfIsAutoRead()，层层递进后设置selector监听OP_ACCEPT。</li>
+</ol>
+<p>上述的说明没有源码配合的话，就会显得很难理解。但是配合源码的话，又会显得过于啰嗦，太着重于细节。这里抛开代码，对netty启动做一个总结。</p>
+<p>netty的启动过程掺杂着各种异步调用，但实际上channel可以归类为4个状态：</p>
+<ol>
+<li>Init：创建了channel需要的pipeline，以及其中的tail和head，并且设置channel选项和属性。此时虽然有了需要绑定的地址，但是实际并没有进行绑定，并且channel没有注册到相应的EventLoop。</li>
+<li>Registry：将channel注册到了EventLoop中，然后在对应的pipeline添加了设置的handler和ServerBootstrapAcceptor（用来创建新连接）。此时channel并未bind地址。</li>
+<li>Bind：从tail到head链式执行bind方法，待全部完成后，对channel进行地址绑定。注意此时，该channel还未工作，因为一开始设置的socket兴趣类型为0（即不对任何io感兴趣）。</li>
+<li>Active：从head到tail执行channelActive方法，全部完成后，设置socket兴趣类型为OP_ACCEPT。至此，channel开始进行工作。</li>
+</ol>
+<p>简单提一下服务端接收客户端连接：首先服务器接收到连接，使用accept创造新的socket，然后invokeChannelRead，直到ServerBootstrapAcceptor的channelRead，将新的socket放入worker线程池。<br>另外客户端的状态变化为Init-&gt;Registry-&gt;Connect-&gt;Active，需要注意的是当Connet成功后，才会转为Active状态。</p>
+<h1 id="netty的ByteBuf"><a href="#netty的ByteBuf" class="headerlink" title="netty的ByteBuf"></a>netty的ByteBuf</h1><p>netty在接收read数据时，会自动使用AdaptiveRecvByteBufAllocator类来创建ByteBuf。池化的ByteBuf需要通过<code>ReferenceCountUtil.release(msg)</code>手动回收或者直接传递至TailContext进行自动回收。<br>AdaptiveRecvByteBufAllocator中的规格如下。</p>
+<pre><code>static {
+    List&lt;Integer&gt; sizeTable = new ArrayList&lt;Integer&gt;();
+    for (int i = 16; i &lt; 512; i += 16) {
+        sizeTable.add(i);
+    }
+    for (int i = 512; i &gt; 0; i &lt;&lt;= 1) {
+        sizeTable.add(i);
+    }
+    SIZE_TABLE = new int[sizeTable.size()];
+    for (int i = 0; i &lt; SIZE_TABLE.length; i ++) {
+        SIZE_TABLE[i] = sizeTable.get(i);
+    }
+}</code></pre><p>也就是BufSize={16, 32, 48, 64, …, 512, 1024, 2048, …, 2*10^30}，默认是1024字节。在分配内存首选堆外内存（也就是直接内存）。<br>至于具体的创建buf的过程则是netty的核心（池化内存）。netty使用PoolChunkList和PoolSubpage管理内存：</p>
 <ul>
-<li>SimpleEntry：可变Entry</li>
-<li>SimpleImmutableEntry：不可变Entry</li>
-</ul>
-<h1 id="具体的集合实现"><a href="#具体的集合实现" class="headerlink" title="具体的集合实现"></a>具体的集合实现</h1><p>接下来介绍几个具体集合的实现细节。</p>
-<h2 id="ArrayList"><a href="#ArrayList" class="headerlink" title="ArrayList"></a>ArrayList</h2><p>其内部存储结构其实就是elementData数组，具体的实现细节有：</p>
+<li><p>PoolChunkList：管理Chunk，内部使用完全二叉树结构管理page，其大小由pageSize和maxOrder（可以认为是最大深度）。</p>
 <ul>
-<li>未指定初始容量，那么elementData的初始容量为0，在第一次进行add后容量变为10。</li>
-<li>在数组扩容时，每次以1.5倍扩张</li>
-</ul>
-<h2 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h2><p>HashMap的内部存储结构是哈希桶数组，其具体细节有：</p>
-<ul>
-<li>初始的加载因子为0.75，哈希桶数量为16。</li>
-<li>不直接使用key的hashcode，而是对hashcode进一步处理，得到真正可用的hash值（个人其实不太理解为何要进行这一步处理，因为hash应该取决于元素本身的hashcode方法，查了一些资料，说是尽量让高低位都参与运算，可能对于后续查找数组中的哈希桶有帮助）</li>
-<li>每次调用put方法时，都会先找到对应的哈希桶（计算得到的hash值&amp;哈希桶数量-1），然后遍历桶上的链表，看key是否已存在：<ul>
-<li>若key存在，则替换该key的value值</li>
-<li>若key不存在，则进行尾插，但是若该链表元素数量超过树化限制（8），则会将该链表转化为红黑树。</li>
+<li>pageSize默认为8K，maxOrder默认为11，所以默认情况下chunk大小为16M。即高度为11的完全二叉树，共有4095个结点（其中2048个叶子结点，每个代表一个page）。</li>
+<li>该完全二叉树的底层存储结构为数组，并且下标从1开始，所以数组大小为4095+1。</li>
+<li>树中每个非叶子结点的内存大小等于左右子树的内存之和。</li>
+<li>数组中结点序号对应的是该结点的深度，深度为1，即可分配16M；深度为2，分配8M…当值为12时，表示该结点已经分配。</li>
 </ul>
 </li>
-<li>当HashMap的元素数量大于threshold（加载因子*hash桶数量）时，并且重新调整内部node的位置。</li>
+<li><p>PoolSubpage：针对小于page的内存又分成两类</p>
+<ul>
+<li>tinySubpagePools：大小的基本单位为16字节，16、32、48、…、496。</li>
+<li>smallSubpagePools：大小的基本单位为512字节，512、1024…4096</li>
 </ul>
-<h2 id="HashSet"><a href="#HashSet" class="headerlink" title="HashSet"></a>HashSet</h2><p>其实质就是HashMap，只是Value部分全都由一个内置的Object对象替代。</p>
+</li>
+</ul>
+<p>在具体分配时，需要根据需要分配的大小判断使用page还是subPage：</p>
+<ul>
+<li>page：在chunkList中查找可用的chunk进行分配，若没有，则重新创建一个chunk。</li>
+<li>subPage：区分选择tinySubpagePools还是smallPagePools，看是否有可用的PoolSubpage，如果有的话就直接分配；如果没有，则分配一个page，参见上条。</li>
+</ul>
 
       
     </div>
@@ -443,9 +506,7 @@ for (int i: list) {
       
         <div class="post-tags">
           
-            <a href="/tags/jdk/" rel="tag"><i class="fa fa-tag"></i>jdk</a>
-          
-            <a href="/tags/%E9%9B%86%E5%90%88/" rel="tag"><i class="fa fa-tag"></i>集合</a>
+            <a href="/tags/netty/" rel="tag"><i class="fa fa-tag"></i>netty</a>
           
         </div>
       
@@ -458,8 +519,8 @@ for (int i: list) {
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/03/07/pnpl/" rel="next" title="PNPL（POF控制器）">
-                <i class="fa fa-chevron-left"></i> PNPL（POF控制器）
+              <a href="/2020/04/05/mybatis/" rel="next" title="MyBatis源码解析">
+                <i class="fa fa-chevron-left"></i> MyBatis源码解析
               </a>
             
           </div>
@@ -467,10 +528,6 @@ for (int i: list) {
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/03/17/onos1/" rel="prev" title="onos之安装编译">
-                onos之安装编译 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -606,7 +663,7 @@ for (int i: list) {
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#从Abstract类看集合"><span class="nav-number">1.</span> <span class="nav-text">从Abstract类看集合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Iterable"><span class="nav-number">1.1.</span> <span class="nav-text">Iterable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Collection"><span class="nav-number">1.2.</span> <span class="nav-text">Collection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractCollection"><span class="nav-number">1.3.</span> <span class="nav-text">AbstractCollection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractList"><span class="nav-number">1.4.</span> <span class="nav-text">AbstractList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AbstractMap"><span class="nav-number">1.5.</span> <span class="nav-text">AbstractMap</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#具体的集合实现"><span class="nav-number">2.</span> <span class="nav-text">具体的集合实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ArrayList"><span class="nav-number">2.1.</span> <span class="nav-text">ArrayList</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashMap"><span class="nav-number">2.2.</span> <span class="nav-text">HashMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashSet"><span class="nav-number">2.3.</span> <span class="nav-text">HashSet</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#netty启动"><span class="nav-number">1.</span> <span class="nav-text">netty启动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty的ByteBuf"><span class="nav-number">2.</span> <span class="nav-text">netty的ByteBuf</span></a></li></ol></div>
             
 
           </div>
