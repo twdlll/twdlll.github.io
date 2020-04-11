@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Twd&#39;s Home">
 <meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 EventLoopGroup bossGroup = new NioEventLoopGroup(1); E">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-10T16:11:38.485Z">
+<meta property="og:updated_time" content="2020-04-11T06:55:48.927Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -286,7 +286,7 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-11T00:11:38+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2020-04-11T14:55:48+08:00">
                 2020-04-11
               </time>
             
@@ -454,7 +454,7 @@ try {
 <li>Active：从head到tail执行channelActive方法，全部完成后，设置socket兴趣类型为OP_ACCEPT。至此，channel开始进行工作。</li>
 </ol>
 <p>简单提一下服务端接收客户端连接：首先服务器接收到连接，使用accept创造新的socket，然后invokeChannelRead，直到ServerBootstrapAcceptor的channelRead，将新的socket放入worker线程池。<br>另外客户端的状态变化为Init-&gt;Registry-&gt;Connect-&gt;Active，需要注意的是当Connet成功后，才会转为Active状态。</p>
-<h1 id="netty的ByteBuf"><a href="#netty的ByteBuf" class="headerlink" title="netty的ByteBuf"></a>netty的ByteBuf</h1><p>netty在接收read数据时，会自动使用AdaptiveRecvByteBufAllocator类来创建ByteBuf。池化的ByteBuf需要通过<code>ReferenceCountUtil.release(msg)</code>手动回收或者直接传递至TailContext进行自动回收。<br>AdaptiveRecvByteBufAllocator中的规格如下。</p>
+<h1 id="netty的ByteBuf"><a href="#netty的ByteBuf" class="headerlink" title="netty的ByteBuf"></a>netty的ByteBuf</h1><p>netty在接收read数据时，会自动使用AdaptiveRecvByteBufAllocator类来创建ByteBuf（实际还是由PooledByteBufAllocator执行创建行为的）。注意：池化的ByteBuf需要通过<code>ReferenceCountUtil.release(msg)</code>手动回收或者直接传递至TailContext进行自动回收。<br>AdaptiveRecvByteBufAllocator主要对接收read消息的ByteBuf做了限制。</p>
 <pre><code>static {
     List&lt;Integer&gt; sizeTable = new ArrayList&lt;Integer&gt;();
     for (int i = 16; i &lt; 512; i += 16) {
