@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Twd&#39;s Home">
 <meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 EventLoopGroup bossGroup = new NioEventLoopGroup(1); E">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-11T11:03:06.274Z">
+<meta property="og:updated_time" content="2020-04-12T08:33:03.346Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -286,8 +286,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-11T19:03:06+08:00">
-                2020-04-11
+              <time title="更新于" itemprop="dateModified" datetime="2020-04-12T16:33:03+08:00">
+                2020-04-12
               </time>
             
           </span>
@@ -454,23 +454,118 @@ try {
 <li>Active：从head到tail执行channelActive方法，全部完成后，设置socket兴趣类型为OP_ACCEPT。至此，channel开始进行工作。</li>
 </ol>
 <p>简单提一下服务端接收客户端连接：首先服务器接收到连接，使用accept创造新的socket，然后invokeChannelRead，直到ServerBootstrapAcceptor的channelRead，将新的socket放入worker线程池。<br>另外客户端的状态变化为Init-&gt;Registry-&gt;Connect-&gt;Active，需要注意的是当Connet成功后，才会转为Active状态。</p>
-<h1 id="netty的ByteBuf"><a href="#netty的ByteBuf" class="headerlink" title="netty的ByteBuf"></a>netty的ByteBuf</h1><p>关于ByteBuf的使用，已经有很多博客讲过了。这里主要讲解下池化的ByteBuf是怎么获得的。<br>netty在接收read数据时，会自动使用AdaptiveRecvByteBufAllocator类来创建ByteBuf（创建动作实际上是交给PooledByteBufAllocator执行的）。<br>这里需要注意的是：池化的ByteBuf需要通过<code>ReferenceCountUtil.release(msg)</code>手动回收或者直接传递至TailContext进行自动回收。<br>AdaptiveRecvByteBufAllocator仅仅对申请的ByteBuf做了限制。</p>
-<pre><code>static {
-    List&lt;Integer&gt; sizeTable = new ArrayList&lt;Integer&gt;();
-    for (int i = 16; i &lt; 512; i += 16) {
-        sizeTable.add(i);
+<h1 id="netty的FastThreadLocal"><a href="#netty的FastThreadLocal" class="headerlink" title="netty的FastThreadLocal"></a>netty的FastThreadLocal</h1><p>netty中的FastThreadLocal是PoolThreadCache、Recycle的基石，从它的名字就能看出，它起到ThreadLocal的作用，并且比ThreadLocal更快。那么JDK中的ThreadLocal存在什么问题，使得netty自己写了一个类来替代它呢。<br>首先ThreadLocal是通过在Thread内部的ThreadLocalMap类型的threadLocals实现的。在调用<code>ThreadLocal.get()</code>会在当前线程的threadLocals中生成一条包含有ThreadLocal对象和Value的entry。由于不同Thread中的threadLocals不同，所以对于同一个ThreadLocal，相应的value就会不同，从而实现了线程间的隔离。但是Thread存在很多不足，这里将通过JDK8中的ThreadLocal源码来讲解。</p>
+<pre><code>// ThreadLocal.java
+private void set(ThreadLocal&lt;?&gt; key, Object value) {
+    Entry[] tab = table;
+    int len = tab.length;
+    int i = key.threadLocalHashCode &amp; (len-1);
+    for (Entry e = tab[i];
+         e != null;
+         e = tab[i = nextIndex(i, len)]) {
+        ThreadLocal&lt;?&gt; k = e.get();
+        if (k == key) {
+            e.value = value;
+            return;
+        }
+        if (k == null) {
+            replaceStaleEntry(key, value, i);
+            return;
+        }
     }
-    for (int i = 512; i &gt; 0; i &lt;&lt;= 1) {
-        sizeTable.add(i);
+    tab[i] = new Entry(key, value);
+    int sz = ++size;
+    if (!cleanSomeSlots(i, sz) &amp;&amp; sz &gt;= threshold)
+        rehash();
     }
-    SIZE_TABLE = new int[sizeTable.size()];
-    for (int i = 0; i &lt; SIZE_TABLE.length; i ++) {
-        SIZE_TABLE[i] = sizeTable.get(i);
-    }
-}</code></pre><p>也就是BufSize={16, 32, 48, 64, …, 512, 1024, 2048, …, 2^30}。初始大小为1024。<br>具体的创建内存、分配ByteBuf、管理ByteBuf池的过程则是netty内存池的核心。默认使用PooledByteBufAllocator.DEFAULT分配堆外内存（也就是直接内存）。<br>至于具体的创建buf的过程则是netty的核心（池化内存）。<br>netty使用PoolThreadCache和Arena进行内存分配：</p>
+}
+
+private static int nextIndex(int i, int len) {
+    return ((i + 1 &lt; len) ? i + 1 : 0);
+}</code></pre><p>这里截取了ThreadLocalMap的set方法（由ThreadLocal.setInitialValue()调用），根据代码可以看出：</p>
 <ul>
-<li>Arena：由多个线程共享，是实际上进行内存申请和分配的核心。</li>
-<li>PoolThreadCache：由单个线程独享，顾名思义，是内存的缓存，当缓存中有内存块的存在时，会先在缓存中查找是否存在符合的内存块。</li>
+<li>根据nextIndex方法可以看出ThreadLocal解决哈希冲突的方法是线性探测，所以查找的时候也是根据线性探测法查找。当使用多个ThreadLocal时，哈希冲突的概率会变大，这时ThreadLocal的get或set速度都会更慢。</li>
+<li>其实ThreadLocalMap中每个entry的key是WeekReference&lt;ThreadLocal&lt;?&gt;&gt;。当ThreadLocal使用完毕后，并且没有remove，但是此时entry中的value还存在着，因此会导致内存泄漏。事实上，ThreadLocalMap也针对此提供了一些清除机制，也就是在每一次set或getEntry后都会清理一部分key为null的entry。只是这种机制并不能保证完全避免内存泄漏。</li>
+</ul>
+<p>接着我们再来看看FastThreadLocal：</p>
+<pre><code>// FastThreadLocal.java
+public final V get() {
+    InternalThreadLocalMap threadLocalMap = InternalThreadLocalMap.get();
+    Object v = threadLocalMap.indexedVariable(index);
+    if (v != InternalThreadLocalMap.UNSET) {
+        return (V) v;
+    }
+    return initialize(threadLocalMap);
+}</code></pre><p>可以看到FastThreadLocal引入了新的InternalThreadLocalMap，InternalThreadLocalMap的get也很有意思。</p>
+<pre><code>// InternalThreadLocalMap.java
+public static InternalThreadLocalMap get() {
+    Thread thread = Thread.currentThread();
+    if (thread instanceof FastThreadLocalThread) {
+        return fastGet((FastThreadLocalThread) thread);
+    } else {
+        return slowGet();
+    }
+}</code></pre><p>一般来讲FastThreadLocal是和FastThreadLocalThread（Thread子类）配合使用的，但FastThreadLocal也提供了与Thread的兼容，其实就是使用ThreadLocal在每个线程中存一个InternalThreadLocalMap，然后再执行其他操作，相当于多执行了一次调用。<br>InternalThreadLocalMap以数组作为底层存储结构，初始是大小为32的Object[]。</p>
+<pre><code>// FastThreadLocal.java
+private V initialize(InternalThreadLocalMap threadLocalMap) {
+    V v = null;
+    try {
+        v = initialValue();
+    } catch (Exception e) {
+        PlatformDependent.throwException(e);
+    }
+    // index是FastThreadLocal创建时确定的，表示value在Object[]的下标，从1开始
+    threadLocalMap.setIndexedVariable(index, v);
+    // 注意Object[]中第0个的类型是Set&lt;FastThreadLocal&lt;?&gt;&gt;，存储了所有创建的FastThreadLocal对象
+    // 每次init FastThreadLocal后，都会将其添加到Set&lt;FastThreadLocal&lt;?&gt;&gt;中
+    addToVariablesToRemove(threadLocalMap, this);
+    return v;
+}</code></pre><p>更细致的代码不继续展开，大的改动就是去掉了弱引用，并且将所有用过的FastThreadLocal都存储起来。当FastThreadLocal.remove()时，就会清空Object[]相应下标的值，并且也在removeSet中除去。那么如果没有remove，那么FastThreadLocal是怎么释放的呢？</p>
+<pre><code>// FastThreadLocalThread.java
+public FastThreadLocalThread(Runnable target) {
+    super(FastThreadLocalRunnable.wrap(target));
+    cleanupFastThreadLocals = true;
+}
+
+// FastThreadLocalRunnable.java
+public void run() {
+    try {
+        runnable.run();
+    } finally {
+        FastThreadLocal.removeAll();
+    }
+}
+
+static Runnable wrap(Runnable runnable) {
+    return runnable instanceof FastThreadLocalRunnable ? runnable : new FastThreadLocalRunnable(runnable);
+}</code></pre><p>这也就是为什么推荐FastThreadLocalThread和FastThreadLocal配合使用的原因了。在线程运行结束后，就会进行removeAll，释放内存。</p>
+<ul>
+<li>对于普通线程，这其实有点牵强，也就是在线程运行时，并不会清除掉无用的value，直到线程运行结束，才会removeAll。但是原生的ThreadLocal在线程运行结束后，也会在GC之后进行清除的。</li>
+<li>对于线程池线程，因为线程池中的线程不是执行完1个任务就结束的，而是会等待执行多个任务，此时该清除机制就会非常有用。</li>
+</ul>
+<p>所以，总的来说FastThreadLocal相比原生ThreadLocal有以下两个优点：</p>
+<ul>
+<li><p>查询速度快：采用下标查询法，空间换时间，O(1)的时间复杂度。</p>
+</li>
+<li><p>避免内存溢出：适用于线程池线程中。</p>
+<h1 id="netty的ByteBuf"><a href="#netty的ByteBuf" class="headerlink" title="netty的ByteBuf"></a>netty的ByteBuf</h1><p>关于ByteBuf的使用，已经有很多博客讲过了。这里主要讲解下池化的ByteBuf是怎么获得的。<br>netty在接收read数据时，会自动使用AdaptiveRecvByteBufAllocator类来创建ByteBuf（创建动作实际上是交给PooledByteBufAllocator执行的）。<br>这里需要注意的是：池化的ByteBuf需要通过<code>ReferenceCountUtil.release(msg)</code>手动回收或者直接传递至TailContext进行自动回收。<br>AdaptiveRecvByteBufAllocator仅仅对申请的ByteBuf做了限制。</p>
+<p>  static {</p>
+<pre><code>List&lt;Integer&gt; sizeTable = new ArrayList&lt;Integer&gt;();
+for (int i = 16; i &lt; 512; i += 16) {
+    sizeTable.add(i);
+}
+for (int i = 512; i &gt; 0; i &lt;&lt;= 1) {
+    sizeTable.add(i);
+}
+SIZE_TABLE = new int[sizeTable.size()];
+for (int i = 0; i &lt; SIZE_TABLE.length; i ++) {
+    SIZE_TABLE[i] = sizeTable.get(i);
+}</code></pre><p>  }<br>也就是BufSize={16, 32, 48, 64, …, 512, 1024, 2048, …, 2^30}。初始大小为1024。<br>具体的创建内存、分配ByteBuf、管理ByteBuf池的过程则是netty内存池的核心。默认使用PooledByteBufAllocator.DEFAULT分配堆外内存（也就是直接内存）。<br>至于具体的创建buf的过程则是netty的核心（池化内存）。<br>netty使用PoolThreadCache和Arena进行内存分配：</p>
+</li>
+<li><p>Arena：由多个线程共享，是实际上进行内存申请和分配的核心。</p>
+</li>
+<li><p>PoolThreadCache：由单个线程独享，顾名思义，是内存的缓存，当缓存中有内存块的存在时，会先在缓存中查找是否存在符合的内存块。</p>
+</li>
 </ul>
 <p>举个例子来讲解这两者之间的关系：当线程第一次申请ByteBuf时，PoolThreadCache是空的，所以在其中找不到合适的内存块；线程接着向Arena发起申请，Arena响应申请后，返回ByteBuf；线程使用ByteBuf完毕后，进行释放，ByteBuf被释放后先进入PoolThreadCache中（等到分配次数达到一定次数后才会进入Arena中）。<br>那么Arena是怎么管理内存块呢？主要是通过PoolChunkList和PoolSubpage来进行管理。</p>
 <ul>
@@ -669,7 +764,7 @@ try {
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#netty启动"><span class="nav-number">1.</span> <span class="nav-text">netty启动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty的ByteBuf"><span class="nav-number">2.</span> <span class="nav-text">netty的ByteBuf</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#netty启动"><span class="nav-number">1.</span> <span class="nav-text">netty启动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty的FastThreadLocal"><span class="nav-number">2.</span> <span class="nav-text">netty的FastThreadLocal</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty的ByteBuf"><span class="nav-number">3.</span> <span class="nav-text">netty的ByteBuf</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
