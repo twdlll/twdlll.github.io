@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Twd&#39;s Home">
 <meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 EventLoopGroup bossGroup = new NioEventLoopGroup(1); E">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-12T08:33:03.346Z">
+<meta property="og:updated_time" content="2020-04-12T12:43:25.323Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -286,7 +286,7 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-12T16:33:03+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2020-04-12T20:43:25+08:00">
                 2020-04-12
               </time>
             
@@ -485,7 +485,7 @@ private static int nextIndex(int i, int len) {
 }</code></pre><p>这里截取了ThreadLocalMap的set方法（由ThreadLocal.setInitialValue()调用），根据代码可以看出：</p>
 <ul>
 <li>根据nextIndex方法可以看出ThreadLocal解决哈希冲突的方法是线性探测，所以查找的时候也是根据线性探测法查找。当使用多个ThreadLocal时，哈希冲突的概率会变大，这时ThreadLocal的get或set速度都会更慢。</li>
-<li>其实ThreadLocalMap中每个entry的key是WeekReference&lt;ThreadLocal&lt;?&gt;&gt;。当ThreadLocal使用完毕后，并且没有remove，但是此时entry中的value还存在着，因此会导致内存泄漏。事实上，ThreadLocalMap也针对此提供了一些清除机制，也就是在每一次set或getEntry后都会清理一部分key为null的entry。只是这种机制并不能保证完全避免内存泄漏。</li>
+<li>其实ThreadLocalMap中每个entry的key是WeakReference&lt;ThreadLocal&lt;?&gt;&gt;。当ThreadLocal使用完毕后，并且没有remove，但是此时entry中的value还存在着，因此会导致内存泄漏。事实上，ThreadLocalMap也针对此提供了一些清除机制，也就是在每一次set或getEntry后都会清理一部分key为null的entry。只是这种机制并不能保证完全避免内存泄漏。</li>
 </ul>
 <p>接着我们再来看看FastThreadLocal：</p>
 <pre><code>// FastThreadLocal.java
