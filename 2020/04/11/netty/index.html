@@ -87,8 +87,10 @@
 <meta property="og:site_name" content="Twd&#39;s Home">
 <meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 EventLoopGroup bossGroup = new NioEventLoopGroup(1); E">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-13T05:20:44.582Z">
+<meta property="og:image" content="&#x2F;images&#x2F;netty&#x2F;accept_error.png">
+<meta property="og:updated_time" content="2020-04-15T12:25:59.691Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="&#x2F;images&#x2F;netty&#x2F;accept_error.png">
 
 
 
@@ -286,8 +288,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-13T13:20:44+08:00">
-                2020-04-13
+              <time title="更新于" itemprop="dateModified" datetime="2020-04-15T20:25:59+08:00">
+                2020-04-15
               </time>
             
           </span>
@@ -583,6 +585,11 @@ static Runnable wrap(Runnable runnable) {
 <li>subPage：区分选择tinySubpagePools还是smallPagePools，看是否有可用的PoolSubpage，如果有的话就直接分配；如果没有，则分配一个page，参见上条。</li>
 </ul>
 <p>关于chunk、tinySubpagePools和smallSubpagePool的数据结构和管理可以看参考博客，我就不重新画图了，不得不说netty的设计特别巧妙。</p>
+<h1 id="netty使用心得"><a href="#netty使用心得" class="headerlink" title="netty使用心得"></a>netty使用心得</h1><p>以下是使用netty时的一些问题和心得总结。</p>
+<h2 id="通过心跳机制关闭长连接"><a href="#通过心跳机制关闭长连接" class="headerlink" title="通过心跳机制关闭长连接"></a>通过心跳机制关闭长连接</h2><p>可以使用IdleStateHandler通过读/写超时事件进行触发，但是IdleStateHandler只能在连接有效时使用，不适用于异常中断情况。</p>
+<h2 id="对客户端异常中断进行处理"><a href="#对客户端异常中断进行处理" class="headerlink" title="对客户端异常中断进行处理"></a>对客户端异常中断进行处理</h2><p>netty在检测到连接中断后会自动关闭channel，所以可以在channelHandler中重写channelInactive、channelUnregistered和channelRemoved（这三个方法依次执行）。</p>
+<h2 id="在接收新连接时创建2个channel"><a href="#在接收新连接时创建2个channel" class="headerlink" title="在接收新连接时创建2个channel"></a>在接收新连接时创建2个channel</h2><p>有时接收新连接时只创建一个channel，有时创建2个（第一个很快关闭）。<br><img src="/images/netty/accept_error.png" alt=""></p>
+<p>可以看到创建了2个channel（测试环境win10，jdk8），具体原因尚不清楚，等以后有时间再看看。</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://huzb.me/2019/10/13/netty%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" target="_blank" rel="noopener">netty源码学习笔记–内存分配</a></p>
 
       
@@ -762,7 +769,7 @@ static Runnable wrap(Runnable runnable) {
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#netty启动"><span class="nav-number">1.</span> <span class="nav-text">netty启动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty的FastThreadLocal"><span class="nav-number">2.</span> <span class="nav-text">netty的FastThreadLocal</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty的ByteBuf"><span class="nav-number">3.</span> <span class="nav-text">netty的ByteBuf</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#netty启动"><span class="nav-number">1.</span> <span class="nav-text">netty启动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty的FastThreadLocal"><span class="nav-number">2.</span> <span class="nav-text">netty的FastThreadLocal</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty的ByteBuf"><span class="nav-number">3.</span> <span class="nav-text">netty的ByteBuf</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#netty使用心得"><span class="nav-number">4.</span> <span class="nav-text">netty使用心得</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#通过心跳机制关闭长连接"><span class="nav-number">4.1.</span> <span class="nav-text">通过心跳机制关闭长连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对客户端异常中断进行处理"><span class="nav-number">4.2.</span> <span class="nav-text">对客户端异常中断进行处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在接收新连接时创建2个channel"><span class="nav-number">4.3.</span> <span class="nav-text">在接收新连接时创建2个channel</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
