@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="idea," />
+  <meta name="keywords" content="sdn,pof," />
 
 
 
@@ -79,18 +79,19 @@
 
 
 
-<meta name="description" content="idea目录结构idea的目录结构分为五部分：  Sources:这个目录下主要存放源代码。 Tests:这个目录下也存放着源代码，只不过是测试源代码。 Resources:这个目录下存放着资源文件，包括图片和xml等。 Test Resources:这个目录下存放着测试所需要的资源文件。 Excluded:排除该文件夹，使该目录下的源码失效，不参与编译。  如何将目录设置为指定类型有两种方法：">
-<meta name="keywords" content="idea">
+<meta name="description" content="在初版POF Controller的基础上进行改进，对其架构进行了改进。 架构介绍对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。 Netty线程池Netty线程池负责跟底层交换机进行通信，其主要职责有：  Encode&#x2F;Decode工作：首先编解码工作并不复杂，另外相对于另一种实现（增加编解码组件，专门负责编解码工作），直接集成在Channel中更加简单">
+<meta name="keywords" content="sdn,pof">
 <meta property="og:type" content="article">
-<meta property="og:title" content="idea相关">
-<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;12&#x2F;05&#x2F;idea&#x2F;index.html">
+<meta property="og:title" content="POF控制器（二）">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;04&#x2F;19&#x2F;pnpl1&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="idea目录结构idea的目录结构分为五部分：  Sources:这个目录下主要存放源代码。 Tests:这个目录下也存放着源代码，只不过是测试源代码。 Resources:这个目录下存放着资源文件，包括图片和xml等。 Test Resources:这个目录下存放着测试所需要的资源文件。 Excluded:排除该文件夹，使该目录下的源码失效，不参与编译。  如何将目录设置为指定类型有两种方法：">
+<meta property="og:description" content="在初版POF Controller的基础上进行改进，对其架构进行了改进。 架构介绍对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。 Netty线程池Netty线程池负责跟底层交换机进行通信，其主要职责有：  Encode&#x2F;Decode工作：首先编解码工作并不复杂，另外相对于另一种实现（增加编解码组件，专门负责编解码工作），直接集成在Channel中更加简单">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;images&#x2F;idea&#x2F;idea_dirs.png">
-<meta property="og:updated_time" content="2019-12-08T04:29:21.851Z">
+<meta property="og:image" content="&#x2F;images&#x2F;pnpl1&#x2F;arch.png">
+<meta property="og:image" content="&#x2F;images&#x2F;pnpl1&#x2F;event.png">
+<meta property="og:updated_time" content="2020-04-19T11:57:18.417Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;idea&#x2F;idea_dirs.png">
+<meta name="twitter:image" content="&#x2F;images&#x2F;pnpl1&#x2F;arch.png">
 
 
 
@@ -120,13 +121,13 @@
 
 
 
-  <link rel="canonical" href="https//twdlll.github.io/2019/12/05/idea/"/>
+  <link rel="canonical" href="https//twdlll.github.io/2020/04/19/pnpl1/"/>
 
 
 
 
 
-  <title>idea相关 | Twd's Home</title>
+  <title>POF控制器（二） | Twd's Home</title>
   
 
 
@@ -243,7 +244,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2019/12/05/idea/">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/04/19/pnpl1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Twd">
@@ -260,7 +261,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">idea相关</h1>
+          <h1 class="post-title" itemprop="name headline">POF控制器（二）</h1>
         
 
         <div class="post-meta">
@@ -272,8 +273,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-05T00:00:00+08:00">
-                2019-12-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-19T00:00:00+08:00">
+                2020-04-19
               </time>
             
 
@@ -288,8 +289,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2019-12-08T12:29:21+08:00">
-                2019-12-08
+              <time title="更新于" itemprop="dateModified" datetime="2020-04-19T19:57:18+08:00">
+                2020-04-19
               </time>
             
           </span>
@@ -307,8 +308,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A5%E5%B8%B8%E9%97%AE%E9%A2%98/" itemprop="url" rel="index">
-                    <span itemprop="name">日常问题</span>
+                  <a href="/categories/%E4%B8%AA%E4%BA%BA%E7%BB%8F%E5%8E%86/" itemprop="url" rel="index">
+                    <span itemprop="name">个人经历</span>
                   </a>
                 </span>
 
@@ -349,27 +350,37 @@
       
 
       
-        <h1 id="idea目录结构"><a href="#idea目录结构" class="headerlink" title="idea目录结构"></a>idea目录结构</h1><p><img src="/images/idea/idea_dirs.png" alt=""><br>idea的目录结构分为五部分：</p>
-<ul>
-<li>Sources:这个目录下主要存放源代码。</li>
-<li>Tests:这个目录下也存放着源代码，只不过是测试源代码。</li>
-<li>Resources:这个目录下存放着资源文件，包括图片和xml等。</li>
-<li>Test Resources:这个目录下存放着测试所需要的资源文件。</li>
-<li>Excluded:排除该文件夹，使该目录下的源码失效，不参与编译。</li>
-</ul>
-<p>如何将目录设置为指定类型有两种方法：</p>
+        <p>在初版POF Controller的基础上进行改进，对其架构进行了改进。</p>
+<h1 id="架构介绍"><a href="#架构介绍" class="headerlink" title="架构介绍"></a>架构介绍</h1><p><img src="/images/pnpl1/arch.png" alt=""><br>对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。</p>
+<h1 id="Netty线程池"><a href="#Netty线程池" class="headerlink" title="Netty线程池"></a>Netty线程池</h1><p>Netty线程池负责跟底层交换机进行通信，其主要职责有：</p>
 <ol>
-<li>选定文件夹，右键选择Mark Directory as, 然后选择指定文件夹。</li>
-<li>打开file选项，选择Project Structure，然后在modules选项卡中就可以进行标记。</li>
+<li>Encode/Decode工作：首先编解码工作并不复杂，另外相对于另一种实现（增加编解码组件，专门负责编解码工作），直接集成在Channel中更加简单方便。</li>
+<li>与交换机进行协议握手：对于每个交换机而言，仅与控制器完成一次握手，远小于后续业务处理的工作量，所以也可以放在Channel中。</li>
+<li>响应EchoRequest消息：该消息是控制器与交换机之间的心跳机制，对于该消息无需进行计算，只需要简单发送EchoReply，所以也可由Channel承担。</li>
+<li>生成Event，发送至Event Dispatcher，这也是Netty线程池最重要的作用。</li>
 </ol>
-<p>idea的目录结构跟maven的对应关系为：idea的Sources和Resources目录会转入target/classes目录，Tests和Test Resources目录会转入target/test-classes目录。</p>
-<h1 id="源发行版-8-需要目标发行版1-8"><a href="#源发行版-8-需要目标发行版1-8" class="headerlink" title="源发行版 8 需要目标发行版1.8"></a>源发行版 8 需要目标发行版1.8</h1><p>版本问题，检查下列设置：</p>
+<p>关于生成的Event类型如下图所示：<br><img src="/images/pnpl1/event.png" alt=""></p>
+<h1 id="Event-Dispatcher"><a href="#Event-Dispatcher" class="headerlink" title="Event Dispatcher"></a>Event Dispatcher</h1><p>负责将收到的消息转发出去，对于不同的消息都有单独的DispatchLoop（线程）负责分发，分发方式为FIFO。</p>
 <ul>
-<li>Project Structure中的Project SDK和Project language level一致</li>
-<li>Project Structure中Modules的language level一致。</li>
-<li>Settings下的Java Compiler中的Target bytecode version一致。</li>
-<li>pom.xml中的maven.compiler.source和maven.compiler.target一致</li>
+<li>LinkEvent：发送给LinkDiscovery。</li>
+<li>HostEvent：发送给HostDiscovery。</li>
+<li>WorkEvent：发送给Worker。</li>
 </ul>
+<h1 id="Network"><a href="#Network" class="headerlink" title="Network"></a>Network</h1><p>Network是一个非常核心的组件，它的可靠性是其他组件运行的前提。HostDiscovery和LinkDiscovery会修改Network，而Worker则需要Network的拓扑信息进行业务处理。由于该组件会受到多线程的读写，并且考虑到该场景读多写少，Worker业务处理速度较快（无I/O读写和数据库访问），所以使用StampedLock。StampedLock使用乐观锁+悲观锁，性能上较ReentrantReadWriteLock更高，但是编写业务逻辑时更加复杂（需要考虑到乐观锁失效的情况）。</p>
+<h1 id="HostDiscovery"><a href="#HostDiscovery" class="headerlink" title="HostDiscovery"></a>HostDiscovery</h1><p>处理HostEvent（对arp消息进行包装）。</p>
+<ul>
+<li>arp请求：若Network中已有目标host，就下发arp响应；若没有，则洪泛该arp请求。</li>
+<li>arp响应：在Network中添加发出响应的host。</li>
+</ul>
+<h1 id="LinkDiscovery"><a href="#LinkDiscovery" class="headerlink" title="LinkDiscovery"></a>LinkDiscovery</h1><p>处理LinkEvent（对LLDP消息进行包装）。<br>对于收到的LinkEvent，检查该链路是否已经存在Network中，若不存在，则添加。并且该组件还会周期性地扫描链路，确保实时更新链路情况。</p>
+<h1 id="Worker"><a href="#Worker" class="headerlink" title="Worker"></a>Worker</h1><p>对于接收到的WorkEvent进行处理。但是这种处理过程主要分为4个部分：</p>
+<ol>
+<li>对收到的消息进行过滤处理，防止收到多个相同的WorkEvent，进行多次处理。</li>
+<li>使用乐观锁模式的Topo视图进行处理，并把相应结果转化为流表，但是暂存起来。暂存的目的主要是防止乐观锁模式失败。</li>
+<li>检查乐观锁是否有效，有效则下发流表；若无效，则使用悲观读锁重新处理。</li>
+<li>将WorkEvent中的数据包PacketOut，防止丢包。</li>
+</ol>
+<h1 id="另外的优化"><a href="#另外的优化" class="headerlink" title="另外的优化"></a>另外的优化</h1><p>由于控制器是以POF Message和交换机进行交互，但是不断创建POF Message显然会加重创造对象的开销和GC的频率，所以使用Netty的Recycler对象池对部分热点消息进行回收。</p>
 
       
     </div>
@@ -387,7 +398,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/idea/" rel="tag"><i class="fa fa-tag"></i>idea</a>
+            <a href="/tags/sdn/" rel="tag"><i class="fa fa-tag"></i>sdn</a>
+          
+            <a href="/tags/pof/" rel="tag"><i class="fa fa-tag"></i>pof</a>
           
         </div>
       
@@ -400,8 +413,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/12/04/gfs/" rel="next" title="GFS分析">
-                <i class="fa fa-chevron-left"></i> GFS分析
+              <a href="/2020/04/15/open_lib/" rel="next" title="实用库推荐">
+                <i class="fa fa-chevron-left"></i> 实用库推荐
               </a>
             
           </div>
@@ -409,10 +422,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/12/11/mapreduce/" rel="prev" title="MapReduce">
-                MapReduce <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -548,7 +557,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#idea目录结构"><span class="nav-number">1.</span> <span class="nav-text">idea目录结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源发行版-8-需要目标发行版1-8"><span class="nav-number">2.</span> <span class="nav-text">源发行版 8 需要目标发行版1.8</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#架构介绍"><span class="nav-number">1.</span> <span class="nav-text">架构介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Netty线程池"><span class="nav-number">2.</span> <span class="nav-text">Netty线程池</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Event-Dispatcher"><span class="nav-number">3.</span> <span class="nav-text">Event Dispatcher</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Network"><span class="nav-number">4.</span> <span class="nav-text">Network</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HostDiscovery"><span class="nav-number">5.</span> <span class="nav-text">HostDiscovery</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LinkDiscovery"><span class="nav-number">6.</span> <span class="nav-text">LinkDiscovery</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Worker"><span class="nav-number">7.</span> <span class="nav-text">Worker</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#另外的优化"><span class="nav-number">8.</span> <span class="nav-text">另外的优化</span></a></li></ol></div>
             
 
           </div>
