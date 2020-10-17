@@ -45,6 +45,44 @@
 
 
 
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
 
 
 
@@ -79,16 +117,16 @@
 
 
 
-<meta name="description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 EventLoopGroup bossGroup = new NioEventLoopGroup(1); E">
+<meta name="description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。   EventLoopGroup bossGroup = new NioEventLoopGroup(1);">
 <meta name="keywords" content="netty">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Netty源码解析">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;04&#x2F;11&#x2F;netty&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 EventLoopGroup bossGroup = new NioEventLoopGroup(1); E">
+<meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。   EventLoopGroup bossGroup = new NioEventLoopGroup(1);">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;netty&#x2F;accept_error.png">
-<meta property="og:updated_time" content="2020-04-15T12:25:59.691Z">
+<meta property="og:updated_time" content="2020-10-17T04:49:39.822Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;netty&#x2F;accept_error.png">
 
@@ -191,6 +229,16 @@
         </li>
       
         
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
@@ -207,6 +255,16 @@
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
           </a>
         </li>
       
@@ -288,8 +346,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-15T20:25:59+08:00">
-                2020-04-15
+              <time title="更新于" itemprop="dateModified" datetime="2020-10-17T12:49:39+08:00">
+                2020-10-17
               </time>
             
           </span>
@@ -350,27 +408,27 @@
 
       
         <p>之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。</p>
-<h1 id="netty启动"><a href="#netty启动" class="headerlink" title="netty启动"></a>netty启动</h1><p>这里仅介绍服务器端的启动过程（客户端的启动比较简单）。</p>
+<h1 id="netty启动"><a href="#netty启动" class="headerlink" title="netty启动"></a>netty启动</h1><p>这里仅介绍服务器端的启动过程（客户端的启动比较简单）。  </p>
 <pre><code>EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 EventLoopGroup workerGroup = new NioEventLoopGroup();
 final EchoServerHandler serverHandler = new EchoServerHandler();
 try {
     ServerBootstrap b = new ServerBootstrap();
     b.group(bossGroup, workerGroup)
-     .channel(NioServerSocketChannel.class)
-     .option(ChannelOption.SO_BACKLOG, 100)
-     .handler(new LoggingHandler(LogLevel.INFO))
-     .childHandler(new ChannelInitializer&lt;SocketChannel&gt;() {
-         @Override
-         public void initChannel(SocketChannel ch) throws Exception {
-             ChannelPipeline p = ch.pipeline();                  if (sslCtx != null) {
-                 p.addLast(sslCtx.newHandler(ch.alloc()));
-             }
-             //p.addLast(new LoggingHandler(LogLevel.INFO));
-             p.addLast(serverHandler);
-         }
-     });
-
+        .channel(NioServerSocketChannel.class)
+        .option(ChannelOption.SO_BACKLOG, 100)
+        .handler(new LoggingHandler(LogLevel.INFO))
+        .childHandler(new ChannelInitializer&lt;SocketChannel&gt;() {
+            @Override
+            public void initChannel(SocketChannel ch) throws Exception {
+                ChannelPipeline p = ch.pipeline();                  
+                if (sslCtx != null) {
+                    p.addLast(sslCtx.newHandler(ch.alloc()));
+                }
+                //p.addLast(new LoggingHandler(LogLevel.INFO));
+                p.addLast(serverHandler);
+            }
+        });
     // Start the server.
     ChannelFuture f = b.bind(PORT).sync();</code></pre><blockquote>
 <p>以上截取自netty-example中的EchoServer的源码。</p>
@@ -386,7 +444,6 @@ try {
     if (regFuture.cause() != null) {
         return regFuture;
     }
-
     if (regFuture.isDone()) {
         // 这个时候注册已经成功
         ChannelPromise promise = channel.newPromise();
@@ -712,6 +769,8 @@ static Runnable wrap(Runnable runnable) {
             
               <div class="site-state-item site-state-posts">
               
+                <a href="/archives/%7C%7C%20archive">
+              
                 <a href="/archives">
               
                   <span class="site-state-item-count">16</span>
@@ -749,6 +808,12 @@ static Runnable wrap(Runnable runnable) {
           
 
           
+          
+            <div class="cc-license motion-element" itemprop="license">
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
+                <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+              </a>
+            </div>
           
 
           
@@ -789,7 +854,7 @@ static Runnable wrap(Runnable runnable) {
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
@@ -875,6 +940,8 @@ static Runnable wrap(Runnable runnable) {
   
 
 
+  
+
 
 
 
@@ -913,6 +980,11 @@ static Runnable wrap(Runnable runnable) {
   
   
     <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
   
 
 
