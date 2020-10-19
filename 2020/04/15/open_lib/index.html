@@ -117,15 +117,15 @@
 
 
 
-<meta name="description" content="这篇博客主要是记录一些比较少见但又很好用的库。 分析JVM中对象布局：JOLJOL的maven三元组。 &amp;lt;dependency&amp;gt;     &amp;lt;groupId&amp;gt;org.openjdk.jol&amp;lt;&#x2F;groupId&amp;gt;     &amp;lt;artifactId&amp;gt;jol-core&amp;lt;&#x2F;artifactId&amp;gt;     &amp;lt;version&amp;gt;0.9&amp;lt;&#x2F;v">
+<meta name="description" content="这篇博客主要是记录一些比较少见但又很好用的库。 分析JVM中对象布局：JOLJOL的maven三元组： 12345&amp;lt;dependency&amp;gt;  &amp;lt;groupId&amp;gt;org.openjdk.jol&amp;lt;&#x2F;groupId&amp;gt;  &amp;lt;artifactId&amp;gt;jol-core&amp;lt;&#x2F;artifactId&amp;gt;  &amp;lt;version&amp;gt;0.9&amp;lt;&#x2F;versi">
 <meta property="og:type" content="article">
 <meta property="og:title" content="实用库推荐">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;04&#x2F;15&#x2F;open_lib&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="这篇博客主要是记录一些比较少见但又很好用的库。 分析JVM中对象布局：JOLJOL的maven三元组。 &amp;lt;dependency&amp;gt;     &amp;lt;groupId&amp;gt;org.openjdk.jol&amp;lt;&#x2F;groupId&amp;gt;     &amp;lt;artifactId&amp;gt;jol-core&amp;lt;&#x2F;artifactId&amp;gt;     &amp;lt;version&amp;gt;0.9&amp;lt;&#x2F;v">
+<meta property="og:description" content="这篇博客主要是记录一些比较少见但又很好用的库。 分析JVM中对象布局：JOLJOL的maven三元组： 12345&amp;lt;dependency&amp;gt;  &amp;lt;groupId&amp;gt;org.openjdk.jol&amp;lt;&#x2F;groupId&amp;gt;  &amp;lt;artifactId&amp;gt;jol-core&amp;lt;&#x2F;artifactId&amp;gt;  &amp;lt;version&amp;gt;0.9&amp;lt;&#x2F;versi">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;open_lib&#x2F;jol.png">
-<meta property="og:updated_time" content="2020-04-15T08:26:02.199Z">
+<meta property="og:updated_time" content="2020-10-19T06:59:49.366Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;open_lib&#x2F;jol.png">
 
@@ -345,8 +345,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-15T16:26:02+08:00">
-                2020-04-15
+              <time title="更新于" itemprop="dateModified" datetime="2020-10-19T14:59:49+08:00">
+                2020-10-19
               </time>
             
           </span>
@@ -407,23 +407,11 @@
 
       
         <p>这篇博客主要是记录一些比较少见但又很好用的库。</p>
-<h1 id="分析JVM中对象布局：JOL"><a href="#分析JVM中对象布局：JOL" class="headerlink" title="分析JVM中对象布局：JOL"></a>分析JVM中对象布局：JOL</h1><p>JOL的maven三元组。</p>
-<pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;org.openjdk.jol&lt;/groupId&gt;
-    &lt;artifactId&gt;jol-core&lt;/artifactId&gt;
-    &lt;version&gt;0.9&lt;/version&gt;
-&lt;/dependency&gt;</code></pre><p>使用也非常简单，通过它可以了解对象布局情况。</p>
-<pre><code>public class Test {
-    private long a = 2;
-    private short b = 1;
-    public static void main(String[] args) {
-        Object o = new Object();
-        // 查看普通对象布局
-        System.out.println(ClassLayout.parseInstance(o).toPrintable());
-        // 查看Class对象布局
-        System.out.println(ClassLayout.parseClass(Test.class).toPrintable());
-    }
-}</code></pre><p>结果如下：<br><img src="/images/open_lib/jol.png" alt=""></p>
+<h1 id="分析JVM中对象布局：JOL"><a href="#分析JVM中对象布局：JOL" class="headerlink" title="分析JVM中对象布局：JOL"></a>分析JVM中对象布局：JOL</h1><p>JOL的maven三元组：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.openjdk.jol<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jol-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.9<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>使用也非常简单，通过它可以了解对象布局情况，以下是示例代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">long</span> a = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">short</span> b = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Object o = <span class="keyword">new</span> Object();</span><br><span class="line">    <span class="comment">// 查看普通对象布局</span></span><br><span class="line">    System.out.println(ClassLayout.parseInstance(o).toPrintable());</span><br><span class="line">    <span class="comment">// 查看Class对象布局</span></span><br><span class="line">    System.out.println(ClassLayout.parseClass(Test<span class="class">.<span class="keyword">class</span>).<span class="title">toPrintable</span>())</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果如下：<br><img src="/images/open_lib/jol.png" alt=""></p>
 <ol>
 <li>对象头的mark word部分</li>
 <li>对象头的class ref部分</li>

@@ -117,16 +117,16 @@
 
 
 
-<meta name="description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。   EventLoopGroup bossGroup = new NioEventLoopGroup(1);">
+<meta name="description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 123456789101112131415161718192021222324EventLoopGroup">
 <meta name="keywords" content="netty">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Netty源码解析">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;04&#x2F;11&#x2F;netty&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。   EventLoopGroup bossGroup = new NioEventLoopGroup(1);">
+<meta property="og:description" content="之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。 netty启动这里仅介绍服务器端的启动过程（客户端的启动比较简单）。 123456789101112131415161718192021222324EventLoopGroup">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;netty&#x2F;accept_error.png">
-<meta property="og:updated_time" content="2020-10-17T04:49:39.822Z">
+<meta property="og:updated_time" content="2020-10-19T07:19:19.866Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;netty&#x2F;accept_error.png">
 
@@ -346,8 +346,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-10-17T12:49:39+08:00">
-                2020-10-17
+              <time title="更新于" itemprop="dateModified" datetime="2020-10-19T15:19:19+08:00">
+                2020-10-19
               </time>
             
           </span>
@@ -408,66 +408,16 @@
 
       
         <p>之前就看过netty的源码，但是由于netty调用栈极其复杂，细致地看每行代码很容易陷入思维混乱。本文虽然基于源码，但不完全依赖源码，希望以稍微偏上层的总结来理解netty的整体流程。源码版本为4.1.41.Final。</p>
-<h1 id="netty启动"><a href="#netty启动" class="headerlink" title="netty启动"></a>netty启动</h1><p>这里仅介绍服务器端的启动过程（客户端的启动比较简单）。  </p>
-<pre><code>EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-EventLoopGroup workerGroup = new NioEventLoopGroup();
-final EchoServerHandler serverHandler = new EchoServerHandler();
-try {
-    ServerBootstrap b = new ServerBootstrap();
-    b.group(bossGroup, workerGroup)
-        .channel(NioServerSocketChannel.class)
-        .option(ChannelOption.SO_BACKLOG, 100)
-        .handler(new LoggingHandler(LogLevel.INFO))
-        .childHandler(new ChannelInitializer&lt;SocketChannel&gt;() {
-            @Override
-            public void initChannel(SocketChannel ch) throws Exception {
-                ChannelPipeline p = ch.pipeline();                  
-                if (sslCtx != null) {
-                    p.addLast(sslCtx.newHandler(ch.alloc()));
-                }
-                //p.addLast(new LoggingHandler(LogLevel.INFO));
-                p.addLast(serverHandler);
-            }
-        });
-    // Start the server.
-    ChannelFuture f = b.bind(PORT).sync();</code></pre><blockquote>
+<h1 id="netty启动"><a href="#netty启动" class="headerlink" title="netty启动"></a>netty启动</h1><p>这里仅介绍服务器端的启动过程（客户端的启动比较简单）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">EventLoopGroup bossGroup = <span class="keyword">new</span> NioEventLoopGroup(<span class="number">1</span>);</span><br><span class="line">EventLoopGroup workerGroup = <span class="keyword">new</span> NioEventLoopGroup();</span><br><span class="line"><span class="keyword">final</span> EchoServerHandler serverHandler = <span class="keyword">new</span> EchoServerHandler();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();</span><br><span class="line">    b.group(bossGroup, workerGroup)</span><br><span class="line">        .channel(NioServerSocketChannel<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">        .<span class="title">option</span>(<span class="title">ChannelOption</span>.<span class="title">SO_BACKLOG</span>, 100)</span></span><br><span class="line"><span class="class">        .<span class="title">handler</span>(<span class="title">new</span> <span class="title">LoggingHandler</span>(<span class="title">LogLevel</span>.<span class="title">INFO</span>))</span></span><br><span class="line"><span class="class">        .<span class="title">childHandler</span>(<span class="title">new</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">SocketChannel</span>&gt;() </span>&#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                ChannelPipeline p = ch.pipeline();                  </span><br><span class="line">                <span class="keyword">if</span> (sslCtx != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    p.addLast(sslCtx.newHandler(ch.alloc()));</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//p.addLast(new LoggingHandler(LogLevel.INFO));</span></span><br><span class="line">                p.addLast(serverHandler);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    <span class="comment">// Start the server.</span></span><br><span class="line">    ChannelFuture f = b.bind(PORT).sync();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
 <p>以上截取自netty-example中的EchoServer的源码。</p>
 </blockquote>
 <p><code>b.group()...</code>部分的代码比较简单，就是设置ServerBootstrap的启动属性。启动的核心方法是<code>bind()</code>。</p>
-<pre><code>public ChannelFuture bind(SocketAddress localAddress) {
-    validate();
-    return doBind(ObjectUtil.checkNotNull(localAddress, &quot;localAddress&quot;));
-}</code></pre><p>首先会将PORT和本地IP进行组合构建InetSocketAddress对象并传入以上方法。可以看到bind的第一步是validate，主要是判断ServerBootstrap对象是否设置一些参数，如group、childgroup、channelFactory和childHandler。</p>
-<pre><code>private ChannelFuture doBind(final SocketAddress localAddress) {
-    final ChannelFuture regFuture = initAndRegister();
-    final Channel channel = regFuture.channel();
-    if (regFuture.cause() != null) {
-        return regFuture;
-    }
-    if (regFuture.isDone()) {
-        // 这个时候注册已经成功
-        ChannelPromise promise = channel.newPromise();
-        doBind0(regFuture, channel, localAddress, promise);
-        return promise;
-    } else {
-        // 注册一般都是成功的，但是以防万一
-        final PendingRegistrationPromise promise = new PendingRegistrationPromise(channel);
-        // 添加异步监听
-        regFuture.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                Throwable cause = future.cause();
-                if (cause != null) {
-                    promise.setFailure(cause);
-                } else {
-                    promise.registered();
-                    doBind0(regFuture, channel, localAddress, promise);
-                }
-            }
-        });
-        return promise;
-    }
-}</code></pre><p>在介绍前，这里先讲解一下netty的几个概念：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ChannelFuture <span class="title">bind</span><span class="params">(SocketAddress localAddress)</span> </span>&#123;</span><br><span class="line">    validate();</span><br><span class="line">    <span class="keyword">return</span> doBind(ObjectUtil.checkNotNull(localAddress, <span class="string">"localAddress"</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先会将PORT和本地IP进行组合构建InetSocketAddress对象并传入以上方法。可以看到bind的第一步是validate，主要是判断ServerBootstrap对象是否设置一些参数，如group、childgroup、channelFactory和childHandler。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> ChannelFuture <span class="title">doBind</span><span class="params">(<span class="keyword">final</span> SocketAddress localAddress)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> ChannelFuture regFuture = initAndRegister();</span><br><span class="line">    <span class="keyword">final</span> Channel channel = regFuture.channel();</span><br><span class="line">    <span class="keyword">if</span> (regFuture.cause() != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> regFuture;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (regFuture.isDone()) &#123;</span><br><span class="line">        <span class="comment">// 这个时候注册已经成功</span></span><br><span class="line">        ChannelPromise promise = channel.newPromise();</span><br><span class="line">        doBind0(regFuture, channel, localAddress, promise);</span><br><span class="line">        <span class="keyword">return</span> promise;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 注册一般都是成功的，但是以防万一</span></span><br><span class="line">        <span class="keyword">final</span> PendingRegistrationPromise promise = <span class="keyword">new</span> PendingRegistrationPromise(channel);</span><br><span class="line">        <span class="comment">// 添加异步监听</span></span><br><span class="line">        regFuture.addListener(<span class="keyword">new</span> ChannelFutureListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(ChannelFuture future)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                Throwable cause = future.cause();</span><br><span class="line">                <span class="keyword">if</span> (cause != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    promise.setFailure(cause);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    promise.registered();</span><br><span class="line">                    doBind0(regFuture, channel, localAddress, promise);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">return</span> promise;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在介绍前，这里先讲解一下netty的几个概念：</p>
 <ul>
 <li>NioEventLoopGroup可以理解为线程池，其中的每个EventLoop都对应一个线程。</li>
 <li>每个EventLoop都有一个selector</li>
@@ -514,108 +464,28 @@ try {
 </ol>
 <p>简单提一下服务端接收客户端连接：首先服务器接收到连接，使用accept创造新的socket，然后invokeChannelRead，直到ServerBootstrapAcceptor的channelRead，将新的socket放入worker线程池。<br>另外客户端的状态变化为Init-&gt;Registry-&gt;Connect-&gt;Active，需要注意的是当Connet成功后，才会转为Active状态。</p>
 <h1 id="netty的FastThreadLocal"><a href="#netty的FastThreadLocal" class="headerlink" title="netty的FastThreadLocal"></a>netty的FastThreadLocal</h1><p>netty中的FastThreadLocal是PoolThreadCache、Recycle的基石，从它的名字就能看出，它起到ThreadLocal的作用，并且比ThreadLocal更快。那么JDK中的ThreadLocal存在什么问题，使得netty自己写了一个类来替代它呢。<br>首先ThreadLocal是通过在Thread内部的ThreadLocalMap类型的threadLocals实现的。在调用<code>ThreadLocal.get()</code>会在当前线程的threadLocals中生成一条包含有ThreadLocal对象和Value的entry。由于不同Thread中的threadLocals不同，所以对于同一个ThreadLocal，相应的value就会不同，从而实现了线程间的隔离。但是Thread存在很多不足，这里将通过JDK8中的ThreadLocal源码来讲解。</p>
-<pre><code>// ThreadLocal.java
-private void set(ThreadLocal&lt;?&gt; key, Object value) {
-    Entry[] tab = table;
-    int len = tab.length;
-    int i = key.threadLocalHashCode &amp; (len-1);
-    for (Entry e = tab[i];
-         e != null;
-         e = tab[i = nextIndex(i, len)]) {
-        ThreadLocal&lt;?&gt; k = e.get();
-        if (k == key) {
-            e.value = value;
-            return;
-        }
-        if (k == null) {
-            replaceStaleEntry(key, value, i);
-            return;
-        }
-    }
-    tab[i] = new Entry(key, value);
-    int sz = ++size;
-    if (!cleanSomeSlots(i, sz) &amp;&amp; sz &gt;= threshold)
-        rehash();
-    }
-}
-
-private static int nextIndex(int i, int len) {
-    return ((i + 1 &lt; len) ? i + 1 : 0);
-}</code></pre><p>这里截取了ThreadLocalMap的set方法（由ThreadLocal.setInitialValue()调用），根据代码可以看出：</p>
+<figure class="highlight java"><figcaption><span>ThreadLocal.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(ThreadLocal&lt;?&gt; key, Object value)</span> </span>&#123;</span><br><span class="line">    Entry[] tab = table;</span><br><span class="line">    <span class="keyword">int</span> len = tab.length;</span><br><span class="line">    <span class="keyword">int</span> i = key.threadLocalHashCode &amp; (len-<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (Entry e = tab[i];</span><br><span class="line">            e != <span class="keyword">null</span>;</span><br><span class="line">            e = tab[i = nextIndex(i, len)]) &#123;</span><br><span class="line">        ThreadLocal&lt;?&gt; k = e.get();</span><br><span class="line">        <span class="keyword">if</span> (k == key) &#123;</span><br><span class="line">            e.value = value;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (k == <span class="keyword">null</span>) &#123;</span><br><span class="line">            replaceStaleEntry(key, value, i);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    tab[i] = <span class="keyword">new</span> Entry(key, value);</span><br><span class="line">    <span class="keyword">int</span> sz = ++size;</span><br><span class="line">    <span class="keyword">if</span> (!cleanSomeSlots(i, sz) &amp;&amp; sz &gt;= threshold)</span><br><span class="line">        rehash();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">nextIndex</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> ((i + <span class="number">1</span> &lt; len) ? i + <span class="number">1</span> : <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里截取了ThreadLocalMap的set方法（由ThreadLocal.setInitialValue()调用），根据代码可以看出：</p>
 <ul>
 <li>根据nextIndex方法可以看出ThreadLocal解决哈希冲突的方法是线性探测，所以查找的时候也是根据线性探测法查找。当使用多个ThreadLocal时，哈希冲突的概率会变大，这时ThreadLocal的get或set速度都会更慢。</li>
 <li>其实ThreadLocalMap中每个entry的key是WeakReference&lt;ThreadLocal&lt;?&gt;&gt;。当ThreadLocal使用完毕后，并且没有remove，但是此时entry中的value还存在着，因此会导致内存泄漏。事实上，ThreadLocalMap也针对此提供了一些清除机制，也就是在每一次set或getEntry后都会清理一部分key为null的entry。只是这种机制并不能保证完全避免内存泄漏。</li>
 </ul>
 <p>接着我们再来看看FastThreadLocal：</p>
-<pre><code>// FastThreadLocal.java
-public final V get() {
-    InternalThreadLocalMap threadLocalMap = InternalThreadLocalMap.get();
-    Object v = threadLocalMap.indexedVariable(index);
-    if (v != InternalThreadLocalMap.UNSET) {
-        return (V) v;
-    }
-    return initialize(threadLocalMap);
-}</code></pre><p>可以看到FastThreadLocal引入了新的InternalThreadLocalMap，InternalThreadLocalMap的get也很有意思。</p>
-<pre><code>// InternalThreadLocalMap.java
-public static InternalThreadLocalMap get() {
-    Thread thread = Thread.currentThread();
-    if (thread instanceof FastThreadLocalThread) {
-        return fastGet((FastThreadLocalThread) thread);
-    } else {
-        return slowGet();
-    }
-}</code></pre><p>一般来讲FastThreadLocal是和FastThreadLocalThread（Thread子类）配合使用的，但FastThreadLocal也提供了与Thread的兼容，其实就是使用ThreadLocal在每个线程中存一个InternalThreadLocalMap，然后再执行其他操作，相当于多执行了一次调用。但是需要注意的是，只有搭配FastThreadLocalThread，FastThreadLocal才会快过ThreadLocal。<br>InternalThreadLocalMap以数组作为底层存储结构，初始是大小为32的Object[]。</p>
-<pre><code>// FastThreadLocal.java
-private V initialize(InternalThreadLocalMap threadLocalMap) {
-    V v = null;
-    try {
-        v = initialValue();
-    } catch (Exception e) {
-        PlatformDependent.throwException(e);
-    }
-    // index是FastThreadLocal创建时确定的，表示value在Object[]的下标，从1开始
-    threadLocalMap.setIndexedVariable(index, v);
-    // 注意Object[]中第0个的类型是Set&lt;FastThreadLocal&lt;?&gt;&gt;，存储了所有创建的FastThreadLocal对象
-    // 每次init FastThreadLocal后，都会将其添加到Set&lt;FastThreadLocal&lt;?&gt;&gt;中
-    addToVariablesToRemove(threadLocalMap, this);
-    return v;
-}</code></pre><p>更细致的代码不继续展开，大的改动就是去掉了弱引用，并且将所有用过的FastThreadLocal都存储起来。当FastThreadLocal.remove()时，就会清空Object[]相应下标的值，并且也在removeSet中除去。那么如果没有remove，那么FastThreadLocal是怎么释放的呢？</p>
-<pre><code>// FastThreadLocalThread.java
-public FastThreadLocalThread(Runnable target) {
-    super(FastThreadLocalRunnable.wrap(target));
-    cleanupFastThreadLocals = true;
-}
-
-// FastThreadLocalRunnable.java
-public void run() {
-    try {
-        runnable.run();
-    } finally {
-        FastThreadLocal.removeAll();
-    }
-}
-
-static Runnable wrap(Runnable runnable) {
-    return runnable instanceof FastThreadLocalRunnable ? runnable : new FastThreadLocalRunnable(runnable);
-}</code></pre><p>这也就是为什么推荐FastThreadLocalThread和FastThreadLocal配合使用的原因了。在线程运行结束后，就会调用removeAll，释放内存。但其实有点牵强，也就是在线程运行时，并不会清除掉无用的value，直到线程运行结束，才会removeAll。但是原生的ThreadLocal在线程运行结束后，也会在由GC进行清除的。<br>所以，总的来说FastThreadLocal相比原生ThreadLocal有以下两个优点：</p>
+<figure class="highlight java"><figcaption><span>FastThreadLocal.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    InternalThreadLocalMap threadLocalMap = InternalThreadLocalMap.get();</span><br><span class="line">    Object v = threadLocalMap.indexedVariable(index);</span><br><span class="line">    <span class="keyword">if</span> (v != InternalThreadLocalMap.UNSET) &#123;</span><br><span class="line">        <span class="keyword">return</span> (V) v;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> initialize(threadLocalMap);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到FastThreadLocal引入了新的InternalThreadLocalMap，InternalThreadLocalMap的get也很有意思。</p>
+<figure class="highlight java"><figcaption><span>InternalThreadLocalMap.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> InternalThreadLocalMap <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Thread thread = Thread.currentThread();</span><br><span class="line">    <span class="keyword">if</span> (thread <span class="keyword">instanceof</span> FastThreadLocalThread) &#123;</span><br><span class="line">        <span class="keyword">return</span> fastGet((FastThreadLocalThread) thread);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> slowGet();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>一般来讲FastThreadLocal是和FastThreadLocalThread（Thread子类）配合使用的，但FastThreadLocal也提供了与Thread的兼容，其实就是使用ThreadLocal在每个线程中存一个InternalThreadLocalMap，然后再执行其他操作，相当于多执行了一次调用。但是需要注意的是，只有搭配FastThreadLocalThread，FastThreadLocal才会快过ThreadLocal。<br>InternalThreadLocalMap以数组作为底层存储结构，初始是大小为32的Object[]。</p>
+<figure class="highlight java"><figcaption><span>FastThreadLocal.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> V <span class="title">initialize</span><span class="params">(InternalThreadLocalMap threadLocalMap)</span> </span>&#123;</span><br><span class="line">    V v = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        v = initialValue();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        PlatformDependent.throwException(e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// index是FastThreadLocal创建时确定的，表示value在Object[]的下标，从1开始</span></span><br><span class="line">    threadLocalMap.setIndexedVariable(index, v);</span><br><span class="line">    <span class="comment">// 注意Object[]中第0个的类型是Set&lt;FastThreadLocal&lt;?&gt;&gt;，存储了所有创建的FastThreadLocal对象</span></span><br><span class="line">    <span class="comment">// 每次init FastThreadLocal后，都会将其添加到Set&lt;FastThreadLocal&lt;?&gt;&gt;中</span></span><br><span class="line">    addToVariablesToRemove(threadLocalMap, <span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">return</span> v;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>更细致的代码不继续展开，大的改动就是去掉了弱引用，并且将所有用过的FastThreadLocal都存储起来。当FastThreadLocal.remove()时，就会清空Object[]相应下标的值，并且也在removeSet中除去。那么如果没有remove，那么FastThreadLocal是怎么释放的呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FastThreadLocalThread.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">FastThreadLocalThread</span><span class="params">(Runnable target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>(FastThreadLocalRunnable.wrap(target));</span><br><span class="line">    cleanupFastThreadLocals = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// FastThreadLocalRunnable.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        runnable.run();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        FastThreadLocal.removeAll();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> Runnable <span class="title">wrap</span><span class="params">(Runnable runnable)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> runnable <span class="keyword">instanceof</span> FastThreadLocalRunnable ? runnable : <span class="keyword">new</span> FastThreadLocalRunnable(runnable);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这也就是为什么推荐FastThreadLocalThread和FastThreadLocal配合使用的原因了。在线程运行结束后，就会调用removeAll，释放内存。但其实有点牵强，也就是在线程运行时，并不会清除掉无用的value，直到线程运行结束，才会removeAll。但是原生的ThreadLocal在线程运行结束后，也会在由GC进行清除的。<br>所以，总的来说FastThreadLocal相比原生ThreadLocal有以下两个优点：</p>
 <ul>
 <li>查询速度快：采用下标查询法，O(1)的时间复杂度。</li>
 <li>显式释放内存：相对于GC行为的不确定性。（这个优点我个人觉得很勉强）</li>
 </ul>
 <h1 id="netty的ByteBuf"><a href="#netty的ByteBuf" class="headerlink" title="netty的ByteBuf"></a>netty的ByteBuf</h1><p>关于ByteBuf的使用，已经有很多博客讲过了。这里主要讲解下池化的ByteBuf是怎么获得的。<br>netty在接收read数据时，会自动使用AdaptiveRecvByteBufAllocator类来创建ByteBuf（创建动作实际上是交给PooledByteBufAllocator执行的）。<br>这里需要注意的是：池化的ByteBuf需要通过<code>ReferenceCountUtil.release(msg)</code>手动回收或者直接传递至TailContext进行自动回收。<br>AdaptiveRecvByteBufAllocator仅仅对申请的ByteBuf做了限制。</p>
-<pre><code>static {
-    List&lt;Integer&gt; sizeTable = new ArrayList&lt;Integer&gt;();
-    for (int i = 16; i &lt; 512; i += 16) {
-        sizeTable.add(i);
-    }
-    for (int i = 512; i &gt; 0; i &lt;&lt;= 1) {
-        sizeTable.add(i);
-    }
-    SIZE_TABLE = new int[sizeTable.size()];
-    for (int i = 0; i &lt; SIZE_TABLE.length; i ++) {
-        SIZE_TABLE[i] = sizeTable.get(i);
-    }
-}</code></pre><p>也就是BufSize={16, 32, 48, 64, …, 512, 1024, 2048, …, 2^30}。初始大小为1024。<br>具体的创建内存、分配ByteBuf、管理ByteBuf池的过程则是netty内存池的核心。默认使用PooledByteBufAllocator.DEFAULT分配堆外内存（也就是直接内存）。<br>至于具体的创建buf的过程则是netty的核心（池化内存）。<br>netty使用PoolThreadCache和Arena进行内存分配：</p>
+<figure class="highlight java"><figcaption><span>FastThreadLocalThread.java</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    List&lt;Integer&gt; sizeTable = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">16</span>; i &lt; <span class="number">512</span>; i += <span class="number">16</span>) &#123;</span><br><span class="line">        sizeTable.add(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">512</span>; i &gt; <span class="number">0</span>; i &lt;&lt;= <span class="number">1</span>) &#123;</span><br><span class="line">        sizeTable.add(i);</span><br><span class="line">    &#125;</span><br><span class="line">    SIZE_TABLE = <span class="keyword">new</span> <span class="keyword">int</span>[sizeTable.size()];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; SIZE_TABLE.length; i ++) &#123;</span><br><span class="line">        SIZE_TABLE[i] = sizeTable.get(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也就是BufSize={16, 32, 48, 64, …, 512, 1024, 2048, …, 2^30}。初始大小为1024。<br>具体的创建内存、分配ByteBuf、管理ByteBuf池的过程则是netty内存池的核心。默认使用PooledByteBufAllocator.DEFAULT分配堆外内存（也就是直接内存）。<br>至于具体的创建buf的过程则是netty的核心（池化内存）。<br>netty使用PoolThreadCache和Arena进行内存分配：</p>
 <ul>
 <li>Arena：由多个线程共享，是实际上进行内存申请和分配的核心。</li>
 <li>PoolThreadCache：由单个线程独享，顾名思义，是内存的缓存，当缓存中有内存块的存在时，会先在缓存中查找是否存在符合的内存块。</li>
