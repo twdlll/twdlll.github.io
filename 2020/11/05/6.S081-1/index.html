@@ -126,7 +126,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;6.S081-1&#x2F;fd.jpg">
 <meta property="og:image" content="&#x2F;images&#x2F;6.S081-1&#x2F;cmds.png">
-<meta property="og:updated_time" content="2020-11-05T13:09:23.233Z">
+<meta property="og:updated_time" content="2020-11-07T06:42:35.546Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;6.S081-1&#x2F;fd.jpg">
 
@@ -346,8 +346,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-11-05T21:09:23+08:00">
-                2020-11-05
+              <time title="更新于" itemprop="dateModified" datetime="2020-11-07T14:42:35+08:00">
+                2020-11-07
               </time>
             
           </span>
@@ -494,7 +494,7 @@ sleep:
      ecall
      ret</code></pre><p>开头包含的kernel/syscall.h文件中定义各个系统调用号。然后<code>.global sleep</code>使得sleep对链接器可见，从而和user/user.h中的sleep函数链接起来。后续的汇编代码的意思是，首先在a7寄存器中放置指定的系统调用号，然后ecall通过软中断（陷入）来引发内核执行系统调用。</p>
 <blockquote>
-<p>如果对RISC-V汇编感兴趣的同学，可以阅读<a href="http://crva.io/documents/RISC-V-Reader-Chinese-v2p1.pdf.back" target="_blank" rel="noopener">RISC-V手册</a>。  </p>
+<p>如果对RISC-V汇编感兴趣的同学，可以阅读<a href="http://riscvbook.com/chinese/RISC-V-Reader-Chinese-v2p1.pdf" target="_blank" rel="noopener">RISC-V手册</a>。  </p>
 </blockquote>
 <p>然后可以在kernel/syscall.c看到syscalls，表示了系统调用号到系统调用的映射关系。在syscall(void)中，通过trapframe-&gt;a7得到系统调用号，然后执行相应系统调用，即sys_sleep。</p>
 <blockquote>
@@ -517,7 +517,7 @@ sleep:
 <li><a href="https://wjqwsp.github.io/2017/06/04/xv6-shell%E5%AE%9E%E7%8E%B0%E6%BA%90%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">xv6 shell实现源代码分析</a></li>
 <li><a href="https://zhayujie.com/mit6828-env.html" target="_blank" rel="noopener">MIT6.828准备 — risc-v和xv6环境搭建</a></li>
 <li><a href="https://pdos.csail.mit.edu/6.828/2020/labs/util.html" target="_blank" rel="noopener">Lab: Xv6 and Unix utilities</a></li>
-<li><a href="http://crva.io/documents/RISC-V-Reader-Chinese-v2p1.pdf.back" target="_blank" rel="noopener">RISC-V手册</a></li>
+<li><a href="http://riscvbook.com/chinese/RISC-V-Reader-Chinese-v2p1.pdf" target="_blank" rel="noopener">RISC-V手册</a></li>
 </ul>
 
       
