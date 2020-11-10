@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="第二节课的实验内容比较多，所以分成2章博客来讲。这一篇博客主要讲xv6 book的2-4章，至于实验提到的源码，其实比较简单，可以自己看看。 xv6 gdb调试如果大家足够有耐心的话，可以选择使用gdb调试，去一步一步debug内核的执行过程。这里介绍下xv6的调试方法。首先在xv6-labs-2020目录下： make qemu-gdb应该会出现然后打开另一个终端，进入riscv-gnu-too">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统之6.S081（二）-1">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;11&#x2F;10&#x2F;6.S081-2&#x2F;index.html">
+<meta property="og:site_name" content="Twd&#39;s Home">
+<meta property="og:description" content="第二节课的实验内容比较多，所以分成2章博客来讲。这一篇博客主要讲xv6 book的2-4章，至于实验提到的源码，其实比较简单，可以自己看看。 xv6 gdb调试如果大家足够有耐心的话，可以选择使用gdb调试，去一步一步debug内核的执行过程。这里介绍下xv6的调试方法。首先在xv6-labs-2020目录下： make qemu-gdb应该会出现然后打开另一个终端，进入riscv-gnu-too">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;gdb1.png">
+<meta property="og:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;gdb2.png">
+<meta property="og:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;ks2p.png">
+<meta property="og:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;v2p.png">
+<meta property="og:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;v2p_detail.png">
+<meta property="og:updated_time" content="2020-11-10T08:50:39.468Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;gdb1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https//twdlll.github.io/2020/11/10/6.S081-2/"/>
+
+
+
+
+
+  <title>操作系统之6.S081（二）-1 | Twd's Home</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Twd's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/11/10/6.S081-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Twd">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Twd's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">操作系统之6.S081（二）-1</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-11-10T00:00:00+08:00">
+                2020-11-10
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2020-11-10T16:50:39+08:00">
+                2020-11-10
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/6-S081/" itemprop="url" rel="index">
+                    <span itemprop="name">6.S081</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>第二节课的实验内容比较多，所以分成2章博客来讲。这一篇博客主要讲<a href="https://pdos.csail.mit.edu/6.828/2020/xv6/book-riscv-rev1.pdf" target="_blank" rel="noopener">xv6 book</a>的2-4章，至于实验提到的源码，其实比较简单，可以自己看看。</p>
+<h1 id="xv6-gdb调试"><a href="#xv6-gdb调试" class="headerlink" title="xv6 gdb调试"></a>xv6 gdb调试</h1><p>如果大家足够有耐心的话，可以选择使用gdb调试，去一步一步debug内核的执行过程。这里介绍下xv6的调试方法。首先在xv6-labs-2020目录下：</p>
+<pre><code>make qemu-gdb</code></pre><p>应该会出现<br><img src="/images/6.S081-2/gdb1.png" alt=""><br>然后打开另一个终端，进入riscv-gnu-toolchain的编译产物所在目录的bin目录，我这边之前设置的是/usr/local/opt/risc-gnu-toolchain/bin，详情参考<a href="https://twdlll.github.io/2020/11/05/6.S081-1/#more" target="_blank" rel="noopener">6.S081（一）</a>。然后执行以下过程：</p>
+<pre><code># 启动gdb
+riscv64-unknown-elf-gdb
+
+# 接着在gdb中输入以下命令
+# 1. 切换到xv6-labs-2020所在目录
+cd /home/xxx/xv6/xv6-labs-2020/
+# 2. 加载内核执行文件
+file kernel/kernel
+# 3. 打断点
+b _entry
+# 4. 连接qemu-gdb server
+target remote 127.0.0.1:26000
+# 5. 使用gdb命令开始调试
+c; si; ni; x/5i $pc; i register a0</code></pre><p>可以看到下图所示的结果：<br><img src="/images/6.S081-2/gdb2.png" alt=""></p>
+<h1 id="物理资源的抽象"><a href="#物理资源的抽象" class="headerlink" title="物理资源的抽象"></a>物理资源的抽象</h1><p>抽象思想是非常重要的，包括设计模式中的依赖倒置原则也强烈建议高层模块和底层模块都应该依赖于抽象。操作系统无疑是在抽象这一块做的最好的产品之一，它把物理资源（如CPU、内存、硬盘等）抽象成一系列模型（如文件、进程等），然后应用程序只需要按照这个模型进行编程即可。<br>举个例子，我们在餐馆吃饭的时候，只需要点菜，付钱，吃，然后走人就可以了。对于我们来说，只需要完成这些步骤就行了，而不需要考虑这些之外的东西。而实际上餐馆需要早上买菜，洗菜，然后烧成菜品，在顾客吃完后，还需要收拾饭后垃圾，实际上餐厅给我们提供了一个方便且快捷的用餐环境（抽象）。当然我们也可以选择不去餐厅吃，而是自己买菜自己烧，然后收拾厨余和饭后垃圾，但显然过程会相较于餐厅用餐更加繁琐且麻烦。<br>操作系统就像是一个餐厅，给每一个用餐的客人（应用程序）提供美食（物理资源抽象）。操作系统承诺每个应用程序都能以进程形式运行，进程能读写文件，甚至能跟其他应用程序进行沟通等。基于这个抽象模型，开发者调用系统调用开发应用程序。而在开发者处理逻辑之外的地方，操作系统默默完成进程调度和隔离、文件操作抽象到具体硬盘操作等等的工作，为应用程序保驾护航。当然应用程序也可以自己买菜，自己使用CPU资源和读写硬盘，但是这也意味着实现一个小功能都要考虑一系列过程，对开发者的水平也是一个很大的挑战。<br>接着我们再深入一点，这个进程抽象到底包含哪些内容呢？简单来讲，就是这个进程抽象仿佛拥有整台计算机的CPU、内存等。操作系统为了让用户进程有这种假象，就要对CPU、内存等进行一些虚拟化操作，使进程活在自己的世界里。</p>
+<ul>
+<li>CPU：操作系统通过进程调度（如时间片轮转等），通过保留当前进程的状态，然后切换到新线程执行，然后再切换。使得每个进程感觉自己一直都在运行，但是事实上，如果有A、B、C三个进程，可能实际CPU在1秒的运行过程是：300ms运行A，300ms运行B，300ms运行C（另外的100ms是2次进程切换消耗的时间）。</li>
+<li>内存：使用进程页表来虚拟化内存，用虚拟的页表号（虚拟内存）来对应真实的页框（物理内存）。</li>
+</ul>
+<h1 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h1><p>进程是程序运行时的动态描述，在xv6中使用proc结构体（kernel/proc.h)进行表示。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">proc</span> &#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">spinlock</span> <span class="title">lock</span>;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// p-&gt;lock must be held when using these:</span></span><br><span class="line">  <span class="keyword">enum</span> procstate state;        <span class="comment">// Process state</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">proc</span> *<span class="title">parent</span>;</span>         <span class="comment">// Parent process</span></span><br><span class="line">  <span class="keyword">void</span> *chan;                  <span class="comment">// If non-zero, sleeping on chan</span></span><br><span class="line">  <span class="keyword">int</span> killed;                  <span class="comment">// If non-zero, have been killed</span></span><br><span class="line">  <span class="keyword">int</span> xstate;                  <span class="comment">// Exit status to be returned to parent's wait</span></span><br><span class="line">  <span class="keyword">int</span> pid;                     <span class="comment">// Process ID</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// these are private to the process, so p-&gt;lock need not be held.</span></span><br><span class="line">  uint64 kstack;               <span class="comment">// Virtual address of kernel stack</span></span><br><span class="line">  uint64 sz;                   <span class="comment">// Size of process memory (bytes)</span></span><br><span class="line">  <span class="keyword">pagetable_t</span> pagetable;       <span class="comment">// User page table</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">trapframe</span> *<span class="title">trapframe</span>;</span> <span class="comment">// data page for trampoline.S</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">context</span> <span class="title">context</span>;</span>      <span class="comment">// swtch() here to run process</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">file</span> *<span class="title">ofile</span>[<span class="title">NOFILE</span>];</span>  <span class="comment">// Open files</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">inode</span> *<span class="title">cwd</span>;</span>           <span class="comment">// Current directory</span></span><br><span class="line">  <span class="keyword">char</span> name[<span class="number">16</span>];               <span class="comment">// Process name (debugging)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中5-10行的变量主要是描述进程的执行状况的，13行以后的变量这里简单介绍一下：</p>
+<ul>
+<li>kstack：进程的内核栈，每个进程都有用户栈和内核栈。当进程运行用户指令时，只有其用户栈被使用，其内核栈则是空的。然而当进程（通过系统调用或中断）进入内核时，内核代码就在进程的内核栈中执行；进程处于内核中时，其用户栈仍然保存着数据，只是暂时处于不活跃状态。</li>
+<li>pagetable：进程页表，是内存管理的重要内容。</li>
+<li>trapframe：用于描述系统调用时的状态，指导内核执行相应的动作。</li>
+<li>context：执行上下文，主要是一组寄存器的保存与切换。</li>
+<li>ofile：进程的打开文件表，能够直接映射文件的inode，但实际上内核通过全局的ftable来管理所有打开的文件。</li>
+<li>cwd：工作目录</li>
+</ul>
+<p>有些内容暂时不是很清楚，但是后文会慢慢讲清楚。</p>
+<h1 id="CPU权限"><a href="#CPU权限" class="headerlink" title="CPU权限"></a>CPU权限</h1><p>对于系统调用，我们知道用户代码不能直接执行，要转交给内核代码执行。很自然的，就可以想到内核相较于用户具有更高的权限。那么这种权限是怎么实现的呢？其实是由CPU的硬件支持的。在RSIC-V中，CPU有三种模式：</p>
+<ul>
+<li>机器模式：该模式下能执行所有的特权操作，主要是用于开机时配置计算机。CPU最开始就是在这个模式下启动的。</li>
+<li>监管模式：该模式能够执行一些特权指令，比如打开或关闭中断，读写页表寄存器。</li>
+<li>用户模式：只能执行一些普通指令。</li>
+</ul>
+<blockquote>
+<p>其实CPU的特权划分很常见，比如x86也有4个特权级（0最高，3最低）。大多数操作系统使用x86的特权级0和3，分别用于内核模式和用户模式。</p>
+</blockquote>
+<p>这里也可以把监管模式又称为内核态，用户模式称为用户态。顾名思义，用户进程大多数情况下运行在用户态，当其调用系统调用时，则会切换到内核态，由内核去判断输入参数的合法性，并决定是否真正执行系统调用。通过这一机制，就可以实现内核与用户程序的关系（类似于root用户和普通用户）。</p>
+<h1 id="xv6启动"><a href="#xv6启动" class="headerlink" title="xv6启动"></a>xv6启动</h1><p>在介绍xv6启动前，我想先介绍一下计算机是如何启动的（不涉及操作系统）：</p>
+<ol>
+<li><strong>第一阶段（BIOS）</strong>：开机程序被刷入ROM芯片，计算机通电后第一件事就是读取它。<ol>
+<li>硬件自检：BIOS程序首先检查硬件是否满足运行的基本条件。如果没有问题，则会显示CPU、内存等信息。</li>
+<li>转交控制权：硬件自检没问题，BIOS需要把控制权转交给下一阶段的启动程序。这个启动程序是由BIOS选项中的“启动顺序”决定的（如从U盘启动、从硬盘启动等）。</li>
+</ol>
+</li>
+<li><strong>第二阶段（主引导记录）</strong>：BIOS按照“启动顺序”选取启动设备的第一个扇区，这个扇区也就时“主引导记录”。主引导记录中包括了机器码，分区表和主引导记录签名。其中主引导记录签名则表明该设备是否可用于启动；分区表则表明了硬盘的各个分区（1个硬盘可分为多个分区，类似于windows的C盘、D盘等）。机器码根据分区表记录，选择启动分区。</li>
+<li><strong>第三阶段（硬盘启动）</strong>：此时计算机的控制权转交给了硬盘的某个分区。此时又分为三种情况：<ul>
+<li>卷引导记录：卷引导记录告诉计算机操作系统在这个分区里的位置，然后加载操作系统。</li>
+<li>扩展分区和逻辑分区：分区可能是扩展分区，那么需要通过其分区表，一层一层寻找到启动的逻辑分区。</li>
+<li>启动管理器：计算机在读取主引导记录的机器码后，不将控制权交给某个具体分区，而是运行“启动管理器”（如Linux的Grub）。由用户选择启动哪个操作系统。</li>
+</ul>
+</li>
+<li><strong>第四阶段（操作系统）</strong>：操作系统的内核首先被载入内存，然后开始进行操作系统阶段的初始化。</li>
+</ol>
+<p>详细的启动过程可见<a href="http://www.ruanyifeng.com/blog/2013/02/booting.html" target="_blank" rel="noopener">计算机是如何启动的</a>。<a href="https://pdos.csail.mit.edu/6.828/2020/xv6/book-riscv-rev1.pdf" target="_blank" rel="noopener">xv6 book</a>中的启动过程是从第四阶段开始的，起始位置是由kernel/kernel.ld决定的，也就是kernel/entry.S中的_entry，这也是操作系统启动的开始。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">_entry:</span><br><span class="line">  # set up a stack for C.</span><br><span class="line">      # stack0 is declared in start.c,</span><br><span class="line">      # with a 4096-byte stack per CPU.</span><br><span class="line">      # sp = stack0 + (hartid * 4096)</span><br><span class="line">      la sp, stack0</span><br><span class="line">      li a0, 1024*4</span><br><span class="line">  csrr a1, mhartid</span><br><span class="line">      addi a1, a1, 1</span><br><span class="line">      mul a0, a0, a1</span><br><span class="line">      add sp, sp, a0	#栈顶</span><br><span class="line">  # jump to start() in start.c</span><br><span class="line">      call start</span><br></pre></td></tr></table></figure>
+<p>其实是给每个CPU分配4K的栈空间，然后让sp指向栈空间栈顶。相应的汇编指令可见<a href="http://riscvbook.com/chinese/RISC-V-Reader-Chinese-v2p1.pdf" target="_blank" rel="noopener">RISC-V手册</a>，其中stack0是一个起始地址（定义在kernel/start.c中）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__attribute__ ((aligned (<span class="number">16</span>))) <span class="keyword">char</span> stack0[<span class="number">4096</span> * NCPU];</span><br></pre></td></tr></table></figure>
+<p>当分配完毕后，调用start函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 获取mstatus(mashine status)，并将其设置为监管模式</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> x = r_mstatus();</span><br><span class="line">  x &amp;= ~MSTATUS_MPP_MASK;</span><br><span class="line">  x |= MSTATUS_MPP_S;</span><br><span class="line">  w_mstatus(x);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将main函数地址作为机器模式下发生异常的入口</span></span><br><span class="line">  w_mepc((uint64)main);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 禁用虚拟地址转换</span></span><br><span class="line">  w_satp(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将所有异常和中断委托给监管模式</span></span><br><span class="line">  w_medeleg(<span class="number">0xffff</span>);</span><br><span class="line">  w_mideleg(<span class="number">0xffff</span>);</span><br><span class="line">  w_sie(r_sie() | SIE_SEIE | SIE_STIE | SIE_SSIE);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 对时钟初始化，使其能产生计时器中断</span></span><br><span class="line">  timerinit();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将CPU id保存到该CPU的tp寄存器中</span></span><br><span class="line">  <span class="keyword">int</span> id = r_mhartid();</span><br><span class="line">  w_tp(id);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 异常返回，从而执行main（在监管模式下）</span></span><br><span class="line">  <span class="function"><span class="keyword">asm</span> <span class="title">volatile</span><span class="params">(<span class="string">"mret"</span>)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要注意的是每个CPU都会执行start，也就是最后都会跳到main函数。但是从下面的main函数看到，只有CPU0才会承担起系统初始化的工作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(cpuid() == <span class="number">0</span>)&#123;</span><br><span class="line">    consoleinit();   <span class="comment">// 初始化终端，并将终端读写调用链接至consoleread/consolewrite</span></span><br><span class="line">    printfinit();	 <span class="comment">// 初始化输出锁</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"xv6 kernel is booting\n"</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line">    kinit();         <span class="comment">// 初始化物理内存，以链表形式组织起一堆空闲内存（4KB）</span></span><br><span class="line">    kvminit();       <span class="comment">// 创建内核页表</span></span><br><span class="line">    kvminithart();   <span class="comment">// 启用页表</span></span><br><span class="line">    procinit();      <span class="comment">// 初始化进程表</span></span><br><span class="line">    trapinit();      <span class="comment">// 初始化trap向量</span></span><br><span class="line">    trapinithart();  <span class="comment">// 安装内核向量</span></span><br><span class="line">    plicinit();      <span class="comment">// 设置中断控制器</span></span><br><span class="line">    plicinithart();  </span><br><span class="line">    binit();         <span class="comment">// 初始化缓冲区</span></span><br><span class="line">    iinit();         <span class="comment">// 初始化inode缓冲区</span></span><br><span class="line">    fileinit();      <span class="comment">// 初始化文件表</span></span><br><span class="line">    virtio_disk_init(); <span class="comment">// 初始化虚拟硬盘</span></span><br><span class="line">    userinit();      <span class="comment">// 创建第一个用户进程</span></span><br><span class="line">    __sync_synchronize();</span><br><span class="line">    started = <span class="number">1</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">while</span>(started == <span class="number">0</span>) ;</span><br><span class="line">    __sync_synchronize();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"hart %d starting\n"</span>, cpuid());</span><br><span class="line">    kvminithart();    <span class="comment">// turn on paging</span></span><br><span class="line">    trapinithart();   <span class="comment">// install kernel trap vector</span></span><br><span class="line">    plicinithart();   <span class="comment">// ask PLIC for device interrupts</span></span><br><span class="line">  &#125;</span><br><span class="line">  scheduler();        </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里再具体介绍一下部分方法：</p>
+<ul>
+<li>kinit：使用kmem来管理物理内存，这里的内存是从end（kernel.ld中定义）一直到PHYSTOP（end+128M），也就是只使用128M的内存。kinit中会先对这些内存以4KB为1页进行初始化（赋1）。</li>
+<li>kvminit：会分配一页用于内核页表，并设置页表项，其中大部分是直接映射（虚拟地址=物理地址），除了trampoline。</li>
+<li>kvinithart：设置satp寄存器（Supervisor Address Translationand Protection，监管者地址转换和保护）为Sv39模式，即使用低39位作为虚拟地址。然后清空快表（TLB)表项。</li>
+<li>procinit：初始化64个进程描述结构体，并使每个进程的kstack与实际物理内存进行映射（注意中间隔着guard page），如下图所示。</li>
+</ul>
+<p><img src="/images/6.S081-2/ks2p.png" alt=""></p>
+<p>剩下的方法就不展开讲了，可以看具体的代码实现。我们接着关注第一个进程的创建，即userinit()，其代码是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">userinit</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">proc</span> *<span class="title">p</span>;</span></span><br><span class="line">  <span class="comment">// 1. 分配进程</span></span><br><span class="line">  p = allocproc();</span><br><span class="line">  initproc = p;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 2. 设置执行代码</span></span><br><span class="line">  uvminit(p-&gt;pagetable, initcode, <span class="keyword">sizeof</span>(initcode));</span><br><span class="line">  p-&gt;sz = PGSIZE;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 第一次从内核到用户</span></span><br><span class="line">  p-&gt;trapframe-&gt;epc = <span class="number">0</span>;      <span class="comment">// user program counter</span></span><br><span class="line">  p-&gt;trapframe-&gt;sp = PGSIZE;  <span class="comment">// user stack pointer</span></span><br><span class="line"></span><br><span class="line">  safestrcpy(p-&gt;name, <span class="string">"initcode"</span>, <span class="keyword">sizeof</span>(p-&gt;name));</span><br><span class="line">  p-&gt;cwd = namei(<span class="string">"/"</span>);</span><br><span class="line">  p-&gt;state = RUNNABLE;</span><br><span class="line">  <span class="built_in">release</span>(&amp;p-&gt;lock);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>分配进程：首先64个proc结构体已完成初始化（相应的内核栈也已创建），所以创建用户进程时，先选一个没有使用的proc，然后对该proc做以下操作。</p>
+<ol>
+<li>分配pid。</li>
+<li>分配trapframe</li>
+<li>创建进程页表，其中TRAMPOLINE映射的物理内存地址和kernel页表一样。</li>
+<li>初始化proc.context<br>这里简单说一下TRAMPOLINE和trapframe，内核页表和进程页表都有对TRAMPOLINE的映射，其物理地址是trampoline。当进程调用系统调用时，此时先不切换进程页表到内核页面，而是通过trampoline的userver把寄存器的值存入该进程的trapframe，然后再切换到内核页表，由内核根据trapframe进行系统调用的执行。</li>
+</ol>
+<p>放置执行代码：往进程页表中放入init的数据和指令，然后执行kernel/initcode.S的start，即重回内核，开始执行exec(“/init”)。代码位于user/init.c。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> pid, wpid;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span>(<span class="built_in">open</span>(<span class="string">"console"</span>, O_RDWR) &lt; <span class="number">0</span>)&#123;</span><br><span class="line">    mknod(<span class="string">"console"</span>, CONSOLE, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">open</span>(<span class="string">"console"</span>, O_RDWR);</span><br><span class="line">  &#125;</span><br><span class="line">  dup(<span class="number">0</span>);  <span class="comment">// stdout</span></span><br><span class="line">  dup(<span class="number">0</span>);  <span class="comment">// stderr</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(;;)&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"init: starting sh\n"</span>);</span><br><span class="line">    pid = fork();</span><br><span class="line">    <span class="keyword">if</span>(pid &lt; <span class="number">0</span>)&#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"init: fork failed\n"</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(pid == <span class="number">0</span>)&#123;</span><br><span class="line">      exec(<span class="string">"sh"</span>, argv); <span class="comment">// ****我们最熟悉的shell****</span></span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"init: exec sh failed\n"</span>);</span><br><span class="line">      <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(;;)&#123;</span><br><span class="line">      <span class="comment">// this call to wait() returns if the shell exits,</span></span><br><span class="line">      <span class="comment">// or if a parentless process exits.</span></span><br><span class="line">      wpid = wait((<span class="keyword">int</span> *) <span class="number">0</span>);</span><br><span class="line">      <span class="keyword">if</span>(wpid == pid)&#123;</span><br><span class="line">        <span class="comment">// the shell exited; restart it.</span></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span>(wpid &lt; <span class="number">0</span>)&#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"init: wait returned an error\n"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// it was a parentless process; do nothing.</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>到这里，xv6的启动也就结束了，剩下的就是sh在发挥作用了。</p>
+<h1 id="页表实现"><a href="#页表实现" class="headerlink" title="页表实现"></a>页表实现</h1><p><img src="/images/6.S081-2/v2p.png" alt=""><br>xv6页表中的虚拟内存地址仅使用64位中的低39位，页表从逻辑上可看成由页表项（Page Table Entry，PTE）组成的一维数组。每个页表大概包含$2^{27}$条页表项。每条PTE包含44位宽的物理页号（Physical Page Number, PPN)和一些标志位。通过页表中的页表项找到对应的物理内存地址如上图所示。下图显示了多级页表查询过程和页表项的flags。<br><img src="/images/6.S081-2/v2p_detail.png" alt=""><br>使用多级页表的好处是，能够减少驻存在内存中的页表个数，节约内存。对于分页机制，网络上有很多资料介绍，这里不多描述。<br>在虚拟内存中有个很重要的东西叫Translation Look-aside Buffer（TLB）。TLB会缓存PTE，从而加速查找。当xv6更换页表时（如进程切换等）,CPU会使TLB的缓存失。<br>当用户进程申请内存时，xv6会使用kalloc分配物理内存，并给进程添加一条PTE来指向这块物理内存。</p>
+<h1 id="缺页"><a href="#缺页" class="headerlink" title="缺页"></a>缺页</h1><p>当CPU无法把虚拟地址转化为物理地址，就会产生缺页异常。缺页异常又可分为三种：</p>
+<ul>
+<li>加载页面错误：加载操作无法通过虚拟地址得到物理地址</li>
+<li>存储页面错误：存储操作无法找到对应的虚拟地址</li>
+<li>指令页面错误：指令地址无法被翻译</li>
+</ul>
+<p>scause寄存器表明了缺页类型。</p>
+<h1 id="Trap"><a href="#Trap" class="headerlink" title="Trap"></a>Trap</h1><p>有三种事件会使CPU搁置正在执行的指令并将控制权转移到特殊的代码进行处理。这三类事件包括：</p>
+<ul>
+<li>系统调用：当进程执行ecall指令时，会请求内核执行。</li>
+<li>异常：当指令是非法的（可能是用户代码，也有可能是内核代码），将会跳转到异常处理上。</li>
+<li>设备中断：设备告知CPU其事件的完成，比如硬盘完成了读写请求。</li>
+</ul>
+<p>这些事件可统称为trap（陷入）。实际上当trap发生时，需要保存此刻进程的状态以便后续继续执行。xv6中与trap相关的寄存器有以下几个：</p>
+<ul>
+<li>stvec：内核会把trap处理器的地址写在这，RSIC-V会跳转到相应地址去处理一个trap。</li>
+<li>sepc：当trap发生时，RISC-V会把进程的下一条指令地址写在这（不写在pc寄存器是因为pc会拷贝stvec的内容，从而处理trap）。sret指令会在trap处理完成后，将sepc拷贝到pc，从而继续运行进程。</li>
+<li>scause：该寄存器存储的数字表明trap发生的原因。</li>
+<li>sscratch：内核会在这里面放上一个值，用户trap处理的开始阶段。</li>
+<li>sstatus：其中两个位比较重要，SIE位表明设备中断是否被启用，SPP位表明trap发生于什么模式下。</li>
+</ul>
+<p>CPU处理trap（非时钟中断）的过程如下：</p>
+<ol>
+<li>如果trap是设备中断，根据sstatus的SIE位决定后续动作。如果SIE被清空，那么trap处理结束；如果SIE非空，则继续向下处理。</li>
+<li>清空SIE位（中断处理过程不产生新的中断）</li>
+<li>把pc值（下一条指令地址）拷贝至sepc。</li>
+<li>保存当前模式至sstatus的SPP位上。</li>
+<li>设置scause来表示trap原因。</li>
+<li>设置当前模式为监管模式。</li>
+<li>把stvec值拷贝至pc。</li>
+<li>执行trap处理器。</li>
+</ol>
+<p>可以看到硬件并没有完成切换到内核页表、切换到内核栈、保存当前其他寄存器值的工作，这些都需要内核软件来进行完成。当然这么设计也是有好处的，因为有些操作系统是没有页表机制，所以硬件承担最小的职责有助于灵活性和高效性。<br>xv6中与trap相关的代码位于kernel/trampline.S和kernel/trap.c中。其中trampline.S中的uservec负责将trap时的寄存器内容保存到trapframe，userret则是将trapframe的内容重新恢复至寄存器。trap.c中的usertrap则会处理具体的trap，然后usertrapret则会处理trap返回的相关事项。执行过程为：uservec -&gt; usertrap -&gt; usertrapret -&gt; userret。这里简单讲下uservec：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">uservec:</span><br><span class="line">  # 交换a0和sscratch，sscratch存在着当前进程的trapframe地址</span><br><span class="line">  # 所以a0指向sscratch</span><br><span class="line">  csrrw a0, sscratch, a0</span><br><span class="line"></span><br><span class="line">  # 把当前进程寄存器的值保存到trapframe中</span><br><span class="line">  sd ra, 40(a0)</span><br><span class="line">  ...</span><br><span class="line">  sd t6, 280(a0)</span><br><span class="line"></span><br><span class="line">  # 把原始a0的内容（此时存在sscratch中）放到p-&gt;trapframe-&gt;a0</span><br><span class="line">  csrr t0, sscratch</span><br><span class="line">  sd t0, 112(a0)</span><br><span class="line"></span><br><span class="line">  # 把该进程的内核栈指针赋给sp</span><br><span class="line">  ld sp, 8(a0)</span><br><span class="line"></span><br><span class="line">  # 把trapframe-&gt;kernel_hartid赋给tp</span><br><span class="line">  ld tp, 32(a0)</span><br><span class="line"></span><br><span class="line">  # 加载usertrap()地址</span><br><span class="line">  ld t0, 16(a0)</span><br><span class="line"></span><br><span class="line">  # 加载内核页表，并存入satp</span><br><span class="line">  ld t1, 0(a0)</span><br><span class="line">  csrw satp, t1</span><br><span class="line">  # 清空TLB缓存</span><br><span class="line">  sfence.vma zero, zero</span><br><span class="line"></span><br><span class="line">  # 执行t0，即usertrap</span><br><span class="line">  jr t0</span><br></pre></td></tr></table></figure>
+<p>其实思路比较简单，就是把当前寄存器的值存到trapframe中，然后切换内核栈和内核页表，然后执行usertrap。其他三个其实也不难，大家可以自行阅读。另外需要注意的是，如果在内核空间发生trap（如设备中断和异常），那么就调用kernelvec-&gt;kerneltrap。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li><a href="https://github.com/huyubing/books-pdf/blob/master/C%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1%E8%AF%AD%E8%A8%80(K%26R)%E6%B8%85%E6%99%B0%E4%B8%AD%E6%96%87%E7%89%88.pdf" target="_blank" rel="noopener">C语言程序设计(K&amp;R)</a></li>
+<li><a href="https://pdos.csail.mit.edu/6.828/2020/labs/syscall.html" target="_blank" rel="noopener">Lab: system calls</a></li>
+<li><a href="https://pdos.csail.mit.edu/6.828/2020/xv6/book-riscv-rev1.pdf" target="_blank" rel="noopener">xv6 book</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2013/02/booting.html" target="_blank" rel="noopener">计算机是如何启动的</a></li>
+<li><a href="http://riscvbook.com/chinese/RISC-V-Reader-Chinese-v2p1.pdf" target="_blank" rel="noopener">RISC-V手册</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/11/05/6.S081-1/" rel="next" title="操作系统之6.S081（一）">
+                <i class="fa fa-chevron-left"></i> 操作系统之6.S081（一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar/me.jpg"
+                alt="Twd" />
+            
+              <p class="site-author-name" itemprop="name">Twd</p>
+              <p class="site-description motion-element" itemprop="description">There is no royal road to learning.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+            <div class="cc-license motion-element" itemprop="license">
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
+                <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+              </a>
+            </div>
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#xv6-gdb调试"><span class="nav-number">1.</span> <span class="nav-text">xv6 gdb调试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#物理资源的抽象"><span class="nav-number">2.</span> <span class="nav-text">物理资源的抽象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#进程"><span class="nav-number">3.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CPU权限"><span class="nav-number">4.</span> <span class="nav-text">CPU权限</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#xv6启动"><span class="nav-number">5.</span> <span class="nav-text">xv6启动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#页表实现"><span class="nav-number">6.</span> <span class="nav-text">页表实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#缺页"><span class="nav-number">7.</span> <span class="nav-text">缺页</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Trap"><span class="nav-number">8.</span> <span class="nav-text">Trap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">9.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Twd</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
