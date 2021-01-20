@@ -130,7 +130,7 @@
 <meta property="og:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;v2p.png">
 <meta property="og:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;v2p_detail.png">
 <meta property="og:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;score.png">
-<meta property="og:updated_time" content="2020-11-12T10:25:54.095Z">
+<meta property="og:updated_time" content="2021-01-20T16:39:56.939Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;6.S081-2&#x2F;gdb1.png">
 
@@ -350,8 +350,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-11-12T18:25:54+08:00">
-                2020-11-12
+              <time title="更新于" itemprop="dateModified" datetime="2021-01-21T00:39:56+08:00">
+                2021-01-21
               </time>
             
           </span>
@@ -413,10 +413,9 @@
       
         <p>第二节课讲的是C和gdb，这些比较简单，我主要关注实验部分。详细的实验要求见<a href="https://pdos.csail.mit.edu/6.828/2020/labs/syscall.html" target="_blank" rel="noopener">lab: system calls</a>，实验前需要阅读<a href="https://pdos.csail.mit.edu/6.828/2020/xv6/book-riscv-rev1.pdf" target="_blank" rel="noopener">xv6 book</a>的一些章节和源码，为了保证连贯性，我阅读了2-4章。</p>
 <h1 id="xv6-gdb调试"><a href="#xv6-gdb调试" class="headerlink" title="xv6 gdb调试"></a>xv6 gdb调试</h1><p>如果大家足够有耐心的话，可以选择使用gdb调试，去一步一步debug内核的执行过程。这里介绍下xv6的调试方法。首先在xv6-labs-2020目录下：</p>
-<pre><code>make qemu-gdb</code></pre><p>应该会出现<br><img src="/images/6.S081-2/gdb1.png" alt=""><br>然后打开另一个终端，进入riscv-gnu-toolchain的编译产物所在目录的bin目录，我这边之前设置的是/usr/local/opt/risc-gnu-toolchain/bin，详情参考<a href="https://twdlll.github.io/2020/11/05/6.S081-1/#more" target="_blank" rel="noopener">6.S081（一）</a>。然后执行以下过程：</p>
+<pre><code>make qemu-gdb</code></pre><p>应该会出现<br><img src="/images/6.S081-2/gdb1.png" alt=""><br>然后打开另一个终端，进入riscv-gnu-toolchain的编译产物所在目录的bin目录，我这边之前设置的是/usr/local/opt/risc-gnu-toolchain/bin，编译工具详情参考<a href="https://twdlll.github.io/2020/11/05/6.S081-1/#more" target="_blank" rel="noopener">6.S081（一）</a>。然后执行以下过程：</p>
 <pre><code># 启动gdb
 riscv64-unknown-elf-gdb
-
 # 接着在gdb中输入以下命令
 # 1. 切换到xv6-labs-2020所在目录
 cd /home/xxx/xv6/xv6-labs-2020/
@@ -457,12 +456,12 @@ c; si; ni; x/5i $pc; i register a0</code></pre><p>可以看到下图所示的结
 <p>这里也可以把监管模式又称为内核态，用户模式称为用户态。顾名思义，用户进程大多数情况下运行在用户态，当其调用系统调用时，则会切换到内核态，由内核去判断输入参数的合法性，并决定是否真正执行系统调用。通过这一机制，就可以实现内核与用户程序的关系（类似于root用户和普通用户）。</p>
 <h1 id="xv6启动"><a href="#xv6启动" class="headerlink" title="xv6启动"></a>xv6启动</h1><p>在介绍xv6启动前，我想先介绍一下计算机是如何启动的（不涉及操作系统）：</p>
 <ol>
-<li><strong>第一阶段（BIOS）</strong>：开机程序被刷入ROM芯片，计算机通电后第一件事就是读取它。<ol>
+<li><strong>第一阶段（BIOS）</strong>：开机程序被刷入ROM芯片，计算机通电后第一件事就是读取ROM芯片中的程序。<ol>
 <li>硬件自检：BIOS程序首先检查硬件是否满足运行的基本条件。如果没有问题，则会显示CPU、内存等信息。</li>
 <li>转交控制权：硬件自检没问题，BIOS需要把控制权转交给下一阶段的启动程序。这个启动程序是由BIOS选项中的“启动顺序”决定的（如从U盘启动、从硬盘启动等）。</li>
 </ol>
 </li>
-<li><strong>第二阶段（主引导记录）</strong>：BIOS按照“启动顺序”选取启动设备的第一个扇区，这个扇区也就时“主引导记录”。主引导记录中包括了机器码，分区表和主引导记录签名。其中主引导记录签名则表明该设备是否可用于启动；分区表则表明了硬盘的各个分区（1个硬盘可分为多个分区，类似于windows的C盘、D盘等）。机器码根据分区表记录，选择启动分区。</li>
+<li><strong>第二阶段（主引导记录）</strong>：BIOS按照“启动顺序”选取启动设备的第一个扇区，这个扇区也就是“主引导记录”。主引导记录中包括了机器码，分区表和主引导记录签名。其中主引导记录签名则表明该设备是否可用于启动；分区表则表明了硬盘的各个分区（1个硬盘可分为多个分区，类似于windows的C盘、D盘等）。机器码根据分区表记录，选择启动分区。</li>
 <li><strong>第三阶段（硬盘启动）</strong>：此时计算机的控制权转交给了硬盘的某个分区。此时又分为三种情况：<ul>
 <li>卷引导记录：卷引导记录告诉计算机操作系统在这个分区里的位置，然后加载操作系统。</li>
 <li>扩展分区和逻辑分区：分区可能是扩展分区，那么需要通过其分区表，一层一层寻找到启动的逻辑分区。</li>
@@ -537,7 +536,7 @@ c; si; ni; x/5i $pc; i register a0</code></pre><p>可以看到下图所示的结
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">uservec:</span><br><span class="line">  # 交换a0和sscratch，sscratch存在着当前进程的trapframe地址</span><br><span class="line">  # 所以a0指向sscratch</span><br><span class="line">  csrrw a0, sscratch, a0</span><br><span class="line"></span><br><span class="line">  # 把当前进程寄存器的值保存到trapframe中</span><br><span class="line">  sd ra, 40(a0)</span><br><span class="line">  ...</span><br><span class="line">  sd t6, 280(a0)</span><br><span class="line"></span><br><span class="line">  # 把原始a0的内容（此时存在sscratch中）放到p-&gt;trapframe-&gt;a0</span><br><span class="line">  csrr t0, sscratch</span><br><span class="line">  sd t0, 112(a0)</span><br><span class="line"></span><br><span class="line">  # 把该进程的内核栈指针赋给sp</span><br><span class="line">  ld sp, 8(a0)</span><br><span class="line"></span><br><span class="line">  # 把trapframe-&gt;kernel_hartid赋给tp</span><br><span class="line">  ld tp, 32(a0)</span><br><span class="line"></span><br><span class="line">  # 加载usertrap()地址</span><br><span class="line">  ld t0, 16(a0)</span><br><span class="line"></span><br><span class="line">  # 加载内核页表，并存入satp</span><br><span class="line">  ld t1, 0(a0)</span><br><span class="line">  csrw satp, t1</span><br><span class="line">  # 清空TLB缓存</span><br><span class="line">  sfence.vma zero, zero</span><br><span class="line"></span><br><span class="line">  # 执行t0，即usertrap</span><br><span class="line">  jr t0</span><br></pre></td></tr></table></figure>
 <p>其实思路比较简单，就是把当前寄存器的值存到trapframe中，然后切换内核栈和内核页表，然后执行usertrap。其他三个其实也不难，大家可以自行阅读。另外需要注意的是，如果在内核空间发生trap（如设备中断和异常），那么就调用kernelvec-&gt;kerneltrap。</p>
 <h1 id="trace系统调用"><a href="#trace系统调用" class="headerlink" title="trace系统调用"></a>trace系统调用</h1><p>trace系统调用其实就是给进程添加trace mask，当进程调用系统调用时会判断系统调用号是否与掩码匹配，若匹配，打印记录结果；若不匹配，则不打印。<br>首先我们先从user/trace.c开始，这个文件是已经写好的，关键代码如下：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (trace(atoi(argv[<span class="number">1</span>])) &lt; <span class="number">0</span>) &#123;	<span class="comment">// 为当前进程赋予trace掩码</span></span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="number">2</span>, <span class="string">"%s: trace failed\n"</span>, argv[<span class="number">0</span>]);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">// 调整参数</span></span><br><span class="line">  <span class="keyword">for</span>(i = <span class="number">2</span>; i &lt; argc &amp;&amp; i &lt; MAXARG; i++)&#123;</span><br><span class="line">    nargv[i<span class="number">-2</span>] = argv[i];</span><br><span class="line">  &#125;</span><br><span class="line"><span class="comment">// 启动目标程序</span></span><br><span class="line">  exec(nargv[<span class="number">0</span>], nargv);</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (trace(atoi(argv[<span class="number">1</span>])) &lt; <span class="number">0</span>) &#123;	<span class="comment">// 为当前进程赋予trace掩码</span></span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="number">2</span>, <span class="string">"%s: trace failed\n"</span>, argv[<span class="number">0</span>]);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 调整参数</span></span><br><span class="line">  <span class="keyword">for</span>(i = <span class="number">2</span>; i &lt; argc &amp;&amp; i &lt; MAXARG; i++)&#123;</span><br><span class="line">    nargv[i<span class="number">-2</span>] = argv[i];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 启动目标程序</span></span><br><span class="line">  exec(nargv[<span class="number">0</span>], nargv);</span><br></pre></td></tr></table></figure>
 <p>为了使用trace()，需要在kernel/syscall.h添加SYS_trace，即<code>#define SYS_trace  22</code>，然后在user/usys.pl中添加<code>entry(&quot;trace&quot;);</code>，最后在user/user.h添加trace调用，即<code>int trace(int);</code>，这样的话用户空间的代码就已经完成了。<br>接着扩展内核代码，在kernel/syscall.c中扩充syscalls，添加<code>[SYS_trace]   sys_trace,</code>，然后在kernel/proc.h中扩充proc结构。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">proc</span> &#123;</span></span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">// add for trace system call</span></span><br><span class="line">  <span class="keyword">int</span> tmask;                   <span class="comment">// Trace mask</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>需要注意的是tmask在fork时也需要被子进程继承，所以修改proc.c的fork()。</p>
@@ -545,7 +544,7 @@ c; si; ni; x/5i $pc; i register a0</code></pre><p>可以看到下图所示的结
 <p>在proc.c中添加sys_trace函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">uint64 <span class="title">sys_trace</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> n;</span><br><span class="line">  <span class="keyword">if</span>(argint(<span class="number">0</span>, &amp;n) &lt; <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  myproc()-&gt;tmask = n;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>最后在kernel/syscall.c中声明<code>extern uint64 sys_trace(void);</code>，并修改syscall函数：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">syscall</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> num;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">proc</span> *<span class="title">p</span> = <span class="title">myproc</span>();</span></span><br><span class="line">  num = p-&gt;trapframe-&gt;a7;</span><br><span class="line">  <span class="keyword">if</span>(num &gt; <span class="number">0</span> &amp;&amp; num &lt; NELEM(syscalls) &amp;&amp; syscalls[num]) &#123;</span><br><span class="line">    p-&gt;trapframe-&gt;a0 = syscalls[num]();</span><br><span class="line">  <span class="comment">// 判断该系统调用是否和tmask匹配</span></span><br><span class="line">    <span class="keyword">if</span> (p-&gt;tmask &amp; (<span class="number">1</span> &lt;&lt; num)) </span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"%d: syscall %s -&gt; %d\n"</span>, p-&gt;pid, syscalls_name[num], p-&gt;trapframe-&gt;a0);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d %s: unknown sys call %d\n"</span>,</span><br><span class="line">            p-&gt;pid, p-&gt;name, num);</span><br><span class="line">    p-&gt;trapframe-&gt;a0 = <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">syscall</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> num;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">proc</span> *<span class="title">p</span> = <span class="title">myproc</span>();</span></span><br><span class="line">  num = p-&gt;trapframe-&gt;a7;</span><br><span class="line">  <span class="keyword">if</span>(num &gt; <span class="number">0</span> &amp;&amp; num &lt; NELEM(syscalls) &amp;&amp; syscalls[num]) &#123;</span><br><span class="line">    p-&gt;trapframe-&gt;a0 = syscalls[num]();</span><br><span class="line">    <span class="comment">// 判断该系统调用是否和tmask匹配</span></span><br><span class="line">    <span class="keyword">if</span> (p-&gt;tmask &amp; (<span class="number">1</span> &lt;&lt; num)) </span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">"%d: syscall %s -&gt; %d\n"</span>, p-&gt;pid, syscalls_name[num], p-&gt;trapframe-&gt;a0);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d %s: unknown sys call %d\n"</span>,</span><br><span class="line">            p-&gt;pid, p-&gt;name, num);</span><br><span class="line">    p-&gt;trapframe-&gt;a0 = <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这里用syscalls_name数组来存储所有系统调用的名称：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">char</span> *syscalls_name[] = &#123;</span><br><span class="line">  [SYS_fork]    <span class="string">"fork"</span>,</span><br><span class="line">  ...</span><br><span class="line">  [SYS_close]   <span class="string">"close"</span>,</span><br><span class="line">  [SYS_trace]   <span class="string">"trace"</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>至此所有工作完成。</p>
@@ -970,6 +969,28 @@ c; si; ni; x/5i $pc; i register a0</code></pre><p>可以看到下图所示的结
   
 
   
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
 
   
 
