@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Spring Cloud是一套微服务治理体系，面向分布式系统、云服务。Spring Cloud不是单纯的某个中间件&#x2F;应用框架，而是一套微服务的解决方案。这套方案包括服务注册与发现、负载均衡、服务熔断、降级等。下面讲讲我对Spring Cloud的初步认识。 Spring Boot这里单独把Spring Boot列出来，是因为Spring Boot是当前最火热的开发微应用的框架，是Spring Cl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Cloud初识">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2021&#x2F;01&#x2F;23&#x2F;oms&#x2F;index.html">
+<meta property="og:site_name" content="Twd&#39;s Home">
+<meta property="og:description" content="Spring Cloud是一套微服务治理体系，面向分布式系统、云服务。Spring Cloud不是单纯的某个中间件&#x2F;应用框架，而是一套微服务的解决方案。这套方案包括服务注册与发现、负载均衡、服务熔断、降级等。下面讲讲我对Spring Cloud的初步认识。 Spring Boot这里单独把Spring Boot列出来，是因为Spring Boot是当前最火热的开发微应用的框架，是Spring Cl">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Eureka.png">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Consul.png">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;call.jpg">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;service_avalanche.jpg">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;breaker.png">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Config.jpg">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Bus.jpg">
+<meta property="og:updated_time" content="2021-01-24T05:29:19.488Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="&#x2F;images&#x2F;oms&#x2F;Eureka.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https//twdlll.github.io/2021/01/23/oms/"/>
+
+
+
+
+
+  <title>Spring Cloud初识 | Twd's Home</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Twd's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2021/01/23/oms/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Twd">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Twd's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring Cloud初识</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-23T00:00:00+08:00">
+                2021-01-23
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2021-01-24T13:29:19+08:00">
+                2021-01-24
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Spring Cloud是一套微服务治理体系，面向分布式系统、云服务。Spring Cloud不是单纯的某个中间件/应用框架，而是一套微服务的解决方案。这套方案包括服务注册与发现、负载均衡、服务熔断、降级等。下面讲讲我对Spring Cloud的初步认识。</p>
+<h1 id="Spring-Boot"><a href="#Spring-Boot" class="headerlink" title="Spring Boot"></a>Spring Boot</h1><p>这里单独把Spring Boot列出来，是因为Spring Boot是当前最火热的开发微应用的框架，是Spring Cloud整个微服务治理框架的核心和基础。<br>在学习Spring Boot时，我第一个问题是Spring Boot和Spring的关系是什么？现在如果让我来回答这个问题，我的答案是：</p>
+<ul>
+<li>Spring：为Java EE提供了全面的基础支持，包括Spring IOC， Spring AOP， Spring MVC、 Spring JDBC 和 Spring Security等模块。开发者可自行选择使用的模块，并配合其他库（如MyBatis等）进行应用开发。</li>
+<li>Spring Boot：实现了自动配置，降低了项目搭建的复杂度，能够快速构建服务。</li>
+</ul>
+<p>两者的区别在于：Spring中的各个模块就像是汽车零件。在Spring Boot出现前，用户需要自己组装这些零件，搭建出一辆完整的车。而Spring Boot就像是一个4S店，针对各种场景提供了诸如越野车、商务车等成品车，用户直接上门提车即可（如果用户对于某类车有定制化需求，只需进行些许改装即可）。Spring Boot提供了一系列Spring-boot-starter场景模板，减少了开发者配置项目的工作量，比如之前web项目一般是配置SSM（Spring MVC + Spring + MyBatis），而现在只需要依赖Spring-boot-start-web就能完成搭建。<br>Spring Boot使用也比较简单，仅需要在启动类上添加@SpringBootApplication就能完成自动扫描和启动；配置也比较简单，通常只需要改动properties或yml文件即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    SpringApplication.run(Main<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>这里着重介绍下Spring Boot的主要特性：自动装配和Actuator。</p>
+<h2 id="自动装配"><a href="#自动装配" class="headerlink" title="自动装配"></a>自动装配</h2><p>Spring Boot在启动时会自动装配，通过扫描所有jar包中的spring.factories，得到所有的AutoConfigure类，并开启对应的装配过程。一般来讲，AutoConfigure类的装配过程主要包括2步：</p>
+<ol>
+<li>导入对应Properties类，并将配置信息复制到对应变量上。</li>
+<li>根据Properties类属性和其他条件，AutoConfigure类将添加相关Bean。</li>
+</ol>
+<p>自动装配使得通常情况下，开发者仅需在application.properties/application.yml中修改相应属性就可完成配置。<br>如果Spring Boot官方的spring-boot-starter不适用于应用场景，还可以自己创建starter，详情参见 <a href="https://www.xncoding.com/2017/07/22/spring/sb-starter.html" target="_blank" rel="noopener">自己写starter</a>。</p>
+<h2 id="Actuator"><a href="#Actuator" class="headerlink" title="Actuator"></a>Actuator</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>一般在开发基于SpringBoot的Web应用时都会带上actuator。Actuator提供了许多生产级的特性，比如监控和健康检查等。具体来讲，Actuator以URL的形式（/actuator/xx）提供了一些接口，用于查看服务的各类信息，包括环境变量、线程dump等，具体可见<a href="https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/htmlsingle/#production-ready" target="_blank" rel="noopener">Actuator官方文档</a>。</p>
+<h1 id="服务注册和发现"><a href="#服务注册和发现" class="headerlink" title="服务注册和发现"></a>服务注册和发现</h1><p>微服务治理体系中，微服务是最小单位，但是往往某个业务功能需要多个微服务互相调用，这也意味着微服务之间需要能够相互感知，由此诞生了服务注册和发现。</p>
+<ul>
+<li>服务注册：将某个服务的标识信息（通常是ip+端口）注册到某个公共组件中。</li>
+<li>服务发现：某个服务从公共组件中获取其他服务的信息。</li>
+</ul>
+<p>如果对此还不理解，那么我们做个比方：服务类似于一个个不同行业的企业，像建筑公司、维修公司等，这些公司会把自己的信息（包含电话号）注册到黄页中（这就是服务注册）。有一天，我们需要盖个新房，然后查黄页查到建筑公司的信息，打电话喊他们过来盖房子（这就是服务发现）。黄页就是上文定义中的公共组件。目前服务注册与发现中心有以下几种选择：</p>
+<h2 id="Eureka"><a href="#Eureka" class="headerlink" title="Eureka"></a>Eureka</h2><p>Eureka是由Netflix开源的，分为两部分Eureka Server和Eureka Client。Eureka Server是服务注册中心；Eureka Client则部署在用户服务上，与Eureka Server进行交互，完成服务注册和发现过程。Eureka界面如下所示：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/Eureka.png" width="700">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图2.1 Eureka界面</div>
+</center>
+
+<p>Eureka源于Netflix在AWS上微服务的实践，并根据AWS产生了region和zone的概念。</p>
+<ul>
+<li>region：可简单理解为地理上的分区，如华中华北地区等。  </li>
+<li>zone：可以理解为region的具体机房。</li>
+</ul>
+<p>对Eureka Client进行配置，可以实现同zone优先注册，也可以配合Ribbon完成同机房优先调用。<br>服务注册过程由Eureka Client主动发起，并定期发送心跳进行续约。如果Client连续多次无法更新lease，那么Eureka Server会在90秒内将该服务从注册表中删除。注册信息会在Eureka Server集群进行同步，这样不同zone内的服务能够相互发现。<br>Eureka的缺点主要有以下几个：</p>
+<ol>
+<li>Eureka不支持鉴权，无法对服务注册和发现的请求进行权限认证，这也意味着在Eureka层面服务可以互相调用，对于安全性是很大的风险。</li>
+<li>Eureka采用缓存设计，因此注册表中删除某些下线的服务的行为不是实时的，这就意味着服务消费端不能及时感知，需要依赖消费端的容错机制来保障运行。</li>
+<li>Eureka 2.0已经停止维护，未来可能也不会继续更新。</li>
+</ol>
+<h2 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h2><p>Zookeeper是一个高可靠的分布式协调组件，其通常用于统一命名服务、统一配置管理、集合管理和分布式锁等。Zookeeper的核心功能通过两大类节点（大体可分为持久结点、短暂节点）+树型结构进行实现。<br>Zookeeper支持集群部署，节点间通过Zookeeper Atomic Broadcast（ZAB）协议进行同步，主要分为两部分：崩溃恢复和消息广播。</p>
+<ul>
+<li>崩溃恢复：当leader出现网络中断、崩溃退出与重启等异常情况时采用该模式。新leader要具有集群中所有机器最高编号（zxid最大）的事务proposal（类似Raft）。选出leader之后，需要进行同步，将没有被follower同步的事务proposal逐个发送给follower，如果有不同的proposal，则进行回退操作。leader在正式工作前，会先确认事务日志中的所有proposal是否已经被集群中过半节点commit。leader服务器需要确保所有的follower能够接收到每一条proposal，并且能将所有已经提交的proposal应用到内存数据中。等到follower将所有尚未同步的事务proposal都从leader上同步过后并且应用到内存数据中以后，leader才会把该follower加入到真正可用的follower列表中。  </li>
+<li>消息广播：当leader选举成功后，同时集群中有过半的机器与该leade完成了状态同步之后，就会转入消息广播模式。消息广播类似二阶段提交过程。针对客户端的事务请求，leader服务器会为其生成对应的事务proposal，并将其发送给集群中其余节点，然后分别收集各自的选票，根据选票结果进行事务提交。<ul>
+<li>每个follower在接收到proposal之后，首先会以事务日志形式写到本地磁盘中，并且在写入成功后反馈给leader一个ack响应。leader收到超过半数的ack响应，就会广播一个commit消息给所有follower，通知它们进行事务提交，同时leader也会完成对事务的提交。</li>
+<li>所有的follewer要么正常反馈leader提出的事务proposal，要么抛弃leader服务器。</li>
+<li>在过半follower反馈ack之后就可以开始提交事务proposal 。</li>
+</ul>
+</li>
+</ul>
+<p>Zookeeper作为服务注册中心的缺点在于：Zookeeper为了保证高可靠性，追求CP，一旦遇上网络故障（leader节点与follower节点失去联系），剩余节点就会重新发起leader选举。选举持续时间较长，并且该期间整个Zookeeper集群不可用，那么就会导致服务注册和发现瘫痪。<br>总的来说zookeeper的设计理念（追求CP）跟注册中心的本质要求（AP）相悖，所以尽量不要使用zookeeper作为注册中心。详情参见： <a href="http://dockone.io/article/78" target="_blank" rel="noopener">为什么不应该使用ZooKeeper做服务发现</a></p>
+<h2 id="Consul"><a href="#Consul" class="headerlink" title="Consul"></a>Consul</h2><p>Consul是一套开源的分布式服务发现和配置管理系统，是由HashiCorp公司使用Go语言开发，其有如下特点：</p>
+<ul>
+<li>服务发现：支持DNS和HTTP进行服务发现。</li>
+<li>健康检查：提供不同的健康检查，包括web服务是否正常，本地节点内容利用率等。运维人员可以借助该功能监控集群健康。另外，服务发现组件也会基于健康检查结果进行路由规划。</li>
+<li>KV存储：使用简单的HTTP API就可实现动态配置、功能标记、协调、leader选举等功能。</li>
+<li>安全服务沟通：Consul可以生成和分发TLS证书，用于服务间进行TLS连接，使用Intentions(意图）定义允许哪些服务进行通信。并且Intentions允许动态改变。</li>
+<li>支持多数据中心</li>
+</ul>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/Consul.png" width="700">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图2.2 Consul架构（源于官网）</div>
+</center>
+
+<p>在Consul中的节点又称agent，分为两类client和server。server保存数据，client则负责健康检查，并将数据请求（如服务注册和发现）转发至server。server会对和client交互的信息进行聚合，并存储至catalog中。catalog维护了整个Consul集群的高层次视角，包括哪些服务可用，服务所在的节点，健康信息等等。<br>Consul集群中的节点通过Gossip协议（最终一致性协议，详情参见 <a href="https://zhuanlan.zhihu.com/p/41228196" target="_blank" rel="noopener">Gossip协议</a>）维护成员关系。每个节点都能了解集群内有哪些节点，这些节点是client还是server。<br>Consul的服务注册过程如下：</p>
+<ol>
+<li>服务注册到Consul Client中。</li>
+<li>Consul Client并不直接处理注册请求，而是以RPC形式将请求转发給Consul Server。</li>
+<li>Consul Server处理注册请求时，会通过Raft协议同步至其他Server中。</li>
+</ol>
+<p>Consul的服务发现过程如下：</p>
+<ol>
+<li>服务向Consul Client发送服务发现请求。</li>
+<li>Consul Client将请求转发给Consul Server，并获得目标服务信息。</li>
+<li>Consul Client将目标服务信息反馈给发起请求的服务。</li>
+</ol>
+<h1 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h1><p>负载均衡是通过对请求流量分散到多个服务器来提高应用的性能和可靠性。常见的服务端负载均衡（即对客户端透明，由后端进行流量分发）有Nginx，LVS等。关于服务端负载均衡技术，主要是通过修改数据包目的Mac、NAT转发等进行实现。如果有想深入了解的，可以看下美团自研MGW的技术博客 <a href="https://tech.meituan.com/2017/01/05/mgw.html" target="_blank" rel="noopener">MGW——美团点评高性能四层负载均衡</a>。</p>
+<h2 id="Ribbon"><a href="#Ribbon" class="headerlink" title="Ribbon"></a>Ribbon</h2><p>Spring Cloud Ribbon是基于Netflix Ribbon实现的<strong>客户端负载均衡</strong>工具，主要是提供客户端的软件负载均衡算法和服务调用。<br>Ribbon一般和Eureka配合使用，通过给RestTemplate添加@LoadBalance，就可使用Ribbon。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicationContextConfig</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Bean</span></span><br><span class="line">  <span class="meta">@LoadBalanced</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> RestTemplate <span class="title">restTemplate</span><span class="params">()</span></span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> RestTemplate();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>    
+
+<p>Ribbon负载均衡的原理是：</p>
+<ol>
+<li>当RestTemplate发起请求时，会被LoadBalancerInterceptor拦截，并将负载均衡逻辑交给loadBalancer。</li>
+<li>loadBalancer会根据当前服务实例列表以及对应的IRule（Ribbon默认是轮询），选择目标实例。</li>
+<li>对目标实例发起请求，并对本次请求情况进行记录。</li>
+</ol>
+<p>那么Ribbon是怎么获取服务实例呢？Ribbon会在初始化时，向Eureka注册中心获取服务注册列表，并且每10s一次向Eureka Client发送“ping”，来判断服务的可用性，如果服务的可用性发生改变或者服务数量和之前的不一致，则从注册中心更新或者重新拉取。<br>Ribbon提供了多种IRule，轮询、随机以及更复杂的算法。同时Ribbon还允许对不同服务采取不同的负载均衡算法，也允许用户实现IRule进行自定义负载均衡。<br>详情参见：<a href="https://zhuanlan.zhihu.com/p/262660637" target="_blank" rel="noopener">深入理解Ribbon</a>， <a href="https://www.jianshu.com/p/79b9cf0d0519" target="_blank" rel="noopener">Ribbon的负载均衡策略、原理和扩展</a>。</p>
+<h1 id="简化服务调用"><a href="#简化服务调用" class="headerlink" title="简化服务调用"></a>简化服务调用</h1><p>介绍到这，服务注册、发现等都清晰了，但是调用服务还是需要依赖RestTemplate发起请求才能获得结果。那么能否以一种更加简洁的方式进行服务调用呢？</p>
+<h2 id="OpenFeign"><a href="#OpenFeign" class="headerlink" title="OpenFeign"></a>OpenFeign</h2><p>OpenFeign（基于Fegin）是一个声明式WebService客户端，使用它能更加简单地编写Web Service。使用了OpenFeign后，就可以直接以接口的方式调用服务，越过了RestTemplate主动调用的过程。简单来讲，OpenFegin对服务调用过程进行了包装，展现给程序员一个简单的接口，从此服务调用就好像在使用本地接口一样（具体的服务调用过程对用户透明）。<br>OpenFeign的使用方法是定义服务接口，然后在上面添加注解，主要有以下几步：</p>
+<ol>
+<li>在主启动类上添加@EnableFeginClients</li>
+<li>在接口上加@FeignClient，代码如下<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@FeignClient</span>(value = <span class="string">"sayhello-service"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HelloClient</span> </span>&#123;</span><br><span class="line">  <span class="meta">@GetMapping</span>(value = <span class="string">"/sayHello"</span>)</span><br><span class="line">  <span class="function">ServiceResult&lt;String&gt; <span class="title">sayHello</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>对于HelloClient的sayHello方法调用，会转交给服务提供方相应URL的实现进行执行，并返回结果。<br>OpenFeign默认支持Ribbon，可使用Ribbon配置超时控制功能，还提供了日志功能，用于打印服务调用的具体信息，详细程度从低到高分别是None、BASIC、HEADERS和FULL。</p>
+<h1 id="服务熔断、降级、限流"><a href="#服务熔断、降级、限流" class="headerlink" title="服务熔断、降级、限流"></a>服务熔断、降级、限流</h1><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/call.jpg" width="500">
+    <div style="color:orange; border-bottom: 0.2px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图5.1 服务调用链</div>
+</center>
+
+<p>如图5.1所示，微服务A调用微服务B和微服务C，B和C又调用其他的微服务。假如某个时刻流量激增，A服务的下流服务D率先崩溃，进而导致其上游服务B请求阻塞，耗尽资源，继续这样反向传播，那么就会导致微服务A不可用，也就是所谓的“<strong>雪崩效应</strong>”。  </p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/service_avalanche.jpg" width="500">
+    <div style="color:orange; border-bottom: 0.2px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图5.2 雪崩效应</div>
+</center>
+对于雪崩效应，主要有三种解决手段：
+
+<ul>
+<li>服务熔断：当下游服务因为某种原因变得不可用或响应过慢，上游服务为了保证自己整体服务的可用性，不再继续调用目标服务，而是直接返回，快速释放资源。如果目标服务状态好转，则恢复调用。</li>
+<li>服务降级：如果是下游服务不可用或响应过慢，就调用对应的降级逻辑。如果是本地某些非核心功能需要消耗较多资源，那么就停掉这些非核心功能，优先保证核心功能。</li>
+<li>服务限流：限制流量输入，使流量维持在服务器的承受范围内。</li>
+</ul>
+<p>拿下棋比喻（引自<a href="https://zhuanlan.zhihu.com/p/61363959" target="_blank" rel="noopener">降级-熔断-限流-傻傻分不清</a>中的评论）：</p>
+<ul>
+<li>限流： 相当于尽量避免同时和两三个人同时下</li>
+<li>熔断：相当于你的一颗卒被围死了，就不要利用其它棋去救它了，弃卒保帅，否则救他的棋也可能被拖死</li>
+<li>降级：相当于尽量不要走用处不大的棋了，浪费走棋机会（资源），使已经过河的棋有更多的走棋机会（资源）发挥最大作用</li>
+</ul>
+<p>三者之间的关系我觉得是：熔断是服务降级的一种方式；服务降级和限流都是应对流量压力的不同处理方法。详情见 <a href="https://zhuanlan.zhihu.com/p/61363959" target="_blank" rel="noopener">降级-熔断-限流-傻傻分不清</a>。<br>这里对限流再提一嘴，限流有点类似牺牲客户体验感来换取服务器的运行正常，其通用的方法有令牌桶算法，漏桶算法等（详情见 <a href="https://segmentfault.com/a/1190000015967922" target="_blank" rel="noopener">接口限流算法：漏桶算法&amp;令牌桶算法</a>）。 </p>
+<h2 id="Hystrix"><a href="#Hystrix" class="headerlink" title="Hystrix"></a>Hystrix</h2><p>在分布式环境中，不可避免地会出现许多服务依赖项中的某些失败。Hystrix能保证在一个依赖出问题的情况下，不会导致整体服务失败，避免级联故障，以提高分布式系统的弹性。通过Hystrix能够实现服务降级和熔断。当某个服务单元发生故障时，断路器会向调用方返回一个符合预期的备选响应，而不是长时间的等待，这样就保证了调用方线程不会被不必要地占用。不过可惜的是，Hystrix目前停止更新，进入维护状态。</p>
+<h3 id="Hystrix服务降级"><a href="#Hystrix服务降级" class="headerlink" title="Hystrix服务降级"></a>Hystrix服务降级</h3><p>Hystrix通过设置fallbackMethod达到降级的效果，即当方法出问题时，替换成调用兜底方法。兜底方法的设置需要在业务类方法上添加@HystrixCommand：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloService</span> </span>&#123;</span><br><span class="line">  <span class="meta">@HystrixCommand</span>(fallbackMethod = <span class="string">"helloTimeoutHandler"</span>,</span><br><span class="line">    commandProperties = &#123;<span class="meta">@HystrixProperty</span>(name = <span class="string">"execution.isolation.thread.timeoutInMilliseconds"</span>, value = <span class="string">"3000"</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      TimeUnit.SECONDS.sleep(<span class="number">5</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;&#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"hello"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">helloTimeoutHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"helloTimeout"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上设置能使hello方法执行时间超过3秒时，调用设定好的兜底方法。<br>Hystrix除了可以对单个方法设置兜底方法，也可以设置全局兜底方法，也可以对Fegin的WebService接口设置兜底实现类。</p>
+<h3 id="Hystrix熔断"><a href="#Hystrix熔断" class="headerlink" title="Hystrix熔断"></a>Hystrix熔断</h3><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/breaker.png" width="500">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图5.3 熔断器状态图</div>
+</center>
+
+<p>熔断器主要依赖于上述三个状态变化，即当压力变大时，从Closed变为Open，当压力逐渐减小时从Open到Half Open，最后完全恢复时从Half Open到Closed。其实就相当保险丝，过载了就短路，然后试探性恢复。详细可见<a href="https://martinfowler.com/bliki/CircuitBreaker.html" target="_blank" rel="noopener">CircuitBreaker</a>。<br>Hystrix的熔断设置也很简单，也是通过设置兜底方法实现的。只是@HystrixCommand配置略有不同：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@HystrixCommand</span>(fallbackMethod = <span class="string">"helloTimeoutHandler"</span>, commandProperties = &#123;</span><br><span class="line">  <span class="comment">// 是否开启断路器</span></span><br><span class="line">  <span class="meta">@HystrixProperty</span>(name = <span class="string">"circuitBreaker.enabled"</span>, value = <span class="string">"true"</span>),</span><br><span class="line">  <span class="comment">// 请求次数</span></span><br><span class="line">  <span class="meta">@HystrixProperty</span>(name = <span class="string">"circuitBreaker.requestVolumeThreshold"</span>, value = <span class="string">"10"</span>),</span><br><span class="line">  <span class="comment">// 时间窗口期</span></span><br><span class="line">  <span class="meta">@HystrixProperty</span>(name = <span class="string">"circuitBreaker.sleepWindowInMilliseconds"</span>, value = <span class="string">"10000"</span>),</span><br><span class="line">  <span class="comment">// 失败率达到多少后跳闸</span></span><br><span class="line">  <span class="meta">@HystrixProperty</span>(name = <span class="string">"circuitBreaker.errorThresholdPercentage"</span>, value = <span class="string">"60"</span>)</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>      
+<p>上述配置指的是超过10次调用中失败率达到60%时，熔断器的状态就会从Closed变为Open，直接调用降级fallback方法。在10秒后会尝试放行方法调用（此时状态为Half Open），如果此时方法正常返回，则熔断器变回Closed；如果失败，则变回Open。</p>
+<h1 id="服务网关"><a href="#服务网关" class="headerlink" title="服务网关"></a>服务网关</h1><p>服务网关位于应用程序或服务（提供Rest API）之前的系统，用来管理授权、访问控制器和流量限制等，这样Rest API就被API网关保护起来，对调用者透明。这样的话，隐藏在API后的业务系统就可以专注于业务实现，而不用去处理这些基础控制策略。</p>
+<h2 id="Gateway"><a href="#Gateway" class="headerlink" title="Gateway"></a>Gateway</h2><p>SpringCloud Gateway作为Spring Cloud生态系统中的网关，目标是替代Zuul。SpringCloud Gateway的目标是提供统一的路由方式且基于Filter链的方式提供了网关基本的功能，例如：安全，监控/指标和限流。<br>Gateway有三个基本概念：</p>
+<ul>
+<li>Route（路由）：是构建网关的基本模块，由ID，目标URI，一系列断言和过滤器组成，如果断言为true则匹配该路由。</li>
+<li>Predicate（断言）：可以跟HTTP中的所有内容（如请求头或请求参数）进行匹配，如果请求与断言匹配则进行路由。</li>
+<li>Filter（过滤）：在请求被路由之前或之后，可以对请求/响应进行修改，有点类似拦截器。</li>
+</ul>
+<p>Gateway支持yml配置和JavaBean，以下是JavaBean形式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">  </span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RouteLocator <span class="title">customRouteLocator</span><span class="params">(RouteLocatorBuilder routeLocatorBuilder)</span> </span>&#123;</span><br><span class="line">  RouteLocatorBuilder.Builder routes = routeLocatorBuilder.routes();</span><br><span class="line">  <span class="comment">// 访问当前地址的/aaa，跳转到http://bbb.com</span></span><br><span class="line">  routes.route(<span class="string">"id1"</span>, r -&gt; r.path(<span class="string">"/aaa"</span>).uri(<span class="string">"http://bbb.com"</span>)).build();</span><br><span class="line">  <span class="keyword">return</span> routes.build();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="服务配置"><a href="#服务配置" class="headerlink" title="服务配置"></a>服务配置</h1><p>服务配置指一套集中式、动态的配置管理设施，去管理大量微服务的配置信息。</p>
+<h2 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h2><p>Spring Cloud Config就是面向分布式配置管理而生的，分为server和client两部分：</p>
+<ul>
+<li>server：又称分布式配置中心，是一个独立的微服务应用，用来连接配置服务器（默认是GIT，也支持SVN）并为客户端提供配置信息。</li>
+<li>client：通过指定的server来管理应用资源，以及业务相关的配置内容。会在启动时，拉取server中配置信息。</li>
+</ul>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/Config.jpg" width="700">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图7.1 Config架构</div>
+</center>
+
+<p>Config默认使用GIT来保存和更新配置，server端的yml配置为：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">server:</span></span><br><span class="line">      <span class="attr">git:</span></span><br><span class="line">    <span class="comment"># git仓库</span></span><br><span class="line">        <span class="attr">uri:</span> <span class="string">git@github.com:twd/springcloud-config.git</span></span><br><span class="line">      <span class="comment"># 搜索的目录</span></span><br><span class="line">    <span class="attr">search-paths:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">springcloud-config</span></span><br><span class="line">    <span class="comment"># 读取分支</span></span><br><span class="line">    <span class="attr">label:</span> <span class="string">master</span></span><br></pre></td></tr></table></figure>
+
+<p>注意server是实时读取git仓库内容的，而client端则不是实时读取Server端内容，需要。当更新git仓库内容时，会带来动态刷新问题。需要引入Actuator的刷新功能，在配置更改后，手动发送Actuator刷新请求，使client重新从server拉取最新配置。</p>
+<h1 id="服务总线"><a href="#服务总线" class="headerlink" title="服务总线"></a>服务总线</h1><p>在微服务架构中国，通常会使用轻量级消息代理构建一个共有的消息主题，并让系统中所有微服务实例连接上来。由于该主题中产生的消息会被所有实例监听和消费，所以称之为消息总线。在总线上的任何一个连接实例上，都可以方便地广播一些全局消息。这类全局消息能用于很多场景，比如上文提到的Config手动刷新问题。</p>
+<h2 id="Bus"><a href="#Bus" class="headerlink" title="Bus"></a>Bus</h2><p>Spring Cloud Bus就是服务总线的一种实现，可以配合Spring Cloud Config完成动态刷新。Bus支持Kafka和RabbitMQ。其配合Config的流程图如下所示：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/Bus.jpg" width="700">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图7.1 Bus+Config动态刷新</div>
+</center>
+
+<p>上图已经很清楚，Bus的功能就是在监听发送给微应用的消息，从而将其广播至所有应用。当然也可以直接发送刷新请求给Bus，再由Bus进行广播。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li><a href="https://www.xncoding.com/2017/07/22/spring/sb-starter.html" target="_blank" rel="noopener">自己写starter</a></li>
+<li><a href="https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/htmlsingle/#production-ready" target="_blank" rel="noopener">Actuator官方文档</a></li>
+<li><a href="http://dockone.io/article/78" target="_blank" rel="noopener">为什么不应该使用ZooKeeper做服务发现</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/41228196" target="_blank" rel="noopener">Gossip协议</a></li>
+<li><a href="https://tech.meituan.com/2017/01/05/mgw.html" target="_blank" rel="noopener">MGW——美团点评高性能四层负载均衡</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/262660637" target="_blank" rel="noopener">深入理解Ribbon</a></li>
+<li><a href="https://www.jianshu.com/p/79b9cf0d0519" target="_blank" rel="noopener">Ribbon的负载均衡策略、原理和扩展</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/61363959" target="_blank" rel="noopener">降级-熔断-限流-傻傻分不清</a></li>
+<li><a href="https://segmentfault.com/a/1190000015967922" target="_blank" rel="noopener">接口限流算法：漏桶算法&amp;令牌桶算法</a></li>
+<li><a href="https://martinfowler.com/bliki/CircuitBreaker.html" target="_blank" rel="noopener">CircuitBreaker</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/01/20/great_blogs/" rel="next" title="有趣的问题">
+                <i class="fa fa-chevron-left"></i> 有趣的问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar/me.jpg"
+                alt="Twd" />
+            
+              <p class="site-author-name" itemprop="name">Twd</p>
+              <p class="site-description motion-element" itemprop="description">There is no royal road to learning.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+            <div class="cc-license motion-element" itemprop="license">
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
+                <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+              </a>
+            </div>
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring-Boot"><span class="nav-number">1.</span> <span class="nav-text">Spring Boot</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#自动装配"><span class="nav-number">1.1.</span> <span class="nav-text">自动装配</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Actuator"><span class="nav-number">1.2.</span> <span class="nav-text">Actuator</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务注册和发现"><span class="nav-number">2.</span> <span class="nav-text">服务注册和发现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Eureka"><span class="nav-number">2.1.</span> <span class="nav-text">Eureka</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zookeeper"><span class="nav-number">2.2.</span> <span class="nav-text">Zookeeper</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Consul"><span class="nav-number">2.3.</span> <span class="nav-text">Consul</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#负载均衡"><span class="nav-number">3.</span> <span class="nav-text">负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ribbon"><span class="nav-number">3.1.</span> <span class="nav-text">Ribbon</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简化服务调用"><span class="nav-number">4.</span> <span class="nav-text">简化服务调用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenFeign"><span class="nav-number">4.1.</span> <span class="nav-text">OpenFeign</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务熔断、降级、限流"><span class="nav-number">5.</span> <span class="nav-text">服务熔断、降级、限流</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hystrix"><span class="nav-number">5.1.</span> <span class="nav-text">Hystrix</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hystrix服务降级"><span class="nav-number">5.1.1.</span> <span class="nav-text">Hystrix服务降级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hystrix熔断"><span class="nav-number">5.1.2.</span> <span class="nav-text">Hystrix熔断</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务网关"><span class="nav-number">6.</span> <span class="nav-text">服务网关</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Gateway"><span class="nav-number">6.1.</span> <span class="nav-text">Gateway</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务配置"><span class="nav-number">7.</span> <span class="nav-text">服务配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Config"><span class="nav-number">7.1.</span> <span class="nav-text">Config</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务总线"><span class="nav-number">8.</span> <span class="nav-text">服务总线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bus"><span class="nav-number">8.1.</span> <span class="nav-text">Bus</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">9.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Twd</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
