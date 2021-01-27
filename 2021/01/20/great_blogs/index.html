@@ -117,14 +117,14 @@
 
 
 
-<meta name="description" content="本文主要是摘录一些有趣的问题和相关的一些优博文。 编码那些事首先需要理清楚Unicode，UTF-8，UTF-16和UTF-32之间的关系：  Unicode：是字符集，不是具体的编码格式 UTF-8：变长编码格式，通过一定的规则使用不同个数（1~6）的字节进行编码。 UTF-8缩略编码：使用的字节个数相较UTF-8标准编码更少，仅使用1~3个。 UTF-16：变长编码格式，通过一定规则使用不同个">
+<meta name="description" content="本文主要是摘录一些有趣的问题和相关的一些优秀博文。 编码那些事首先需要理清楚Unicode，UTF-8，UTF-16和UTF-32之间的关系：  Unicode：是字符集，不是具体的编码格式 UTF-8：变长编码格式，通过一定的规则使用不同个数（1~6）的字节进行编码。 UTF-8缩略编码：使用的字节个数相较UTF-8标准编码更少，仅使用1~3个。 UTF-16：变长编码格式，通过一定规则使用不同">
 <meta property="og:type" content="article">
 <meta property="og:title" content="有趣的问题">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2021&#x2F;01&#x2F;20&#x2F;great_blogs&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="本文主要是摘录一些有趣的问题和相关的一些优博文。 编码那些事首先需要理清楚Unicode，UTF-8，UTF-16和UTF-32之间的关系：  Unicode：是字符集，不是具体的编码格式 UTF-8：变长编码格式，通过一定的规则使用不同个数（1~6）的字节进行编码。 UTF-8缩略编码：使用的字节个数相较UTF-8标准编码更少，仅使用1~3个。 UTF-16：变长编码格式，通过一定规则使用不同个">
+<meta property="og:description" content="本文主要是摘录一些有趣的问题和相关的一些优秀博文。 编码那些事首先需要理清楚Unicode，UTF-8，UTF-16和UTF-32之间的关系：  Unicode：是字符集，不是具体的编码格式 UTF-8：变长编码格式，通过一定的规则使用不同个数（1~6）的字节进行编码。 UTF-8缩略编码：使用的字节个数相较UTF-8标准编码更少，仅使用1~3个。 UTF-16：变长编码格式，通过一定规则使用不同">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-01-23T15:14:31.819Z">
+<meta property="og:updated_time" content="2021-01-27T15:43:52.560Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -343,8 +343,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2021-01-23T23:14:31+08:00">
-                2021-01-23
+              <time title="更新于" itemprop="dateModified" datetime="2021-01-27T23:43:52+08:00">
+                2021-01-27
               </time>
             
           </span>
@@ -404,7 +404,7 @@
       
 
       
-        <p>本文主要是摘录一些有趣的问题和相关的一些优博文。</p>
+        <p>本文主要是摘录一些有趣的问题和相关的一些优秀博文。</p>
 <h1 id="编码那些事"><a href="#编码那些事" class="headerlink" title="编码那些事"></a>编码那些事</h1><p>首先需要理清楚Unicode，UTF-8，UTF-16和UTF-32之间的关系：</p>
 <ul>
 <li>Unicode：是字符集，不是具体的编码格式</li>
@@ -418,11 +418,13 @@
 <p>字节序：在计算机科学领域中，指电脑内存中或在数字通信链路中，组成多字节的字的字节的排列顺序。</p>
 </blockquote>
 <p>举个例子，字节序就是int类型的4个字节按怎样的顺序存放在内存中。字节序分为大端序（低地址存最高有效字节）和小端序（低地址处存最小有效字节）。字节序受操作系统和PC影响，目前x86和一般的OS（如windows、Linux）使用的是小端序，而MacOS使用的是大端序。另外还需要注意的是，网络传输中一般使用大端序。<br>位序：一个字节内部各比特位的存放顺序。也分为大端序和小端序，一般和字节序相同，通常情况下我们不需要关心位序。有意思的是，在以太网协议中，虽然高字节先传，但每一字节内低位先传。这个处理过程由网卡负责，在接收端网卡会对每个字节的比特流转换成接收端对应的位序，得到对应的字节值。<br>详情参见：<br><a href="https://zh.wikipedia.org/wiki/%E5%AD%97%E8%8A%82%E5%BA%8F" target="_blank" rel="noopener">字节序</a><br><a href="https://blog.csdn.net/frank_jb/article/details/79027711" target="_blank" rel="noopener">字节序和位序</a>:这篇博客的“小端-&gt;大端比特发送示例图”有误</p>
+<h1 id="Postman自动获取Cookie"><a href="#Postman自动获取Cookie" class="headerlink" title="Postman自动获取Cookie"></a>Postman自动获取Cookie</h1><p>在实际情况中，Postman需要使用Cookie去完成后端交互调试。这时候就需要Postman Interceptor了。<br>Postman Interceptor是一款Chrome插件，可以拦截Chrome中的Request保存到Postman应用中，也可以将Cookie等保存下来，自动附加在Postman发起的请求上。<br>详细的安装及说明见：<a href="https://learning.postman.com/docs/sending-requests/capturing-request-data/interceptor/" target="_blank" rel="noopener">Postman Interceptor使用</a></p>
 <h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
 <li><a href="https://www.cnblogs.com/malecrab/p/5300503.html" target="_blank" rel="noopener">细说：Unicode, UTF-8, UTF-16, UTF-32, UCS-2, UCS-4</a></li>
 <li><a href="https://blog.csdn.net/qq_32946725/article/details/88379036" target="_blank" rel="noopener">utf-8缩略编码和标准编码</a></li>
 <li><a href="https://zh.wikipedia.org/wiki/%E5%AD%97%E8%8A%82%E5%BA%8F" target="_blank" rel="noopener">字节序</a></li>
 <li><a href="https://blog.csdn.net/frank_jb/article/details/79027711" target="_blank" rel="noopener">字节序和位序</a></li>
+<li><a href="https://learning.postman.com/docs/sending-requests/capturing-request-data/interceptor/" target="_blank" rel="noopener">Postman Interceptor使用</a></li>
 </ul>
 
       
@@ -604,7 +606,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#编码那些事"><span class="nav-number">1.</span> <span class="nav-text">编码那些事</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字节序和位序"><span class="nav-number">2.</span> <span class="nav-text">字节序和位序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#编码那些事"><span class="nav-number">1.</span> <span class="nav-text">编码那些事</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字节序和位序"><span class="nav-number">2.</span> <span class="nav-text">字节序和位序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Postman自动获取Cookie"><span class="nav-number">3.</span> <span class="nav-text">Postman自动获取Cookie</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
