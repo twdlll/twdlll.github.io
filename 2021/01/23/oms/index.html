@@ -117,13 +117,16 @@
 
 
 
-<meta name="description" content="Spring Cloud是一套微服务治理体系，面向分布式系统、云服务。Spring Cloud不是单纯的某个中间件&#x2F;应用框架，而是一套微服务的解决方案。这套方案包括服务注册与发现、负载均衡、服务熔断、降级等。下面讲讲我对Spring Cloud的初步认识。 Spring Boot这里单独把Spring Boot列出来，是因为Spring Boot是当前最火热的开发微应用的框架，是Spring Cl">
+<meta name="description" content="Spring Cloud源于微服务架构概念的提出。所以在讲Spring Cloud之前，需要先谈谈微服务架构。           单体式应用  在微服务以前，都是单体式应用。单体式应用集应用的所有功能为一体，是不可拆分的。比如上图的出租车系统，包含乘客管理、支付管理、驾驶员管理等功能。事实上，简单的业务应用采用单体式也是可行的。但随着应用体量的变大以及面临场景的愈发复杂，单体式应用就暴露出一些不">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring Cloud初识">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2021&#x2F;01&#x2F;23&#x2F;oms&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="Spring Cloud是一套微服务治理体系，面向分布式系统、云服务。Spring Cloud不是单纯的某个中间件&#x2F;应用框架，而是一套微服务的解决方案。这套方案包括服务注册与发现、负载均衡、服务熔断、降级等。下面讲讲我对Spring Cloud的初步认识。 Spring Boot这里单独把Spring Boot列出来，是因为Spring Boot是当前最火热的开发微应用的框架，是Spring Cl">
+<meta property="og:description" content="Spring Cloud源于微服务架构概念的提出。所以在讲Spring Cloud之前，需要先谈谈微服务架构。           单体式应用  在微服务以前，都是单体式应用。单体式应用集应用的所有功能为一体，是不可拆分的。比如上图的出租车系统，包含乘客管理、支付管理、驾驶员管理等功能。事实上，简单的业务应用采用单体式也是可行的。但随着应用体量的变大以及面临场景的愈发复杂，单体式应用就暴露出一些不">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;monolithic-architecture.png">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;microservices.png">
+<meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;spring-cloud.png">
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Eureka.png">
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Consul.png">
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;call.jpg">
@@ -131,9 +134,9 @@
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;breaker.png">
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Config.jpg">
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Bus.jpg">
-<meta property="og:updated_time" content="2021-01-24T05:29:19.488Z">
+<meta property="og:updated_time" content="2021-02-05T11:54:38.209Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;oms&#x2F;Eureka.png">
+<meta name="twitter:image" content="&#x2F;images&#x2F;oms&#x2F;monolithic-architecture.png">
 
 
 
@@ -351,8 +354,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2021-01-24T13:29:19+08:00">
-                2021-01-24
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-05T19:54:38+08:00">
+                2021-02-05
               </time>
             
           </span>
@@ -412,8 +415,47 @@
       
 
       
-        <p>Spring Cloud是一套微服务治理体系，面向分布式系统、云服务。Spring Cloud不是单纯的某个中间件/应用框架，而是一套微服务的解决方案。这套方案包括服务注册与发现、负载均衡、服务熔断、降级等。下面讲讲我对Spring Cloud的初步认识。</p>
-<h1 id="Spring-Boot"><a href="#Spring-Boot" class="headerlink" title="Spring Boot"></a>Spring Boot</h1><p>这里单独把Spring Boot列出来，是因为Spring Boot是当前最火热的开发微应用的框架，是Spring Cloud整个微服务治理框架的核心和基础。<br>在学习Spring Boot时，我第一个问题是Spring Boot和Spring的关系是什么？现在如果让我来回答这个问题，我的答案是：</p>
+        <p>Spring Cloud源于微服务架构概念的提出。所以在讲Spring Cloud之前，需要先谈谈微服务架构。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/monolithic-architecture.png" width="800" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">单体式应用</div>
+</center>
+在微服务以前，都是单体式应用。单体式应用集应用的所有功能为一体，是不可拆分的。比如上图的出租车系统，包含乘客管理、支付管理、驾驶员管理等功能。事实上，简单的业务应用采用单体式也是可行的。但随着应用体量的变大以及面临场景的愈发复杂，单体式应用就暴露出一些不足：
+
+<ul>
+<li>耦合严重：系统内往往使用API进行调用，代码耦合紧密导致维护困难，同时开发难度也骤增。</li>
+<li>不够灵活：因为是单体式应用，所以对代码的每一次修改，都会导致整体应用的重新编译和部署（并且编译时间会随着代码量的增加而增加），这会使得开发和产品迭代成本上升。</li>
+<li>扩容时资源浪费：对于极端场景，实际只需要对部分功能进行扩容。但是单体式应用不可拆分，只能以应用为单位进行扩容，浪费了机器资源。</li>
+</ul>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/microservices.png" width="800" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">微服务架构</div>
+</center>
+为了解决单体式应用的不足，微服务架构出现了，其核心概念就是以服务为最小编译和部署单位，通过多个服务的协作来完成业务。对于上述的出租车系统，其对应的微服务架构如图所示。相比单体式应用，微服务架构的粒度显然更细致，其好处有：
+
+<ul>
+<li>服务独立开发和部署：以服务为单位进行开发，显然对整体系统了解的要求降低了。在开发过程中，只要专注于该服务需要完成的职责即可。另外，由于服务的独立性，所以可允许各服务自由选择自己的技术栈。</li>
+<li>运维方便：通过对各个服务进行动态扩容，即可确保整体应用在极端场景下的稳定。</li>
+</ul>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/oms/spring-cloud.png" width="700" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">Spring Cloud</div>
+</center>
+
+<p>相比于单体式应用，微服务架构显然更加具有潜力。但是微服务架构也会面临一些实现问题，包括服务之间怎么感知，怎么调用，负载均衡等等。如果没有实现这些细节问题，那么微服务等同纸上谈兵。也正是这些问题催生出了Spring Cloud，当下最火热的微服务治理体系。Spring Cloud对于微服务的管理细节，针对性地提供了解决方案。使用Spring Cloud，就可以平滑地搭建基于微服务架构的应用。</p>
+<h1 id="Spring-Boot"><a href="#Spring-Boot" class="headerlink" title="Spring Boot"></a>Spring Boot</h1><p>这里单独把Spring Boot列出来，是因为Spring Boot是当前最火热的开发微服务的框架，是Spring Cloud整个微服务治理框架的核心和基础。<br>在学习Spring Boot时，我第一个问题是Spring Boot和Spring的关系是什么？现在如果让我来回答这个问题，我的答案是：</p>
 <ul>
 <li>Spring：为Java EE提供了全面的基础支持，包括Spring IOC， Spring AOP， Spring MVC、 Spring JDBC 和 Spring Security等模块。开发者可自行选择使用的模块，并配合其他库（如MyBatis等）进行应用开发。</li>
 <li>Spring Boot：实现了自动配置，降低了项目搭建的复杂度，能够快速构建服务。</li>
@@ -441,7 +483,7 @@
 <center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/oms/Eureka.png" width="700">
+    src="/images/oms/Eureka.png" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图2.1 Eureka界面</div>
@@ -480,7 +522,7 @@
 <center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/oms/Consul.png" width="700">
+    src="/images/oms/Consul.png" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图2.2 Consul架构（源于官网）</div>
@@ -521,7 +563,7 @@
 <h1 id="服务熔断、降级、限流"><a href="#服务熔断、降级、限流" class="headerlink" title="服务熔断、降级、限流"></a>服务熔断、降级、限流</h1><center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/oms/call.jpg" width="500">
+    src="/images/oms/call.jpg" width="500" loading="lazy">
     <div style="color:orange; border-bottom: 0.2px solid #d9d9d9;
     display: inline-block;
     color: #999;">图5.1 服务调用链</div>
@@ -531,7 +573,7 @@
 <center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/oms/service_avalanche.jpg" width="500">
+    src="/images/oms/service_avalanche.jpg" width="500" loading="lazy">
     <div style="color:orange; border-bottom: 0.2px solid #d9d9d9;
     display: inline-block;
     color: #999;">图5.2 雪崩效应</div>
@@ -558,7 +600,7 @@
 <h3 id="Hystrix熔断"><a href="#Hystrix熔断" class="headerlink" title="Hystrix熔断"></a>Hystrix熔断</h3><center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/oms/breaker.png" width="500">
+    src="/images/oms/breaker.png" width="500" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图5.3 熔断器状态图</div>
@@ -586,7 +628,7 @@
 <center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/oms/Config.jpg" width="700">
+    src="/images/oms/Config.jpg" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图7.1 Config架构</div>
@@ -601,14 +643,16 @@
 <center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/oms/Bus.jpg" width="700">
+    src="/images/oms/Bus.jpg" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图7.1 Bus+Config动态刷新</div>
 </center>
 
-<p>上图已经很清楚，Bus的功能就是在监听发送给微应用的消息，从而将其广播至所有应用。当然也可以直接发送刷新请求给Bus，再由Bus进行广播。</p>
+<p>上图已经很清楚，Bus的功能就是在监听发送给微服务的消息，从而将其广播至所有应用。当然也可以直接发送刷新请求给Bus，再由Bus进行广播。</p>
 <h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li><a href="https://www.nginx.com/blog/introduction-to-microservices/" target="_blank" rel="noopener">Introduction to Microservices</a></li>
+<li><a href="https://spring.io/cloud" target="_blank" rel="noopener">Spring Cloud</a></li>
 <li><a href="https://www.xncoding.com/2017/07/22/spring/sb-starter.html" target="_blank" rel="noopener">自己写starter</a></li>
 <li><a href="https://docs.spring.io/spring-boot/docs/2.2.2.RELEASE/reference/htmlsingle/#production-ready" target="_blank" rel="noopener">Actuator官方文档</a></li>
 <li><a href="http://dockone.io/article/78" target="_blank" rel="noopener">为什么不应该使用ZooKeeper做服务发现</a></li>
