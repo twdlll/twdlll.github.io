@@ -124,7 +124,7 @@
 <meta property="og:site_name" content="Twd&#39;s Home">
 <meta property="og:description" content="本文是对《重构_改善既有代码的设计》的读后感记录，在阅读期间都会持续更新。首先谈谈我对这本书的想法，我觉得我学习《重构》并不仅仅为了去重构一些冗余繁杂的代码，而是在一开始写代码时，就尽量考虑代码的可扩展性和简洁性，争取做到未来不需要重构代码（当然现实是随着业务变化等原因，总会有一些大大小小的重构需求）。我觉得从重构中能学到的代码技巧是身为软件工程师的基本素养，就像武功里的基本功（扎马步等）一样至关">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-01-15T16:19:10.269Z">
+<meta property="og:updated_time" content="2021-02-06T14:36:13.868Z">
 <meta name="twitter:card" content="summary">
 
 
@@ -343,8 +343,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2021-01-16T00:19:10+08:00">
-                2021-01-16
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-06T22:36:13+08:00">
+                2021-02-06
               </time>
             
           </span>
@@ -506,29 +506,10 @@
 </ol>
 <p>第1-2点强调了测试的重要性和撰写测试的时机。根据我人经历来看，确实大部分的时间花在调试上而不是开发上。如果能做好测试，那么就能减少bug的出现，从而大幅缩短调试的时间。另外关于“测试的撰写先于开发”也比较好理解，先写的测试用例属于黑盒测试，代表的是对这个功能的初始期望，比较符合预期需求。如果先编写代码，再编写测试，其实测试用例容易受已编写代码的影响，偏向白盒测试，容易形成不完善的测试用例。<br>第3-5点说明了测试的思路和多关注边界，不要对风险较低的代码段（如读写字段）做过多的测试（这类测试就是无用的测试），要多关注可能出现问题的地方。对于边界，我个人的看法是对于功能模块最好假设一个可执行区间，通过参数校验判断输入是否在可执行区间内，如果不在就抛出异常或返回出错。<br>第6-7点指明了面向对象技术会让测试变得更复杂，因为有许多种组合需要测试。这里作者也提到并不会试着测试所有组合，但会尽量测试每一个类，这可以大大减少各种组合所造成的风险。</p>
 <h1 id="重构列表"><a href="#重构列表" class="headerlink" title="重构列表"></a>重构列表</h1><p>这一章主要是对后续章节重构手法的规范说明，这里不仔细描述。</p>
-<h1 id="重新组织函数"><a href="#重新组织函数" class="headerlink" title="重新组织函数"></a>重新组织函数</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// *** 1 ***</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">printOwing</span><span class="params">(<span class="keyword">double</span> amount)</span> </span>&#123;</span><br><span class="line">  printBanner();</span><br><span class="line">  <span class="comment">// print details</span></span><br><span class="line">  System.out.println(<span class="string">"name:"</span> + _name);</span><br><span class="line">  System.out.println(<span class="string">"amount:"</span> + amount);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// *** 2 ***</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">printOwing</span><span class="params">(<span class="keyword">double</span> amount)</span> </span>&#123;</span><br><span class="line">  printBanner();</span><br><span class="line">  printDetails(amount);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">printDetails</span><span class="params">(<span class="keyword">double</span> amount)</span> </span>&#123;</span><br><span class="line">  System.out.println(<span class="string">"name:"</span> + _name);</span><br><span class="line">  System.out.println(<span class="string">"amount:"</span> + amount);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>对于重新组织函数，作者总结了如下手法：</p>
+<h1 id="重新组织函数"><a href="#重新组织函数" class="headerlink" title="重新组织函数"></a>重新组织函数</h1><p>对于重新组织函数，作者总结了如下手法：</p>
 <ul>
-<li>Extract Method（提炼函数）：将一段代码放入一个独立函数中，比如第1段代码到第2段代码。<ul>
-<li>该方法的优势：<ol>
-<li>如果每个函数的粒度都很小，那么函数被复用的机会就会更大</li>
-<li>会使高层函数读起来就像一系列注解</li>
-<li>如果函数都是细粒度，那么函数的覆写也会更容易些。</li>
-</ol>
-</li>
-<li>被提炼代码段可能出现的问题：<ol>
-<li>如果有一个临时变量值被修改了，看看是否可以将被提炼代码段处理为一个查询，并将结果赋值给相关变量。</li>
-<li>如果被修改的变量不止一个，需要先使用Split Temporary Variable，然后再尝试提炼。也可以使用Replace Temp with Query将临时变量消灭掉。</li>
-<li>将被提炼代码段中需要读取的局部变量，当做参数传给目标函数。</li>
-</ol>
-</li>
-</ul>
-</li>
-<li>Inline Method（内联函数）：是Extract Method的反义词，也就是第2段代码到第1段代码。<ul>
-<li>非必要的间接性会让人不舒服</li>
-<li>对于组织不合理的小型函数，可以将它们内联到一个大型函数中去，再从中提炼组织合理的小型函数。</li>
-</ul>
-</li>
+<li>Extract Method（提炼函数）：将方法中的部分代码抽离出来，形成新的小方法。</li>
+<li>Inline Method（内联函数）：取消不必要的小方法，将其代码内容移至所属的方法中去。</li>
 <li>Inline Temp（内联临时变量）：有一个临时变量只被一个简单表达式赋值一次，而它妨碍了其他重构手法。</li>
 <li>Replace Temp with Query（以查询取代临时变量）：有临时变量a保存某一表达式的运算结果，将这个表达式提炼到一个独立函数中。所有临时变量a的引用点都替换成对新函数的调用。</li>
 <li>Introduce Explaining Variable（引入解释性变量）：将复杂表达式（或其中一部分）的结果放进一个临时变量，以此变量名解释表达式用途。</li>
@@ -541,13 +522,24 @@
 <li>Substitute Algorithm（替换算法）：把某个算法替换成另一个更清晰的算法。</li>
 </ul>
 <p>对于Extract Method和Inline Method，需要拿捏好函数粒度，没有绝对的规则，所有都建立在函数结构清晰的前提下。对于Replace Temp with Query，如果某些临时变量的获取消耗时间，那么就不适用这条。Introduce Explaining Variable则是专注于代码可理解性的提升。</p>
-<h2 id="Extract-Method"><a href="#Extract-Method" class="headerlink" title="Extract Method"></a>Extract Method</h2><p>在函数编写时，其实有条默认规范，就是每个函数尽量不要超过一定的行数，我给自己的要求是每个函数不超过40行。函数行的缩减对于代码整体美观以及他人阅读都是有好处的，太长的代码会使人丧失阅读的兴趣。比如我要将一个租车表单数据转为一个订单实体类对象：</p>
+<h2 id="Extract-Method"><a href="#Extract-Method" class="headerlink" title="Extract Method"></a>Extract Method</h2><p>阿里的《Java开发手册》建议每个方法不超过80行。事实上，过长的方法会降低代码的可读性，也会使人丧失阅读的兴趣。比如要将一个租车表单数据转为一个订单实体类对象：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">OrderBO <span class="title">convertToOrder</span><span class="params">(FormBO formBO)</span> </span>&#123;</span><br><span class="line">  OrderBO orderBO = <span class="keyword">new</span> OrderBO();</span><br><span class="line">  <span class="comment">// 1. 常规属性设置</span></span><br><span class="line">  orderBO.setName(formBO.getName());</span><br><span class="line">  orderBO.setTime(formBO.getTime());</span><br><span class="line">  ...</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 2. 对于部分属性不是简单的赋值，需要进行计算</span></span><br><span class="line">  <span class="comment">// 2.1 根据订单的种类设置租金，并计算订单应付金额</span></span><br><span class="line">  <span class="keyword">int</span> prise = TypeEnum.SHORT_RENT.getCode.equals(formBO.getType()) ? </span><br><span class="line">  	TypeEnum.SHORT_RENT.getPrice() : TypeEnum.SHORT_RENT.getPrice();</span><br><span class="line">  orderBO.setMoney(formBO.getDays() * formBO.getRent()；</span><br><span class="line">  ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>很明显这段代码会非常地长，而且这里不单单是简单赋值，还夹杂相应转换逻辑。这种情况下，我比较喜欢将其中的代码按照业务属性剥离出来，独立成一个个小函数：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">OrderBO <span class="title">convertToOrder</span><span class="params">(FormBO formBO)</span> </span>&#123;</span><br><span class="line">  OrderBO orderBO = <span class="keyword">new</span> OrderBO();</span><br><span class="line">  <span class="comment">// 1. 设置常规属性，只是赋值</span></span><br><span class="line">  setRegularValue(orderBO, formBO);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 2. 计算金额</span></span><br><span class="line">  setMoney(orderBO, formBO);</span><br><span class="line">  ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>很明显这段代码会非常地长，而且这里不单单是简单赋值，还夹杂相应转换逻辑。这种情况下，我比较喜欢将其中的代码按照逻辑属性剥离出来，独立成一个个小函数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">OrderBO <span class="title">convertToOrder</span><span class="params">(FormBO formBO)</span> </span>&#123;</span><br><span class="line">  OrderBO orderBO = <span class="keyword">new</span> OrderBO();</span><br><span class="line">  <span class="comment">// 1. 设置常规属性，只是赋值</span></span><br><span class="line">  <span class="comment">// 额外提一下，纯赋值操作可以使用spring的BeanUtils.copyProperies来完成</span></span><br><span class="line">  setRegularAttribute(orderBO, formBO);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 2. 计算金额</span></span><br><span class="line">  setMoney(orderBO, formBO);</span><br><span class="line">  ....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>这样代码逻辑就会比较清晰，同样的例子还有Spring中ApplicationContext的refresh过程，感兴趣的可以看一下。另外，多提一嘴，对于纯赋值的操作，可以使用BeanUtils.copyProperties进行简化。</p>
+<p>这样代码逻辑就会比较清晰。这样的处理方法其实就是Extract Method，其优势在于：</p>
+<ol>
+<li>如果每个函数的粒度都很小，那么函数被复用的机会就会更大</li>
+<li>会使高层函数读起来就像一系列注解</li>
+<li>如果函数都是细粒度，那么函数的覆写也会更容易些。</li>
+</ol>
+<p>相对的，Inline Method则是Extract Method的逆过程。事实上，如何使用这两个方法完全取决于使用者对于函数粒度的要求和对业务的理解。我个人的思考是：</p>
+<ol>
+<li>某段代码会多次出现在不同的方法内，那么就一定要Extract Method。</li>
+<li>某段代码只会出现在当前方法内，那么就Inline Method。</li>
+<li>某个方法内的代码段不会被复用，但是该方法过于冗长。此时建议按照该方法的业务进行更细粒度的划分，由此进行Extract Method。</li>
+</ol>
 <h1 id="在对象之间搬移特性"><a href="#在对象之间搬移特性" class="headerlink" title="在对象之间搬移特性"></a>在对象之间搬移特性</h1><p>作者提到了对象设计过程中“决定把责任放在哪儿”。类往往会因为承担过多责任而变得臃肿不堪，这时候需要将一部分责任分离出去；如果一个类变得太“不负责任”，就需要将其融入另一个类…这里有以下手法：</p>
 <ul>
 <li>Move Method (搬移函数）：如果有个函数与其所驻类之外的另一个类进行更多交流：调用后者，或被后者调用。那么在该函数最常引用的类中建立一个有类似行为的新函数，将旧函数变成一个单纯的委托函数，或是将旧函数完全移除。<ul>
