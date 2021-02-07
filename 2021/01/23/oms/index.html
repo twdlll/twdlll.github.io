@@ -134,7 +134,7 @@
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;breaker.png">
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Config.jpg">
 <meta property="og:image" content="&#x2F;images&#x2F;oms&#x2F;Bus.jpg">
-<meta property="og:updated_time" content="2021-02-05T11:57:54.117Z">
+<meta property="og:updated_time" content="2021-02-07T06:12:03.687Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;oms&#x2F;monolithic-architecture.png">
 
@@ -354,8 +354,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2021-02-05T19:57:54+08:00">
-                2021-02-05
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-07T14:12:03+08:00">
+                2021-02-07
               </time>
             
           </span>
@@ -385,6 +385,16 @@
           
 
           
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2021/01/23/oms/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2021/01/23/oms/" itemprop="commentCount"></span>
+                </a>
+              </span>
             
           
 
@@ -616,7 +626,7 @@
 <li>Predicate（断言）：可以跟HTTP中的所有内容（如请求头或请求参数）进行匹配，如果请求与断言匹配则进行路由。</li>
 <li>Filter（过滤）：在请求被路由之前或之后，可以对请求/响应进行修改，有点类似拦截器。</li>
 </ul>
-<p>Gateway支持yml配置和JavaBean，以下是JavaBean形式：</p>
+<p>Gateway支持yml配置和JavaBean，以下是JavaBean形式:</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">  </span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RouteLocator <span class="title">customRouteLocator</span><span class="params">(RouteLocatorBuilder routeLocatorBuilder)</span> </span>&#123;</span><br><span class="line">  RouteLocatorBuilder.Builder routes = routeLocatorBuilder.routes();</span><br><span class="line">  <span class="comment">// 访问当前地址的/aaa，跳转到http://bbb.com</span></span><br><span class="line">  routes.route(<span class="string">"id1"</span>, r -&gt; r.path(<span class="string">"/aaa"</span>).uri(<span class="string">"http://bbb.com"</span>)).build();</span><br><span class="line">  <span class="keyword">return</span> routes.build();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h1 id="服务配置"><a href="#服务配置" class="headerlink" title="服务配置"></a>服务配置</h1><p>服务配置指一套集中式、动态的配置管理设施，去管理大量微服务的配置信息。</p>
@@ -676,6 +686,24 @@
     
 
     
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Twd
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https//twdlll.github.io/2021/01/23/oms/" title="Spring Cloud初识">https//twdlll.github.io/2021/01/23/oms/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
 
     <footer class="post-footer">
       
@@ -725,6 +753,9 @@
 
           
 
+  
+    <div class="comments" id="comments">
+    </div>
   
 
 
@@ -1049,6 +1080,28 @@
 
 
 
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'GGPCnBYuRq79rLfW18tJhI0s-gzGzoHsz',
+        appKey: '34sl9GwWQlzfb2VsFNqhO5nw',
+        placeholder: '快来发表你的评论吧',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
 
 
 
