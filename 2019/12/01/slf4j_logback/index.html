@@ -117,19 +117,19 @@
 
 
 
-<meta name="description" content="SLF4J源码分析SLF4J（Simple Logging Facade for Java)是对不同日志框架的简单门面，可允许用户自由选择具体的日志实现。这张图来自SLF4J的官网，它明确地展示了用户的应用是架设在SLF4J API层之上，也就是说屏蔽了用户代码对底层日志实现的依赖。这样，当底层的日志框架变动时，用户只需要让SLF4J适配它，根本无需对应用代码做任何修改。SLF4J的使用很简单：">
+<meta name="description" content="SLF4J源码分析SLF4J（Simple Logging Facade for Java)是对不同日志框架的简单门面，可允许用户自由选择具体的日志实现。        这张图来自SLF4J的官网，它明确地展示了用户的应用是架设在SLF4J API层之上，也就是说屏蔽了用户代码对底层日志实现的依赖。这样，当底层的日志框架变动时，用户只需要让SLF4J适配它，根本无需对应用代码做任何修改。   SL">
 <meta name="keywords" content="slf4j,logback">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SLF4J+Logback源码分析">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;12&#x2F;01&#x2F;slf4j_logback&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="SLF4J源码分析SLF4J（Simple Logging Facade for Java)是对不同日志框架的简单门面，可允许用户自由选择具体的日志实现。这张图来自SLF4J的官网，它明确地展示了用户的应用是架设在SLF4J API层之上，也就是说屏蔽了用户代码对底层日志实现的依赖。这样，当底层的日志框架变动时，用户只需要让SLF4J适配它，根本无需对应用代码做任何修改。SLF4J的使用很简单：">
+<meta property="og:description" content="SLF4J源码分析SLF4J（Simple Logging Facade for Java)是对不同日志框架的简单门面，可允许用户自由选择具体的日志实现。        这张图来自SLF4J的官网，它明确地展示了用户的应用是架设在SLF4J API层之上，也就是说屏蔽了用户代码对底层日志实现的依赖。这样，当底层的日志框架变动时，用户只需要让SLF4J适配它，根本无需对应用代码做任何修改。   SL">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;images&#x2F;slf4j&#x2F;concrete-bindings.png">
-<meta property="og:image" content="&#x2F;images&#x2F;slf4j&#x2F;placeholder.png">
-<meta property="og:updated_time" content="2020-04-06T12:39:02.235Z">
+<meta property="og:image" content="&#x2F;images&#x2F;slf4j&#x2F;binding.webp">
+<meta property="og:image" content="&#x2F;images&#x2F;slf4j&#x2F;placeholder.webp">
+<meta property="og:updated_time" content="2021-02-07T15:04:47.138Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;slf4j&#x2F;concrete-bindings.png">
+<meta name="twitter:image" content="&#x2F;images&#x2F;slf4j&#x2F;binding.webp">
 
 
 
@@ -347,8 +347,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-06T20:39:02+08:00">
-                2020-04-06
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-07T23:04:47+08:00">
+                2021-02-07
               </time>
             
           </span>
@@ -418,298 +418,61 @@
       
 
       
-        <h1 id="SLF4J源码分析"><a href="#SLF4J源码分析" class="headerlink" title="SLF4J源码分析"></a>SLF4J源码分析</h1><p>SLF4J（Simple Logging Facade for Java)是对不同日志框架的简单门面，可允许用户自由选择具体的日志实现。<br><img src="/images/slf4j/concrete-bindings.png" alt=""><br>这张图来自SLF4J的官网，它明确地展示了用户的应用是架设在SLF4J API层之上，也就是说屏蔽了用户代码对底层日志实现的依赖。这样，当底层的日志框架变动时，用户只需要让SLF4J适配它，根本无需对应用代码做任何修改。<br>SLF4J的使用很简单：</p>
-<pre><code>import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+        <h1 id="SLF4J源码分析"><a href="#SLF4J源码分析" class="headerlink" title="SLF4J源码分析"></a>SLF4J源码分析</h1><p>SLF4J（Simple Logging Facade for Java)是对不同日志框架的简单门面，可允许用户自由选择具体的日志实现。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/slf4j/binding.webp" width="800" loading="lazy">
+</center>
+这张图来自SLF4J的官网，它明确地展示了用户的应用是架设在SLF4J API层之上，也就是说屏蔽了用户代码对底层日志实现的依赖。这样，当底层的日志框架变动时，用户只需要让SLF4J适配它，根本无需对应用代码做任何修改。  
+SLF4J的使用很简单：
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Logger logger = LoggerFactory.getLogger(HelloWorld<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        logger.info(<span class="string">"Hello World"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+接下来我们进入源码。
+## SLF4J绑定底层日志框架 ##
+getLogger方法是所有使用的开始
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Logger <span class="title">getLogger</span><span class="params">(Class&lt;?&gt; clazz)</span> </span>&#123;</span><br><span class="line">    Logger logger = getLogger(clazz.getName());</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+这里我略去了不重要的代码，进入真正的getLogger方法（参数是String)
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Logger <span class="title">getLogger</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">    ILoggerFactory iLoggerFactory = getILoggerFactory();</span><br><span class="line">    <span class="keyword">return</span> iLoggerFactory.getLogger(name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+注意这里的ILoggerFactory会绑定到具体日志框架的LoggerFactory。  
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ILoggerFactory <span class="title">getILoggerFactory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> getProvider().getLoggerFactory();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+先来看getProvider方法
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> SLF4JServiceProvider <span class="title">getProvider</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (INITIALIZATION_STATE == UNINITIALIZED) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (LoggerFactory<span class="class">.<span class="keyword">class</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (INITIALIZATION_STATE == UNINITIALIZED) &#123;</span><br><span class="line">                INITIALIZATION_STATE = ONGOING_INITIALIZATION;</span><br><span class="line">                performInitialization();	<span class="comment">// 执行初始化</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">switch</span> (INITIALIZATION_STATE) &#123;</span><br><span class="line">    <span class="keyword">case</span> SUCCESSFUL_INITIALIZATION:</span><br><span class="line">        <span class="keyword">return</span> PROVIDER;</span><br><span class="line">    <span class="keyword">case</span> NOP_FALLBACK_INITIALIZATION:</span><br><span class="line">        <span class="keyword">return</span> NOP_FALLBACK_FACTORY;</span><br><span class="line">    <span class="keyword">case</span> FAILED_INITIALIZATION:</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(UNSUCCESSFUL_INIT_MSG);</span><br><span class="line">    <span class="keyword">case</span> ONGOING_INITIALIZATION:</span><br><span class="line">        <span class="comment">// support re-entrant behavior.</span></span><br><span class="line">        <span class="comment">// See also http://jira.qos.ch/browse/SLF4J-97</span></span><br><span class="line">        <span class="keyword">return</span> SUBST_PROVIDER;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Unreachable code"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+如果当前状态为UNINITIALIZED，则将状态置为ONGOING_INITIALIZATION，然后开始初始化过程。
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">performInitialization</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    bind();		<span class="comment">// 绑定</span></span><br><span class="line">    <span class="keyword">if</span> (INITIALIZATION_STATE == SUCCESSFUL_INITIALIZATION) &#123;</span><br><span class="line">        <span class="comment">// 成功初始化后，就开始进行版本检查（只要大版本对得上，就算匹配成功）</span></span><br><span class="line">        versionSanityCheck();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+进入bind方法。
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">bind</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">/* </span></span><br><span class="line"><span class="comment">        ** 根据jar包的META-INF/services/org.slf4j.spi.SLF4JServiceProvider文件</span></span><br><span class="line"><span class="comment">        ** 加载所有的SLF4JServiceProvider实现对象, 并存入List</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">        List&lt;SLF4JServiceProvider&gt; providersList = findServiceProviders();</span><br><span class="line">        <span class="comment">// 如果有多个实现对象，则打印报告（有多种实现）</span></span><br><span class="line">        reportMultipleBindingAmbiguity(providersList);</span><br><span class="line">        <span class="keyword">if</span> (providersList != <span class="keyword">null</span> &amp;&amp; !providersList.isEmpty()) &#123;</span><br><span class="line">            <span class="comment">// 多种实现下，也只使用第一个实现对象</span></span><br><span class="line">            PROVIDER = providersList.get(<span class="number">0</span>);</span><br><span class="line">            <span class="comment">// 执行当前对象的初始化方法</span></span><br><span class="line">            PROVIDER.initialize();</span><br><span class="line">            <span class="comment">// 将状态改为成功初始化</span></span><br><span class="line">            INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;</span><br><span class="line">            <span class="comment">// 在多种实现下，打印选择的实现对象</span></span><br><span class="line">            reportActualBinding(providersList);</span><br><span class="line">            <span class="comment">// 使用新的LoggerFactory替换之前的Logger实现</span></span><br><span class="line">            fixSubstituteLoggers();</span><br><span class="line">            <span class="comment">// 重新提交日志任务</span></span><br><span class="line">            replayEvents();</span><br><span class="line">            <span class="comment">// 清除SUBST_PROVIDER的所有资源</span></span><br><span class="line">            SUBST_PROVIDER.getSubstituteLoggerFactory().clear();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 无实现对象</span></span><br><span class="line">            INITIALIZATION_STATE = NOP_FALLBACK_INITIALIZATION;</span><br><span class="line">            Util.report(<span class="string">"No SLF4J providers were found."</span>);</span><br><span class="line">            Util.report(<span class="string">"Defaulting to no-operation (NOP) logger implementation"</span>);</span><br><span class="line">            Util.report(<span class="string">"See "</span> + NO_PROVIDERS_URL + <span class="string">" for further details."</span>);</span><br><span class="line"></span><br><span class="line">            Set&lt;URL&gt; staticLoggerBinderPathSet = findPossibleStaticLoggerBinderPathSet();</span><br><span class="line">            reportIgnoredStaticLoggerBinders(staticLoggerBinderPathSet);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        failedBinding(e);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Unexpected initialization failure"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+具体的findServiceProviders方法就不展开了，其实就是调用ServiceLoader去加载实现对象。
+## SLF4J占位符实现 ##
+翻了slf4j-api的源码，发现其中的Logger类对于debug方法的调用是直接交给底层Logger实现去处理的。那么slf4j关于占位符的实现到底是在哪里呢？  
+通过对源码的反复阅读，我发现slf4j-api的确提供了对打印信息中占位符的处理（MessageFormatter类），但是slf4j-api中的Logger的确是直接将方法调用交给下层对象去实现的。其实真正的调用关系如图所示：  
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/slf4j/placeholder.webp" width="200" loading="lazy">
+</center>
+以slf4j和log4j的搭配为例，其实slf4j-api中的Logger只是对下层适配器的引用（在slf4j-log4j12.jar中)，而适配器的底层才是真正的底层Logger（在log4j.jar中）。而对于占位符的操作其实是由适配器进行处理，也就是说SLF4JAPI中的消息，在Adaption Layer中对占位符进行消除和替换，再把替换后的消息交给Underlying logging framework。当然slf4j和logback的组合没有中间的适配器层，即表示logback本身就能对占位符进行处理。
+下面的MessageFormatter.arrayFormat方法是对含有占位符的字符串的真正处理过程。其实就是将占位符{}展开为后续的参数，由StringBuilder进行拼接。
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">public</span> <span class="keyword">static</span> FormattingTuple <span class="title">arrayFormat</span><span class="params">(<span class="keyword">final</span> String messagePattern, <span class="keyword">final</span> Object[] argArray, Throwable throwable)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (messagePattern == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> FormattingTuple(<span class="keyword">null</span>, argArray, throwable);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (argArray == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> FormattingTuple(messagePattern);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">    <span class="comment">// use string builder for better multicore performance</span></span><br><span class="line">    StringBuilder sbuf = <span class="keyword">new</span> StringBuilder(messagePattern.length() + <span class="number">50</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> L;</span><br><span class="line">    <span class="keyword">for</span> (L = <span class="number">0</span>; L &lt; argArray.length; L++) &#123;</span><br><span class="line"></span><br><span class="line">        j = messagePattern.indexOf(DELIM_STR, i);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (j == -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">// no more variables</span></span><br><span class="line">            <span class="keyword">if</span> (i == <span class="number">0</span>) &#123; <span class="comment">// this is a simple string</span></span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> FormattingTuple(messagePattern, argArray, throwable);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123; <span class="comment">// add the tail string which contains no variables and return</span></span><br><span class="line">                <span class="comment">// the result.</span></span><br><span class="line">                sbuf.append(messagePattern, i, messagePattern.length());</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">new</span> FormattingTuple(sbuf.toString(), argArray, throwable);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (isEscapedDelimeter(messagePattern, j)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!isDoubleEscaped(messagePattern, j)) &#123;</span><br><span class="line">                    L--; <span class="comment">// DELIM_START was escaped, thus should not be incremented</span></span><br><span class="line">                    sbuf.append(messagePattern, i, j - <span class="number">1</span>);</span><br><span class="line">                    sbuf.append(DELIM_START);</span><br><span class="line">                    i = j + <span class="number">1</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// The escape character preceding the delimiter start is</span></span><br><span class="line">                    <span class="comment">// itself escaped: "abc x:\\&#123;&#125;"</span></span><br><span class="line">                    <span class="comment">// we have to consume one backward slash</span></span><br><span class="line">                    sbuf.append(messagePattern, i, j - <span class="number">1</span>);</span><br><span class="line">                    deeplyAppendParameter(sbuf, argArray[L], <span class="keyword">new</span> HashMap&lt;Object[], Object&gt;());</span><br><span class="line">                    i = j + <span class="number">2</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// normal case</span></span><br><span class="line">                sbuf.append(messagePattern, i, j);</span><br><span class="line">                deeplyAppendParameter(sbuf, argArray[L], <span class="keyword">new</span> HashMap&lt;Object[], Object&gt;());</span><br><span class="line">                i = j + <span class="number">2</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// append the characters following the last &#123;&#125; pair.</span></span><br><span class="line">    sbuf.append(messagePattern, i, messagePattern.length());</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> FormattingTuple(sbuf.toString(), argArray, throwable);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+其实slf4j受欢迎也有占位符的原因。因为之前的日志打印，如果要打印多字符串的话，其方式如下：
 
-public class HelloWorld {
-      public static void main(String[] args) {
-        Logger logger = LoggerFactory.getLogger(HelloWorld.class);
-        logger.info(&quot;Hello World&quot;);
-      }
-}</code></pre><p>接下来我们进入源码。</p>
-<h2 id="SLF4J绑定底层日志框架"><a href="#SLF4J绑定底层日志框架" class="headerlink" title="SLF4J绑定底层日志框架"></a>SLF4J绑定底层日志框架</h2><p>getLogger方法是所有使用的开始</p>
-<pre><code>public static Logger getLogger(Class&lt;?&gt; clazz) {
-    Logger logger = getLogger(clazz.getName());
-    ...
-}</code></pre><p>这里我略去了不重要的代码，进入真正的getLogger方法（参数是String)</p>
-<pre><code>public static Logger getLogger(String name) {
-    ILoggerFactory iLoggerFactory = getILoggerFactory();
-    return iLoggerFactory.getLogger(name);
-}</code></pre><p>注意这里的ILoggerFactory会绑定到具体日志框架的LoggerFactory。  </p>
-<pre><code>public static ILoggerFactory getILoggerFactory() {
-    return getProvider().getLoggerFactory();
-}</code></pre><p>先来看getProvider方法</p>
-<pre><code>static SLF4JServiceProvider getProvider() {
-    if (INITIALIZATION_STATE == UNINITIALIZED) {
-        synchronized (LoggerFactory.class) {
-            if (INITIALIZATION_STATE == UNINITIALIZED) {
-                INITIALIZATION_STATE = ONGOING_INITIALIZATION;
-                performInitialization();    // 执行初始化
-            }
-        }
-    }
-    switch (INITIALIZATION_STATE) {
-    case SUCCESSFUL_INITIALIZATION:
-        return PROVIDER;
-    case NOP_FALLBACK_INITIALIZATION:
-        return NOP_FALLBACK_FACTORY;
-    case FAILED_INITIALIZATION:
-        throw new IllegalStateException(UNSUCCESSFUL_INIT_MSG);
-    case ONGOING_INITIALIZATION:
-        // support re-entrant behavior.
-        // See also http://jira.qos.ch/browse/SLF4J-97
-        return SUBST_PROVIDER;
-    }
-    throw new IllegalStateException(&quot;Unreachable code&quot;);
-}</code></pre><p>如果当前状态为UNINITIALIZED，则将状态置为ONGOING_INITIALIZATION，然后开始初始化过程。</p>
-<pre><code>private final static void performInitialization() {
-    bind();        // 绑定
-    if (INITIALIZATION_STATE == SUCCESSFUL_INITIALIZATION) {
-        // 成功初始化后，就开始进行版本检查（只要大版本对得上，就算匹配成功）
-        versionSanityCheck();
-    }
-}</code></pre><p>进入bind方法。</p>
-<pre><code>private final static void bind() {
-    try {
-        /* 
-        ** 根据jar包的META-INF/services/org.slf4j.spi.SLF4JServiceProvider文件
-        ** 加载所有的SLF4JServiceProvider实现对象, 并存入List
-        */
-        List&lt;SLF4JServiceProvider&gt; providersList = findServiceProviders();
-        // 如果有多个实现对象，则打印报告（有多种实现）
-        reportMultipleBindingAmbiguity(providersList);
-        if (providersList != null &amp;&amp; !providersList.isEmpty()) {
-            // 多种实现下，也只使用第一个实现对象
-            PROVIDER = providersList.get(0);
-            // 执行当前对象的初始化方法
-            PROVIDER.initialize();
-            // 将状态改为成功初始化
-            INITIALIZATION_STATE = SUCCESSFUL_INITIALIZATION;
-            // 在多种实现下，打印选择的实现对象
-            reportActualBinding(providersList);
-            // 使用新的LoggerFactory替换之前的Logger实现
-            fixSubstituteLoggers();
-            // 重新提交日志任务
-            replayEvents();
-            // 清除SUBST_PROVIDER的所有资源
-            SUBST_PROVIDER.getSubstituteLoggerFactory().clear();
-        } else {
-            // 无实现对象
-            INITIALIZATION_STATE = NOP_FALLBACK_INITIALIZATION;
-            Util.report(&quot;No SLF4J providers were found.&quot;);
-            Util.report(&quot;Defaulting to no-operation (NOP) logger implementation&quot;);
-            Util.report(&quot;See &quot; + NO_PROVIDERS_URL + &quot; for further details.&quot;);
-
-            Set&lt;URL&gt; staticLoggerBinderPathSet = findPossibleStaticLoggerBinderPathSet();
-            reportIgnoredStaticLoggerBinders(staticLoggerBinderPathSet);
-        }
-    } catch (Exception e) {
-        failedBinding(e);
-        throw new IllegalStateException(&quot;Unexpected initialization failure&quot;, e);
-    }
-}</code></pre><p>具体的findServiceProviders方法就不展开了，其实就是调用ServiceLoader去加载实现对象。</p>
-<h2 id="SLF4J占位符实现"><a href="#SLF4J占位符实现" class="headerlink" title="SLF4J占位符实现"></a>SLF4J占位符实现</h2><p>翻了slf4j-api的源码，发现其中的Logger类对于debug方法的调用是直接交给底层Logger实现去处理的。那么slf4j关于占位符的实现到底是在哪里呢？<br>通过对源码的反复阅读，我发现slf4j-api的确提供了对打印信息中占位符的处理（MessageFormatter类），但是slf4j-api中的Logger的确是直接将方法调用交给下层对象去实现的。其实真正的调用关系如图所示：<br><img src="/images/slf4j/placeholder.png" alt=""><br>以slf4j和log4j的搭配为例，其实slf4j-api中的Logger只是对下层适配器的引用（在slf4j-log4j12.jar中)，而适配器的底层才是真正的底层Logger（在log4j.jar中）。而对于占位符的操作其实是由适配器进行处理，也就是说SLF4JAPI中的消息，在Adaption Layer中对占位符进行消除和替换，再把替换后的消息交给Underlying logging framework。当然slf4j和logback的组合没有中间的适配器层，即表示logback本身就能对占位符进行处理。<br>下面的MessageFormatter.arrayFormat方法是对含有占位符的字符串的真正处理过程。其实就是将占位符{}展开为后续的参数，由StringBuilder进行拼接。</p>
-<pre><code>final public static FormattingTuple arrayFormat(final String messagePattern, final Object[] argArray, Throwable throwable) {
-
-    if (messagePattern == null) {
-        return new FormattingTuple(null, argArray, throwable);
-    }
-
-    if (argArray == null) {
-        return new FormattingTuple(messagePattern);
-    }
-
-    int i = 0;
-    int j;
-    // use string builder for better multicore performance
-    StringBuilder sbuf = new StringBuilder(messagePattern.length() + 50);
-
-    int L;
-    for (L = 0; L &lt; argArray.length; L++) {
-
-        j = messagePattern.indexOf(DELIM_STR, i);
-
-        if (j == -1) {
-            // no more variables
-            if (i == 0) { // this is a simple string
-                return new FormattingTuple(messagePattern, argArray, throwable);
-            } else { // add the tail string which contains no variables and return
-                // the result.
-                sbuf.append(messagePattern, i, messagePattern.length());
-                return new FormattingTuple(sbuf.toString(), argArray, throwable);
-            }
-        } else {
-            if (isEscapedDelimeter(messagePattern, j)) {
-                if (!isDoubleEscaped(messagePattern, j)) {
-                    L--; // DELIM_START was escaped, thus should not be incremented
-                    sbuf.append(messagePattern, i, j - 1);
-                    sbuf.append(DELIM_START);
-                    i = j + 1;
-                } else {
-                    // The escape character preceding the delimiter start is
-                    // itself escaped: &quot;abc x:\\{}&quot;
-                    // we have to consume one backward slash
-                    sbuf.append(messagePattern, i, j - 1);
-                    deeplyAppendParameter(sbuf, argArray[L], new HashMap&lt;Object[], Object&gt;());
-                    i = j + 2;
-                }
-            } else {
-                // normal case
-                sbuf.append(messagePattern, i, j);
-                deeplyAppendParameter(sbuf, argArray[L], new HashMap&lt;Object[], Object&gt;());
-                i = j + 2;
-            }
-        }
-    }
-    // append the characters following the last {} pair.
-    sbuf.append(messagePattern, i, messagePattern.length());
-    return new FormattingTuple(sbuf.toString(), argArray, throwable);
-}</code></pre><p>其实slf4j受欢迎也有占位符的原因。因为之前的日志打印，如果要打印多字符串的话，其方式如下：</p>
-<pre><code>log.info(&quot;hello &quot; + &quot;world!&quot;)</code></pre><p>使用+号进行拼接，首先当字符串很多的时候，就需要一大串+，很不美观；其次实质是字符串拼接，性能很差。而使用StringBuilder进行占位符的填充更加优雅，且性能更高。</p>
+<pre><code>log.info(&quot;hello &quot; + &quot;world!&quot;)</code></pre><p>使用+号进行拼接，首先当字符串很多的时候，就需要一大串+，很不美观。使用StringBuilder进行占位符的填充更加优雅，并且在夹杂大部分debug级别日志的场景下，性能高于直接拼接。</p>
 <h1 id="Logback源码分析"><a href="#Logback源码分析" class="headerlink" title="Logback源码分析"></a>Logback源码分析</h1><p>既然说了SLF4J，那顺便把Logback说了吧。以下源码版本为1.1.7，并且代码段之间不一定连续（仅按照调用顺序截取了一部分）。</p>
 <h2 id="创建Logger"><a href="#创建Logger" class="headerlink" title="创建Logger"></a>创建Logger</h2><p>常见的创建方法如下：</p>
 <pre><code>private static Logger log = LoggerFactory.getLogger(xxx.class);</code></pre><p>然后进入：</p>
-<pre><code>public static Logger getLogger(String name) {
-    // 之前讲过
-    ILoggerFactory iLoggerFactory = getILoggerFactory();
-    // 主要是以下方法
-    return iLoggerFactory.getLogger(name);
-  }</code></pre><p>之后的代码位于logback-classic-1.1.7.jar里，主要是<strong>.</strong>分隔符依次创建父Logger，直到完整名称的Logger创建出来为止。</p>
-<pre><code>public final Logger getLogger(final String name) {
-    if (name == null) {
-        throw new IllegalArgumentException(&quot;name argument cannot be null&quot;);
-    }
-    // 如果是name == &quot;ROOT&quot;，则直接返回根Logger
-    if (Logger.ROOT_LOGGER_NAME.equalsIgnoreCase(name)) {
-        return root;
-    }
-    int i = 0;
-    Logger logger = root;
-    // 看是否已经存在相应Logger，对应于xml文件上配置的logger和root标签
-    Logger childLogger = (Logger) loggerCache.get(name);
-    if (childLogger != null) {
-        return childLogger;
-    }
-    String childName;
-    while (true) {
-        int h = LoggerNameUtil.getSeparatorIndexOf(name, i);
-        if (h == -1) {
-            childName = name;
-        } else {
-            childName = name.substring(0, h);
-        }
-        // 由于logback中Logger是以父子关系进行组织的，所以从根Logger开始查找
-        // com.twd的父Logger为com
-        i = h + 1;
-        synchronized (logger) {
-            childLogger = logger.getChildByName(childName);
-            if (childLogger == null) {
-                // 若所要创造的Logger的父Logger不存在，创建并缓存
-                childLogger = logger.createChildByName(childName);
-                loggerCache.put(childName, childLogger);
-                incSize();
-            }
-        }
-        logger = childLogger;
-        if (h == -1) {
-            return childLogger;
-        }
-    }
-}</code></pre><h2 id="使用Logger打印日志"><a href="#使用Logger打印日志" class="headerlink" title="使用Logger打印日志"></a>使用Logger打印日志</h2><p>通过语句<code>log.info(&quot;hello world&quot;)</code>进行展开。</p>
-<pre><code>private void filterAndLog_0_Or3Plus(final String localFQCN, final Marker marker, final Level level, final String msg, final Object[] params,
-                final Throwable t) {
-    // 得到Turbo Filter的过滤结果
-    // 注意：Turbo Filter的作用域跟logback上下文的作用域一致，跟Append内部的过滤器不一样
-    final FilterReply decision = loggerContext.getTurboFilterChainDecision_0_3OrMore(marker, this, level, msg, params, t);
-    // 根据Turbo Filter的过滤结果判断是否往下走
-    if (decision == FilterReply.NEUTRAL) {
-        if (effectiveLevelInt &gt; level.levelInt) {
-            return;
-        }
-    } else if (decision == FilterReply.DENY) {
-        return;
-    }
-    // 创建LoggingEvent并添加到Appender中
-    buildLoggingEventAndAppend(localFQCN, marker, level, msg, params, t);
-}</code></pre><p>然后继续往下debug：</p>
-<pre><code>// 唤醒与该Logger关联的Appender
-public void callAppenders(ILoggingEvent event) {
-    int writes = 0;
-    // 依次从当前Logger到根Logger进行查找，找到所有关联的Appender
-    // 所以使用的时候，当前Logger到根Logger的所有Logger关联的Appender不能重复，不然日志会打印多遍
-    for (Logger l = this; l != null; l = l.parent) {
-        // 进行添加
-        writes += l.appendLoopOnAppenders(event);
-        if (!l.additive) {
-            break;
-        }
-    }
-    // No appenders in hierarchy
-    if (writes == 0) {
-        loggerContext.noAppenderDefinedWarning(this);
-    }
-}</code></pre><p>具体的Appender添加LoggerEvent的代码如下：</p>
-<pre><code>public int appendLoopOnAppenders(E e) {
-    int size = 0;
-    for (Appender&lt;E&gt; appender : appenderList) {
-        // 真正的核心方法
-        appender.doAppend(e);
-        size++;
-    }
-    return size;
-}</code></pre><p>终于到达核心部分：</p>
-<pre><code>public void doAppend(E eventObject) {
-    // 这里的guard是ThreadLocal变量
-    // 不清楚为什么要这么写，按理说线程内部不需要上锁
-    if (Boolean.TRUE.equals(guard.get())) {
-        return;
-    }
-
-    try {
-        guard.set(Boolean.TRUE);
-        if (!this.started) {
-            if (statusRepeatCount++ &lt; ALLOWED_REPEATS) {
-                addStatus(new WarnStatus(&quot;Attempted to append to non started appender [&quot; + name + &quot;].&quot;, this));
-            }
-            return;
-        }
-        // 这里才是通过Appender的Regular Filter进行过滤
-        if (getFilterChainDecision(eventObject) == FilterReply.DENY) {
-            return;
-        }
-        // 然后开始添加
-        this.append(eventObject);
-    } catch (Exception e) {
-        if (exceptionCount++ &lt; ALLOWED_REPEATS) {
-            addError(&quot;Appender [&quot; + name + &quot;] failed to append.&quot;, e);
-        }
-    } finally {
-        guard.set(Boolean.FALSE);
-    }
-}</code></pre><p>继续往下n步：</p>
-<pre><code>protected void subAppend(E event) {
-    if (!isStarted()) {
-        return;
-    }
-    try {
-        // this step avoids LBCLASSIC-139
-        if (event instanceof DeferredProcessingAware) {
-            ((DeferredProcessingAware) event).prepareForDeferredProcessing();
-        }
-        // 这里防止多线程调用Appender输出日志，即一个Appender同一时刻只能写一个LoggingEvent
-        lock.lock();
-        try {
-            // 输出日志
-            writeOut(event);
-        } finally {
-            lock.unlock();
-        }
-    } catch (IOException ioe) {
-        this.started = false;
-        addStatus(new ErrorStatus(&quot;IO failure in appender&quot;, this, ioe));
-    }
-}</code></pre><h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>简单来讲Logback的所有行为都是在用户线程内进行的，Logback本身并不创建专用于日志的线程。其实也好理解，如果本身利用线程池来输出日志，尽管能统一管理，但是会造成日志打印与代码执行的脱节，损坏了日志本身的核心意义。<br>Logback的逻辑也比较简单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Logger <span class="title">getLogger</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 之前讲过</span></span><br><span class="line">    ILoggerFactory iLoggerFactory = getILoggerFactory();</span><br><span class="line">    <span class="comment">// 主要是以下方法</span></span><br><span class="line">    <span class="keyword">return</span> iLoggerFactory.getLogger(name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之后的代码位于logback-classic-1.1.7.jar里，主要是<strong>.</strong>分隔符依次创建父Logger，直到完整名称的Logger创建出来为止。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Logger <span class="title">getLogger</span><span class="params">(<span class="keyword">final</span> String name)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (name == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"name argument cannot be null"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果是name == "ROOT"，则直接返回根Logger</span></span><br><span class="line">    <span class="keyword">if</span> (Logger.ROOT_LOGGER_NAME.equalsIgnoreCase(name)) &#123;</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    Logger logger = root;</span><br><span class="line">    <span class="comment">// 看是否已经存在相应Logger，对应于xml文件上配置的logger和root标签</span></span><br><span class="line">    Logger childLogger = (Logger) loggerCache.get(name);</span><br><span class="line">    <span class="keyword">if</span> (childLogger != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> childLogger;</span><br><span class="line">    &#125;</span><br><span class="line">    String childName;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> h = LoggerNameUtil.getSeparatorIndexOf(name, i);</span><br><span class="line">        <span class="keyword">if</span> (h == -<span class="number">1</span>) &#123;</span><br><span class="line">            childName = name;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            childName = name.substring(<span class="number">0</span>, h);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 由于logback中Logger是以父子关系进行组织的，所以从根Logger开始查找</span></span><br><span class="line">        <span class="comment">// com.twd的父Logger为com</span></span><br><span class="line">        i = h + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">synchronized</span> (logger) &#123;</span><br><span class="line">            childLogger = logger.getChildByName(childName);</span><br><span class="line">            <span class="keyword">if</span> (childLogger == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 若所要创造的Logger的父Logger不存在，创建并缓存</span></span><br><span class="line">                childLogger = logger.createChildByName(childName);</span><br><span class="line">                loggerCache.put(childName, childLogger);</span><br><span class="line">                incSize();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        logger = childLogger;</span><br><span class="line">        <span class="keyword">if</span> (h == -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> childLogger;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="使用Logger打印日志"><a href="#使用Logger打印日志" class="headerlink" title="使用Logger打印日志"></a>使用Logger打印日志</h2><p>通过语句<code>log.info(&quot;hello world&quot;)</code>进行展开。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">filterAndLog_0_Or3Plus</span><span class="params">(<span class="keyword">final</span> String localFQCN, <span class="keyword">final</span> Marker marker, <span class="keyword">final</span> Level level, <span class="keyword">final</span> String msg, <span class="keyword">final</span> Object[] params,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">final</span> Throwable t)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 得到Turbo Filter的过滤结果</span></span><br><span class="line">    <span class="comment">// 注意：Turbo Filter的作用域跟logback上下文的作用域一致，跟Append内部的过滤器不一样</span></span><br><span class="line">    <span class="keyword">final</span> FilterReply decision = loggerContext.getTurboFilterChainDecision_0_3OrMore(marker, <span class="keyword">this</span>, level, msg, params, t);</span><br><span class="line">    <span class="comment">// 根据Turbo Filter的过滤结果判断是否往下走</span></span><br><span class="line">    <span class="keyword">if</span> (decision == FilterReply.NEUTRAL) &#123;</span><br><span class="line">        <span class="keyword">if</span> (effectiveLevelInt &gt; level.levelInt) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (decision == FilterReply.DENY) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 创建LoggingEvent并添加到Appender中</span></span><br><span class="line">    buildLoggingEventAndAppend(localFQCN, marker, level, msg, params, t);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后继续往下debug：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 唤醒与该Logger关联的Appender</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">callAppenders</span><span class="params">(ILoggingEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> writes = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 依次从当前Logger到根Logger进行查找，找到所有关联的Appender</span></span><br><span class="line">    <span class="comment">// 所以使用的时候，当前Logger到根Logger的所有Logger关联的Appender尽量别重复，不然日志会打印多遍</span></span><br><span class="line">    <span class="keyword">for</span> (Logger l = <span class="keyword">this</span>; l != <span class="keyword">null</span>; l = l.parent) &#123;</span><br><span class="line">        <span class="comment">// 进行添加</span></span><br><span class="line">        writes += l.appendLoopOnAppenders(event);</span><br><span class="line">        <span class="keyword">if</span> (!l.additive) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// No appenders in hierarchy</span></span><br><span class="line">    <span class="keyword">if</span> (writes == <span class="number">0</span>) &#123;</span><br><span class="line">        loggerContext.noAppenderDefinedWarning(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>具体的Appender添加LoggerEvent的代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">appendLoopOnAppenders</span><span class="params">(E e)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> size = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (Appender&lt;E&gt; appender : appenderList) &#123;</span><br><span class="line">        <span class="comment">// 真正的核心方法</span></span><br><span class="line">        appender.doAppend(e);</span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> size;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>终于到达核心部分：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doAppend</span><span class="params">(E eventObject)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 这里的guard是ThreadLocal变量</span></span><br><span class="line">    <span class="comment">// 不清楚为什么要这么写，按理说线程内部不需要上锁</span></span><br><span class="line">    <span class="keyword">if</span> (Boolean.TRUE.equals(guard.get())) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        guard.set(Boolean.TRUE);</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.started) &#123;</span><br><span class="line">            <span class="keyword">if</span> (statusRepeatCount++ &lt; ALLOWED_REPEATS) &#123;</span><br><span class="line">                addStatus(<span class="keyword">new</span> WarnStatus(<span class="string">"Attempted to append to non started appender ["</span> + name + <span class="string">"]."</span>, <span class="keyword">this</span>));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 这里才是通过Appender的Regular Filter进行过滤</span></span><br><span class="line">        <span class="keyword">if</span> (getFilterChainDecision(eventObject) == FilterReply.DENY) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 然后开始添加</span></span><br><span class="line">        <span class="keyword">this</span>.append(eventObject);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        <span class="keyword">if</span> (exceptionCount++ &lt; ALLOWED_REPEATS) &#123;</span><br><span class="line">            addError(<span class="string">"Appender ["</span> + name + <span class="string">"] failed to append."</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        guard.set(Boolean.FALSE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>继续往下n步：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">subAppend</span><span class="params">(E event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!isStarted()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// this step avoids LBCLASSIC-139</span></span><br><span class="line">        <span class="keyword">if</span> (event <span class="keyword">instanceof</span> DeferredProcessingAware) &#123;</span><br><span class="line">            ((DeferredProcessingAware) event).prepareForDeferredProcessing();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 这里防止多线程调用Appender输出日志，即一个Appender同一时刻只能写一个LoggingEvent</span></span><br><span class="line">        lock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 输出日志</span></span><br><span class="line">            writeOut(event);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException ioe) &#123;</span><br><span class="line">        <span class="keyword">this</span>.started = <span class="keyword">false</span>;</span><br><span class="line">        addStatus(<span class="keyword">new</span> ErrorStatus(<span class="string">"IO failure in appender"</span>, <span class="keyword">this</span>, ioe));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>简单来讲Logback的所有行为都是在用户线程内进行的，Logback本身并不创建专用于日志的线程。其实也好理解，如果本身利用线程池来输出日志，尽管能统一管理，但是会造成日志打印与代码执行的脱节，损坏了日志本身的核心意义。<br>Logback的逻辑也比较简单：</p>
 <ol>
 <li>创建Logger<ol>
 <li>若需要创建的Logger已存在Logger池中，那么直接拿出来。</li>
@@ -933,7 +696,7 @@ public void callAppenders(ILoggingEvent event) {
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SLF4J源码分析"><span class="nav-number">1.</span> <span class="nav-text">SLF4J源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SLF4J绑定底层日志框架"><span class="nav-number">1.1.</span> <span class="nav-text">SLF4J绑定底层日志框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SLF4J占位符实现"><span class="nav-number">1.2.</span> <span class="nav-text">SLF4J占位符实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Logback源码分析"><span class="nav-number">2.</span> <span class="nav-text">Logback源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Logger"><span class="nav-number">2.1.</span> <span class="nav-text">创建Logger</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Logger打印日志"><span class="nav-number">2.2.</span> <span class="nav-text">使用Logger打印日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">2.3.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SLF4J源码分析"><span class="nav-number">1.</span> <span class="nav-text">SLF4J源码分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Logback源码分析"><span class="nav-number">2.</span> <span class="nav-text">Logback源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建Logger"><span class="nav-number">2.1.</span> <span class="nav-text">创建Logger</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Logger打印日志"><span class="nav-number">2.2.</span> <span class="nav-text">使用Logger打印日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">2.3.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></div>
             
 
           </div>
