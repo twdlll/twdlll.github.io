@@ -125,7 +125,7 @@
 <meta property="og:description" content="这篇博客主要是记录一些比较好用的库。 分析JVM中对象布局：JOLJOL的maven三元组： 12345&amp;lt;dependency&amp;gt;  &amp;lt;groupId&amp;gt;org.openjdk.jol&amp;lt;&#x2F;groupId&amp;gt;  &amp;lt;artifactId&amp;gt;jol-core&amp;lt;&#x2F;artifactId&amp;gt;  &amp;lt;version&amp;gt;0.9&amp;lt;&#x2F;version&amp;gt">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;open_lib&#x2F;jol.png">
-<meta property="og:updated_time" content="2021-01-16T12:01:29.665Z">
+<meta property="og:updated_time" content="2021-02-07T07:54:59.795Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;open_lib&#x2F;jol.png">
 
@@ -345,8 +345,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2021-01-16T20:01:29+08:00">
-                2021-01-16
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-07T15:54:59+08:00">
+                2021-02-07
               </time>
             
           </span>
@@ -434,6 +434,7 @@
 
 <p>基本使用如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ArrayUtils</span></span><br><span class="line">  <span class="comment">// 内置了各种类型的空数组</span></span><br><span class="line">  <span class="keyword">int</span>[] emptyArray = ArrayUtils.EMPTY_INT_ARRAY;</span><br><span class="line">  <span class="comment">// 提供了包装类和基本类型之间的转换</span></span><br><span class="line">  <span class="keyword">int</span>[] basicArray = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;;</span><br><span class="line">  Integer[] wrapArray = ArrayUtils.toObject(basicArray);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ClassUtils</span></span><br><span class="line">  System.out.println(ClassUtils.getPackageName(String<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line">  System.out.println(ClassUtils.getAllSuperclasses(ArrayList<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line">  System.out.println(ClassUtils.getAllInterfaces(ArrayList<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line"></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>事实上，工具库的选择还有很多，比如google的guava，国内的hutool等。</p>
 
       
     </div>
