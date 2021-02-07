@@ -1842,7 +1842,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #d40053;
+  background: #7af;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -2925,7 +2925,7 @@ hr {
   }
 }
 body {
-  background: url("/images/background/dongman.jpg");
+  background: url("/images/background/dongman.webp");
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
