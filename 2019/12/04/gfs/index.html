@@ -117,21 +117,21 @@
 
 
 
-<meta name="description" content="The Google File SystemGFS是google三驾马车之一，是大型的分布式文件系统。所以了解GFS，对了解分布式系统非常有帮助。这篇博客主要从论文和一个小Demo对GFS进行讲解。 GFS论文理解GFS作为google的分布式文件系统，本身根据google的业务场景的业务场景，即大部分文件操作都是追加写，覆盖原有数据的情况比较少等特征，GFS做了对应的调整和优化。本文不会解释GF">
+<meta name="description" content="GFS（Google File System）源于论文《The Google File System》，是Google分布式技术三驾马车之一。了解GFS，对了解分布式文件系统会有帮助。这篇博客主要从论文角度讲解GFS，并以一个小Demo作为演示。 GFS论文理解GFS作为Google的分布式文件系统，根据Google自身业务场景的特性（大部分文件操作都是追加写，覆盖原有数据的情况比较少等），做了相">
 <meta name="keywords" content="gfs">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GFS分析">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;12&#x2F;04&#x2F;gfs&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="The Google File SystemGFS是google三驾马车之一，是大型的分布式文件系统。所以了解GFS，对了解分布式系统非常有帮助。这篇博客主要从论文和一个小Demo对GFS进行讲解。 GFS论文理解GFS作为google的分布式文件系统，本身根据google的业务场景的业务场景，即大部分文件操作都是追加写，覆盖原有数据的情况比较少等特征，GFS做了对应的调整和优化。本文不会解释GF">
+<meta property="og:description" content="GFS（Google File System）源于论文《The Google File System》，是Google分布式技术三驾马车之一。了解GFS，对了解分布式文件系统会有帮助。这篇博客主要从论文角度讲解GFS，并以一个小Demo作为演示。 GFS论文理解GFS作为Google的分布式文件系统，根据Google自身业务场景的特性（大部分文件操作都是追加写，覆盖原有数据的情况比较少等），做了相">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;gfs_architecture.png">
-<meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;lease.png">
-<meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;consistency_model.png">
-<meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;gfsdemo_result.png">
-<meta property="og:updated_time" content="2019-12-05T15:03:49.067Z">
+<meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;gfs_architecture.webp">
+<meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;gfs_architecture.webp">
+<meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;consistency_model.webp">
+<meta property="og:image" content="&#x2F;images&#x2F;gfs&#x2F;gfsdemo_result.webp">
+<meta property="og:updated_time" content="2021-02-10T12:45:52.565Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;gfs&#x2F;gfs_architecture.png">
+<meta name="twitter:image" content="&#x2F;images&#x2F;gfs&#x2F;gfs_architecture.webp">
 
 
 
@@ -349,8 +349,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2019-12-05T23:03:49+08:00">
-                2019-12-05
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-10T20:45:52+08:00">
+                2021-02-10
               </time>
             
           </span>
@@ -420,25 +420,27 @@
       
 
       
-        <h1 id="The-Google-File-System"><a href="#The-Google-File-System" class="headerlink" title="The Google File System"></a>The Google File System</h1><p>GFS是google三驾马车之一，是大型的分布式文件系统。所以了解GFS，对了解分布式系统非常有帮助。这篇博客主要从论文和一个小Demo对GFS进行讲解。</p>
-<h2 id="GFS论文理解"><a href="#GFS论文理解" class="headerlink" title="GFS论文理解"></a>GFS论文理解</h2><p>GFS作为google的分布式文件系统，本身根据google的业务场景的业务场景，即大部分文件操作都是追加写，覆盖原有数据的情况比较少等特征，GFS做了对应的调整和优化。本文不会解释GFS论文的所有内容，而是选取其中的重点部分进行讲解。</p>
-<h3 id="GFS-Architecture"><a href="#GFS-Architecture" class="headerlink" title="GFS Architecture"></a>GFS Architecture</h3><p><img src="/images/gfs/gfs_architecture.png" alt=""><br>在介绍GFS的架构之前，先介绍一下GFS中一个非常重要的概念，即chunk。在GFS中，文件都被划分成固定大小的chunk来进行存储的，比如一个文件是128M，chunk大小被定义为64M（GFS选择的chunk大小就是64M），那么这个文件就可以被分为2个chunk。在GFS中，chunk才是读写的最小处理单位，chunk在创建时会被分配一个全局唯一的64位的chunk handle（可以理解为chunk的身份证）。我们回过头来看架构图，其中有4类角色：  </p>
+        <p>GFS（Google File System）源于论文《The Google File System》，是Google分布式技术三驾马车之一。了解GFS，对了解分布式文件系统会有帮助。这篇博客主要从论文角度讲解GFS，并以一个小Demo作为演示。</p>
+<h1 id="GFS论文理解"><a href="#GFS论文理解" class="headerlink" title="GFS论文理解"></a>GFS论文理解</h1><p>GFS作为Google的分布式文件系统，根据Google自身业务场景的特性（大部分文件操作都是追加写，覆盖原有数据的情况比较少等），做了相应调整和优化。本文不会解释GFS论文的所有内容，而是选取其中的重点进行讲解。</p>
+<h2 id="GFS-Architecture"><a href="#GFS-Architecture" class="headerlink" title="GFS Architecture"></a>GFS Architecture</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/gfs/gfs_architecture.webp" width="800" loading="lazy">
+</center>
+在介绍GFS的架构之前，先介绍一下GFS中一个非常重要的概念，即chunk。在GFS中，文件都被划分成固定大小的chunk来进行存储的，比如一个文件是128M，chunk大小被定义为64M（GFS选择的chunk大小就是64M），那么这个文件就可以被分为2个chunk。在GFS中，chunk才是读写的最小处理单位，chunk在创建时会被分配一个全局唯一的64位的chunk handle（可以理解为chunk的身份证）。我们回过头来看架构图，其中有4类角色：  
+
 <ul>
-<li><p>GFS chunkserver: 顾名思义，就是存放chunk的服务器。为了可靠性考虑，一个chunk会被同时存储在多个chunk server上。</p>
-</li>
-<li><p>master：包含了文件系统的所有元数据，包括命名空间、访问控制信息、file到chunk的映射关系和chunk存放的位置。可以说master是整个GFS的大脑，它知道所有的信息，并且系统级的活动都需要它的参与（比如chunk lease管理、垃圾回收和chunk迁移等）。另外，master还会以心跳包的形式与每个chunkserver保持连接。</p>
-</li>
-<li><p>client：与master和chunkserver进行交互，从而完成数据的读写。其最后的呈现结果是一个专用库，开放了一些API供application调用。</p>
-</li>
-<li><p>application：上层应用，只需要调用client库的API就可以完成读写。打个比方appl调用了client库的open(“123.txt”),client库就会在内部通过一系列交互，打开与该文件相关的chunk。  </p>
-<h4 id="Single-Master"><a href="#Single-Master" class="headerlink" title="Single Master"></a>Single Master</h4><p>GFS中单个master的好处在于设计和实现非常简单。但是需要避免的问题就是，在文件读写请求中，要降低master的参与度。打个比方，如果多个client在读写时全程都需要master的参与，那么由于master是单个的，将形成多对一的关系，master所要承担的压力就会急剧上升，从而很容易成为系统的瓶颈。GFS降低master的参与度的方式是：在请求时，应用把（filename，offset）传给client，client转换成（filename，chunk_index），再传给master。master接收到请求后，会把对应chunk的（chunk handle，chunk location）反馈给client。之后的读写都有client和chunkserver交互完成。也就是说对于一次读写，client只与master进行一次交互。</p>
-</li>
-<li><p>chunk index = offset / chunksize</p>
-</li>
-<li><p>chunk location就是指这个chunk在哪些chunkserver上</p>
-<h4 id="Chunk-Size"><a href="#Chunk-Size" class="headerlink" title="Chunk Size"></a>Chunk Size</h4><p>GFS的chunk大小设置为64MB，其优点和缺点都如下所示：  </p>
-</li>
+<li>GFS chunkserver: 顾名思义，就是存放chunk的服务器。为了可靠性考虑，一个chunk会被同时存储在多个chunk server上。</li>
+<li>master：包含了文件系统的所有元数据，包括命名空间、访问控制信息、file到chunk的映射关系和chunk存放的位置。可以说master是整个GFS的大脑，它知道所有的信息，并且系统级的活动都需要它的参与（比如chunk lease管理、垃圾回收和chunk迁移等）。另外，master还会以心跳包的形式与每个chunkserver保持连接。</li>
+<li>client：与master和chunkserver进行交互，从而完成数据的读写。其最后的呈现结果是一个专用库，开放了一些API供application调用。</li>
+<li>application：上层应用，只需要调用client库的API就可以完成读写。打个比方appl调用了client库的open(“123.txt”),client库就会在内部通过一系列交互，打开与该文件相关的chunk。</li>
 </ul>
+<h3 id="Single-Master"><a href="#Single-Master" class="headerlink" title="Single Master"></a>Single Master</h3><p>GFS中单个master的优势在于设计和实现简单。但是需要避免的是，在文件读写中降低master的参与度。打个比方，如果多个client在读写时全程都需要master的参与，那么将形成多对一的关系，master所要承担的压力会急剧上升，从而成为系统的瓶颈。GFS降低master参与度的方式是：在请求时，应用把（filename，offset）传给client，client转换成（filename，chunk_index），再传给master。master接收到请求后，会把对应chunk的（chunk handle，chunk location）反馈给client。之后的读写都由client和chunkserver交互完成。也就是说对于一次读写，client只与master进行一次交互。</p>
+<ul>
+<li>chunk index = offset / chunksize</li>
+<li>chunk location就是指这个chunk在哪些chunkserver上</li>
+</ul>
+<h3 id="Chunk-Size"><a href="#Chunk-Size" class="headerlink" title="Chunk Size"></a>Chunk Size</h3><p>GFS的chunk大小设置为64MB，其优点和缺点都如下所示：  </p>
 <ul>
 <li>优点：<ul>
 <li>当chunk size较大时，可以减少client和master的交互次数。比如client申请读read(‘1.txt’, 0), read(‘1.txt’, 4096), read(‘1.txt’, 128000),这三次读请求都在1.txt中的第一个chunk，所以实质上client只与master进行了一起交互，即请求1.txt的第一个chunk的位置信息。</li>
@@ -447,19 +449,26 @@
 </ul>
 </li>
 <li>缺点：<ul>
-<li>chunk size越大，也就是说很多小文件可能只有一个chunk，那么如果多个client同时访问这个文件，那么存有该chunk的chunkserver将面临高额的负载，即hot spots问题。对于这个问题，google的做法是对于这种chunk进行更多的备份，并且使批处理队列系统错开应用程序的启动时间。另外，google也认为允许client从其他client读取数据可能会是一个长期方法。</li>
+<li>chunk size越大，也就是说很多小文件可能只有一个chunk，那么如果多个client同时访问这个文件，那么存有该chunk的chunkserver将面临高额的负载，即hot spots问题。对于这个问题，Google的做法是对于这种chunk进行更多的备份，并且通过批处理队列系统错开应用程序的启动时间。另外，Google也认为允许client从其他client读取数据可能会是一个长期方法。</li>
 </ul>
 </li>
 </ul>
-<h4 id="Metadata"><a href="#Metadata" class="headerlink" title="Metadata"></a>Metadata</h4><p>GFS master存储着三种metadata：  </p>
+<h3 id="Metadata"><a href="#Metadata" class="headerlink" title="Metadata"></a>Metadata</h3><p>GFS master存储着三种metadata：  </p>
 <ul>
 <li>文件和chunk的namespaces：是文件系统的逻辑元数据，包括层级目录结构以及访问控制等</li>
 <li>文件到chunk的映射关系：通过文件名查找到对应的chunks</li>
 <li>每个chunk的位置信息：有几个副本，这些副本在哪些chunkserver上  </li>
 </ul>
 <p>对于前两者，master会记录到操作日志并复制到远端以保证其持久化。操作日志会存储在master和多台远程机器上，只有当operation log在master和远程机器上都写入成功后，master才会响应client的请求。<br>关于chunk的位置信息，master并不做持久化保存，因为chunkserver很容易出现宕机等故障。在每次master重启或者有新的chunkserver加入时，会要求对应的chunkserver汇报其包含的chunk信息。<br>对于metadata，master将其全部存在内存中，这样做的好处在于读取和更新metadata的速度很快。至于master的内存会不会成为系统的瓶颈，因为一个64MB的chunk的metadata不会超过64B，因此64G内存的master可容纳1Gchunk的metadata，如果内存真的成为瓶颈，也可以通过增加内存来解决。</p>
-<h3 id="System-Interactions"><a href="#System-Interactions" class="headerlink" title="System Interactions"></a>System Interactions</h3><p>这部分主要讲解GFS的交互过程。</p>
-<h4 id="leases-and-Mutation-Order"><a href="#leases-and-Mutation-Order" class="headerlink" title="leases and Mutation Order"></a>leases and Mutation Order</h4><p>lease是分布式系统常用的一种机制，lease相当于一种授权，是由颁布者授予的某一有效期内的承诺，lease的接受者将在lease到期前获得“特权”。<br>之前也提到了master只负责告诉client请求的chunk所在的chunkserver，后续的读写流程master一概不参与。那么考虑这样一个问题，client该怎么与chunksever交互，并且对该chunk的写都同步到其他副本上。针对这个问题，GFS在多个包含同个chunk的chunkserver中选择一个作为primary，授予其lease保证其在一定期限内一直维持primary的身份。而client就与这个primary打交道。<br><img src="/images/gfs/lease.png" alt=""><br>通过这个图，我们具体理解下整个写流程：  </p>
+<h2 id="System-Interactions"><a href="#System-Interactions" class="headerlink" title="System Interactions"></a>System Interactions</h2><p>这部分主要讲解GFS的交互过程。</p>
+<h3 id="leases-and-Mutation-Order"><a href="#leases-and-Mutation-Order" class="headerlink" title="leases and Mutation Order"></a>leases and Mutation Order</h3><p>lease是分布式系统常用的一种机制，lease相当于一种授权，是由颁布者授予的某一有效期内的承诺，lease的接受者将在lease到期前获得“特权”。<br>之前也提到了master只负责告诉client请求的chunk所在的chunkserver，后续的读写流程master一概不参与。那么考虑这样一个问题，client该怎么与chunksever交互，并且对该chunk的写都同步到其他副本上。针对这个问题，GFS在多个包含同个chunk的chunkserver中选择一个作为primary，授予其lease保证其在一定期限内一直维持primary的身份。而client就与这个primary打交道。  </p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/gfs/gfs_architecture.webp" width="800" loading="lazy">
+</center>
+通过这个图，我们具体理解下整个写流程：  
+
 <ol>
 <li>client先询问master关于这个chunk的primary位置和其他保存副本的chunkserver位置。</li>
 <li>master回复client后，client会缓存primary和其他副本的位置直到lease失效。</li>
@@ -470,22 +479,29 @@
 <li>primary再将响应发送给client。</li>
 </ol>
 <p>当错误发生时，即某些副本未能完成写操作，就会直接发送失败信号给client。client对此的处理是重新发送这个写请求，即重复3~7步骤。另外，当写的内容较大时，client会将其分割成多个写操作。</p>
-<h4 id="Data-Flow"><a href="#Data-Flow" class="headerlink" title="Data Flow"></a>Data Flow</h4><p>回顾之前的写流程的第三步，client需要将数据发送至所有的副本，但是并不是通过由client直接对不同的副本发送消息完成，而是以一种pipeline的方式完成的。  </p>
+<h3 id="Data-Flow"><a href="#Data-Flow" class="headerlink" title="Data Flow"></a>Data Flow</h3><p>回顾之前的写流程的第三步，client需要将数据发送至所有的副本，但是并不是通过由client直接对不同的副本发送消息完成，而是以一种pipeline的方式完成的。  </p>
 <ol>
 <li>client选择离它最近的chunkserver A发送数据。</li>
 <li>chunkserver A收到数据后，转发给离它最近的另一个chunkserver（即primary）。</li>
 <li>primary收到数据后，又转发给chunkserver B。</li>
 </ol>
 <p>也就是通过就近原则，不断地转发数据，直到所有的chunkserver都收到了数据。这种方式有效利用了所有机器的网络带宽。</p>
-<h4 id="Atomic-Record-Appends"><a href="#Atomic-Record-Appends" class="headerlink" title="Atomic Record Appends"></a>Atomic Record Appends</h4><p>追加写的流程与写流程差不多，主要有以下区别：</p>
+<h3 id="Atomic-Record-Appends"><a href="#Atomic-Record-Appends" class="headerlink" title="Atomic Record Appends"></a>Atomic Record Appends</h3><p>追加写的流程与写流程差不多，主要有以下区别：</p>
 <ul>
 <li>client把数据推送到所有副本的最后一个chunk。然后发写请求。</li>
 <li>primary先检查最后一个chunk是否能容纳当前写请求。如果可以，就进行写操作；否则，会将最后一个chunk填充到64MB，然后告诉client需要在下一个chunk上重新发起写请求。（显然，这也就意味了GFS不会接受64MB以上的追加写申请，实际上，GFS的追加写内容大小不能超过1/4个chunk size）</li>
 </ul>
-<h4 id="Consistency-Model"><a href="#Consistency-Model" class="headerlink" title="Consistency Model"></a>Consistency Model</h4><p>读到这里，已经对GFS的交互有了一定了解，接下来我们就来看看GFS的一致性模型。<br><img src="/images/gfs/consistency_model.png" alt=""><br>这里对consistency和defined进行了定义：  </p>
+<h3 id="Consistency-Model"><a href="#Consistency-Model" class="headerlink" title="Consistency Model"></a>Consistency Model</h3><p>读到这里，已经对GFS的交互有了一定了解，接下来我们就来看看GFS的一致性模型。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/gfs/consistency_model.webp" width="800" loading="lazy">
+</center>
+这里对consistency和defined进行了定义：  
+
 <ul>
 <li>consistency：所有client无论从哪个副本读，都能看到相同的内容</li>
-<li>defined：但一个文件区域发生修改后，client可以看到修改的所有内容。</li>
+<li>defined：当一个文件区域发生修改后，client可以看到修改的所有内容。</li>
 </ul>
 <p>接着我们对表格中的几种情况进行分析：</p>
 <ol>
@@ -495,511 +511,40 @@
 <li>Record Append（serial success and concurrent success）：由于内容都是追加至末尾，那么肯定是defined。但是假如其中经历了一次failure，然后重试之后才成功，那么状态就会是interspersed with inconsistent。</li>
 <li>Record Append（failure）：部分追加成功，部分失败，所以是inconsistent。</li>
 </ol>
-<h3 id="Master-Operation"><a href="#Master-Operation" class="headerlink" title="Master Operation"></a>Master Operation</h3><p>master的功能包括namespace operations，make placement decision，create new chunks and hence replicas等等。</p>
-<h4 id="Namespace-Management-and-Locking"><a href="#Namespace-Management-and-Locking" class="headerlink" title="Namespace Management and Locking"></a>Namespace Management and Locking</h4><p>master的每个操作都需要获得一些列的锁，其实质是基于文件路径的读写锁。比如，client要创建/home/usr/new_file，那么就需要获取/home，/home/usr的读锁和/home/usr/new_file的写锁。</p>
-<h4 id="Replica-Placement"><a href="#Replica-Placement" class="headerlink" title="Replica Placement"></a>Replica Placement</h4><p>把每个chunk的副本分散在不同的机架上，从而利用多个机架的带宽，并且提高chunk的可靠性（避免机架级故障）。</p>
-<h4 id="Creation-Re-replicaton-Rebalancing"><a href="#Creation-Re-replicaton-Rebalancing" class="headerlink" title="Creation, Re-replicaton, Rebalancing"></a>Creation, Re-replicaton, Rebalancing</h4><p>在创建chunk时，会根据多种考量来选择合适的chunkserver，比如选择磁盘空间利用率低于平均值的chunkserver等。<br>当一个chunk的副本数少于预期的时候，需要增加副本的数量。<br>还有通过检查副本分布情况，然后调整更好的磁盘使用情况和做好负载均衡。</p>
-<h4 id="Garbage-Collection"><a href="#Garbage-Collection" class="headerlink" title="Garbage Collection"></a>Garbage Collection</h4><p>GFS删除文件后，并不会马上进行物理删除，而是在定期的清理行为中才会对可删除的文件进行清除。具体的清除规则和过程这里不多讲。</p>
-<h3 id="High-Availability"><a href="#High-Availability" class="headerlink" title="High Availability"></a>High Availability</h3><p>GFS通过fast recovery和replication来实现高可用性。  </p>
+<h2 id="Master-Operation"><a href="#Master-Operation" class="headerlink" title="Master Operation"></a>Master Operation</h2><p>master的功能包括namespace operations，make placement decision，create new chunks and hence replicas等等。</p>
+<h3 id="Namespace-Management-and-Locking"><a href="#Namespace-Management-and-Locking" class="headerlink" title="Namespace Management and Locking"></a>Namespace Management and Locking</h3><p>master的每个操作都需要获得一些列的锁，其实质是基于文件路径的读写锁。比如，client要创建/home/usr/new_file，那么就需要获取/home，/home/usr的读锁和/home/usr/new_file的写锁。</p>
+<h3 id="Replica-Placement"><a href="#Replica-Placement" class="headerlink" title="Replica Placement"></a>Replica Placement</h3><p>把每个chunk的副本分散在不同的机架上，从而利用多个机架的带宽，并且提高chunk的可靠性（避免机架级故障）。</p>
+<h3 id="Creation-Re-replicaton-Rebalancing"><a href="#Creation-Re-replicaton-Rebalancing" class="headerlink" title="Creation, Re-replicaton, Rebalancing"></a>Creation, Re-replicaton, Rebalancing</h3><p>在创建chunk时，会根据多种考量来选择合适的chunkserver，比如选择磁盘空间利用率低于平均值的chunkserver等。<br>当一个chunk的副本数少于预期的时候，需要增加副本的数量。<br>还有通过检查副本分布情况，然后调整更好的磁盘使用情况和做好负载均衡。</p>
+<h3 id="Garbage-Collection"><a href="#Garbage-Collection" class="headerlink" title="Garbage Collection"></a>Garbage Collection</h3><p>GFS删除文件后，并不会马上进行物理删除，而是在定期的清理行为中才会对可删除的文件进行清除。具体的清除规则和过程这里不多讲。</p>
+<h2 id="High-Availability"><a href="#High-Availability" class="headerlink" title="High Availability"></a>High Availability</h2><p>GFS通过fast recovery和replication来实现高可用性。  </p>
 <ul>
 <li>fast recovery：指的是master和chunkserver都能在几秒内完成启动。</li>
 <li>replication：也就是多副本，GFS中对chunk、master的operation logs等都会进行多副本处理。</li>
 </ul>
 <p>最后，再说明下，chunkserver会通过checksum来验证数据是否损坏。每个chunk被分为64KB的块，每个块有一个32b的checksum，checksum会在chunkserver的内存和日志中存储。对于读请求，chunkserver如果检测到一个block的checksum不对，就会报错给client和master。client就会从另一个副本读取消息，master也会重新复制一个副本（复制完成后，删除这个出错的副本）。</p>
-<h2 id="GFS-Demo"><a href="#GFS-Demo" class="headerlink" title="GFS Demo"></a>GFS Demo</h2><p>根据GFS的论文思想，我用java语言实现了一个简单GFS Demo，整个demo放弃了网络通信和一些细节实现，主要就是直观描述了create，write，read调用的过程，该demo已经放在了我的github上，链接地址是<a href="https://github.com/twdlll/gfsdemo" target="_blank" rel="noopener">gfs demo</a>。下面的代码展示都略过了不重要的代码。</p>
-<h3 id="GFS-Demo-Element"><a href="#GFS-Demo-Element" class="headerlink" title="GFS Demo Element"></a>GFS Demo Element</h3><p>这里我在element包下创建了三个类，ChunkRequest，ChunkMetaData和Chunk。</p>
-<h4 id="ChunkRequest"><a href="#ChunkRequest" class="headerlink" title="ChunkRequest"></a>ChunkRequest</h4><p>ChunkRequest主要包括文件名和对应的chunk index。当client收到外部的读写请求时，client计算出原始offset对应的chunk index，并和filename组装成ChunkRequest，通过ChunkRequest向master发起请求，获取对应chunk的metadata。</p>
-<pre><code>public class ChunkRequest {
-    private String filename;
-    private int chunkIndex;
-    public String getFilename() {
-        return filename;
-    }
-    public int getChunkIndex() {
-        return chunkIndex;
-    }
-    public ChunkRequest(String filename, int chunkIndex) {
-        this.filename = filename;
-        this.chunkIndex = chunkIndex;
-    }
-    ...
-}</code></pre><h4 id="ChunkMetadata"><a href="#ChunkMetadata" class="headerlink" title="ChunkMetadata"></a>ChunkMetadata</h4><p>这里设定的metadata的大小是1024KB, 这里的metadata没有论文里那么细致，仅仅是简单地记录了chunk handle和存放的chunkserver。</p>
-<pre><code>public class ChunkMetadata {
-    public static final int CHUNK_SIZE = 1 &lt;&lt; 10;
-    private int chunkHandle;
-    private ChunkServer[] chunkServers;
-    public ChunkMetadata(int chunkHandle, ChunkServer[] chunkServers) {
-        this.chunkHandle = chunkHandle;
-        this.chunkServers = chunkServers;
-    }
-    ...
-}</code></pre><h4 id="Chunk"><a href="#Chunk" class="headerlink" title="Chunk"></a>Chunk</h4><p>chunk本质上也是一个文件，这这里chunk是一个最大容量为1024KB的文件。同时chunk也是read和write动作的真正执行者。</p>
-<pre><code>public class Chunk {
-    private int chunkHandle;
-    private final String filename;
-    private FileChannel fileChannel;
-    private Logger logger;
-    public int getChunkHandle() {
-        return chunkHandle;
-    }
-    public void setChunkHandle(int chunkHandle) {
-        this.chunkHandle = chunkHandle;
-    }
-    public String getFilename() {
-        return filename;
-    }
-    public Chunk(int chunkHandle, String prefix) {
-        this.chunkHandle = chunkHandle;
-        filename = String.format(&quot;%s/%d.chunk&quot;, prefix, this.chunkHandle);
-        logger = LoggerFactory.getLogger(filename);
-        try {
-            fileChannel = new RandomAccessFile(filename, &quot;rw&quot;).getChannel();
-        } catch (IOException e) {
-            logger.error(&quot;open chunk error&quot;);
-        }
-    }
-    public ByteBuffer read(int offset, int len) {}
-    public boolean write(int offset, ByteBuffer byteBuffer) {}
-
-}</code></pre><h3 id="GFS-Demo-Role"><a href="#GFS-Demo-Role" class="headerlink" title="GFS Demo Role"></a>GFS Demo Role</h3><p>role包下是整个demo的重点，包括了Master，Client和Chunkserver。这里副本的个数设为3。另外，这里的create和write都需要primary的参与。</p>
-<h4 id="Client"><a href="#Client" class="headerlink" title="Client"></a>Client</h4><p>client受外部调用，通过与master和chunkserver的交互完成读写任务。</p>
-<pre><code>public class Client {
-    // 对应的master
-    private Master master;
-    // metadata缓存
-    private Map&lt;ChunkRequest, ChunkMetadata&gt; chunkMetadataCache = new HashMap&lt;&gt;();
-    private Logger logger = LoggerFactory.getLogger(Client.class);
-    public Client(Master master) {
-        this.master = master;
-    }
-    // 根据原始文件的offset，计算对应的chunk index
-    private int computeChunkIndex(int offset) {
-        return offset / ChunkMetadata.CHUNK_SIZE ;
-    }
-
-    // 根据文件名，原始offset和请求类型获取对应chunk的metadata
-    private ChunkMetadata getChunkMetadata(String filename, int offset, int request) {
-        int chunkIndex = computeChunkIndex(offset);
-        // 封装成ChunkRequest
-        ChunkRequest chunkRequest = new ChunkRequest(filename, chunkIndex);    
-        // 现在缓存中查找是否有对应的metadata
-        ChunkMetadata metadata = chunkMetadataCache.getOrDefault(chunkRequest, null);
-        if (null == metadata) {
-            // 缓存中没有，就去向master请求metadata
-            metadata = master.getChunkMetadata(chunkRequest, request);
-            if (null == metadata) {
-                logger.info(&quot;get chunk&apos;s metadata error&quot;);
-                return null;
-            }
-            // 将得到的metadata更新至缓存
-            chunkMetadataCache.put(chunkRequest, metadata);
-        }
-        return metadata;
-    }
-
-    // 创建文件API
-    public boolean create(String filename) {
-        // 获取metadata，创建文件被认为是创建该文件的第一个chunk
-        ChunkMetadata metadata = getChunkMetadata(filename, 0, Master.REQUEST_CREATE);
-        if (null == metadata) {
-            // 失败主要是文件已被创建
-            logger.info(&quot;create file {} error&quot;, filename);
-            return false;
-        }
-        // 第一个server是primary
-        ChunkServer[] servers = metadata.getChunkServers();
-        // 向primary发送create请求
-        boolean success = servers[0].create(metadata.getChunkHandle());
-        if (success) {
-            logger.info(&quot;create file {} success&quot;, filename);
-        } else {
-            logger.info(&quot;create file {} error&quot;, filename);
-        }
-        return success;
-    }
-
-    // 读API
-    public ByteBuffer read(String filename, int offset, int len) {
-        ChunkMetadata metadata = getChunkMetadata(filename, offset, Master.REQUEST_READ);
-        // 读不需要primary的参与，所以随机选一个副本进行读操作
-        int selectIndex = new Random().nextInt(Master.REPLICA_NUM);
-        return metadata.getChunkServers()[selectIndex].read(metadata.getChunkHandle(), offset % ChunkMetadata.CHUNK_SIZE, len);
-    }
-
-
-    // 写API
-    public boolean write(String filename, int offset, ByteBuffer buffer) {
-        ChunkMetadata metadata = getChunkMetadata(filename, offset, Master.REQUEST_WRITE);
-        // 将原始offset转化为chunk内部的offset
-        offset = offset % ChunkMetadata.CHUNK_SIZE;
-        ChunkServer[] servers = metadata.getChunkServers();
-        // 先将数据推送到3个副本所在的chunkserver
-        logger.info(&quot;begin push data&quot;);
-        for (ChunkServer server : servers) {
-            if (!server.push(metadata.getChunkHandle(), offset, buffer)) {
-                logger.error(&quot;push data error&quot;);
-                return false;
-            }
-        }
-        logger.info(&quot;push data success&quot;);
-        // 向primary发起写请求
-        boolean finish = false;
-        if ((finish = servers[0].write(metadata.getChunkHandle(), offset))) {
-            logger.info(&quot;write data success&quot;);
-        } else {
-            logger.error(&quot;write data error&quot;);
-        }
-        return finish;
-    }
-}</code></pre><h4 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h4><p>master主要负责响应client的metadata请求，已经primary lease的授权，这里的lease无有效期限制。</p>
-<pre><code>public class Master {
-    // 实时地记录了每个chunkserver的负载情况
-    private static class ChunkServerInfo implements Comparable&lt;ChunkServerInfo&gt;{
-        ChunkServer server;
-        int chunkNum = 0;
-        ChunkServerInfo(ChunkServer server, int chunkNum) {
-            this.server = server;
-            this.chunkNum = chunkNum;
-        }
-        @Override
-        public int compareTo(ChunkServerInfo o) {
-            return Integer.compare(chunkNum, o.chunkNum);
-        }
-    }
-
-    // 不同的请求定义
-    public static final int REQUEST_CREATE = 1;
-    public static final int REQUEST_READ = 2;
-    public static final int REQUEST_WRITE = 3;
-
-    // 存储chunk metadata信息，映射关系是 （chunk handle) -&gt; (chunk metadata)
-    private Map&lt;Integer, ChunkMetadata&gt; chunkMetadataMap = new HashMap&lt;&gt;();
-
-    // 副本数量
-    public static final int REPLICA_NUM = 3;
-
-    // 包含所有的chunkserver
-    private List&lt;ChunkServer&gt; chunkServers = new ArrayList&lt;&gt;();
-
-    // 用于创建新块的时候选择
-    private List&lt;ChunkServerInfo&gt; chunkServerInfos = new ArrayList&lt;&gt;();
-
-    public Master() { }
-
-    // 添加新的chunkserver
-    public void addChunkServers(ChunkServer server) {
-        chunkServers.add(server);
-    }
-
-    // 添加新的chunkserver信息
-    public void addChunkServerInfo(ChunkServer server, int chunkNum) {
-        ChunkServerInfo info = new ChunkServerInfo(server, chunkNum);
-        chunkServerInfos.add(info);
-    }
-
-    // chunkhandle由chunkRequest的filename和chunk index计算得到
-    private int computeChunkHandle(ChunkRequest chunkRequest) {
-        return chunkRequest.getFilename().hashCode() * 100 + chunkRequest.getChunkIndex();
-    }
-
-    // 响应client的请求，返回对应chunk的metadata
-    public ChunkMetadata getChunkMetadata(ChunkRequest chunkRequest, int request) {
-        int chunkHandle = computeChunkHandle(chunkRequest);
-        ChunkMetadata metadata = chunkMetadataMap.getOrDefault(chunkHandle, null);
-        if (null == metadata) {
-            if (REQUEST_CREATE == request) {
-                // 对于create请求，显然对应chunk是不存在的，所以创建一个新的metadata
-                metadata = createChunkMetadata(chunkRequest);
-                // 将第一个chunkserver设置成primary
-                metadata.getChunkServers()[0].becomePrimary(metadata);
-            } else if (REQUEST_READ == request) {
-                // 对于读请求，如果对应的chunk不存在，那显然就不能读，返回null
-                return null;
-            } else {
-                // 对于写请求，chunk不存在有两种情况
-                // 1. 该chunk对应的文件未存在，此时拒绝写请求
-                // 2. 该chunk对应的文件存在，但是文件中的当前chunk不存在，此时应该创建chunk
-                // 对于第2种情况，比如abc.txt已经创建了（也就是说该文件的chunk0已经存在了），但是要写chunk1的内容时
-                // 发现chunk1未创建，所以要先创建chunk1，然后回应client的write请求
-                ChunkRequest fileRequest = new ChunkRequest(chunkRequest.getFilename(), 0);
-                int fileChunkHandle = computeChunkHandle(fileRequest);
-                if (chunkMetadataMap.containsKey(fileChunkHandle)) {
-                    // chunk对应的文件已经创建,创建新chunk的metadata
-                    metadata = createChunkMetadata(chunkRequest);
-                    // 使第一个chunkserver成为primary
-                    metadata.getChunkServers()[0].becomePrimary(metadata);
-                    // 让primary完成chunk的创建工作
-                    metadata.getChunkServers()[0].create(metadata.getChunkHandle());
-                }
-            }
-        } else {
-            if (REQUEST_CREATE == request) {
-                // chunk的metadata已经存在，但是还要求创建，则返回null
-                return null;
-            } else {
-                // 无论是读还是写，都授予第一个chunkserver为primary
-                // 实际上读的话不需要primary，这里只是为了实现方便
-                metadata.getChunkServers()[0].becomePrimary(metadata);
-            }
-        }
-        return metadata;
-    }
-
-    // 创建新chunk的metadata，这里的metadata不直接加入到chunkMetadataMap里
-    private ChunkMetadata createChunkMetadata(ChunkRequest chunkRequest) {
-        int chunkHandle = computeChunkHandle(chunkRequest);
-        // select chunkservers
-        ChunkServer[] servers = new ChunkServer[REPLICA_NUM];
-        Collections.sort(chunkServerInfos);
-        for (int i = 0; i &lt; REPLICA_NUM; i++) {
-            servers[i] = chunkServerInfos.get(i).server;
-        }
-        ChunkMetadata metadata = new ChunkMetadata(chunkHandle, servers);
-        return metadata;
-    }
-
-    // 当chunserver完成新chunk的创建后，将调用这个方法将新的metadata添加至master中
-    public void addChunkMetatdat(ChunkMetadata metadata) {
-        chunkMetadataMap.put(metadata.getChunkHandle(), metadata);
-        // 更新各个chunserver的信息，用于负载均衡
-        Set&lt;ChunkServer&gt; servers = new HashSet&lt;&gt;(Arrays.asList(metadata.getChunkServers()));
-        for (ChunkServerInfo info : chunkServerInfos) {
-            if (servers.contains(info.server)) {
-                info.chunkNum++;
-            }
-        }
-    }
-
-    // 当chunserver启动时，会检查自身拥有的chunk，并汇报给master
-    public void reportChunkMetadata(int chunkHandle, ChunkServer server) {
-        ChunkMetadata metadata = chunkMetadataMap.getOrDefault(chunkHandle, null);
-        if (null == metadata) {
-            // 更新chunkMetadataMap
-            metadata = new ChunkMetadata(chunkHandle, new ChunkServer[REPLICA_NUM]);
-            chunkMetadataMap.put(chunkHandle, metadata);
-        }
-        ChunkServer[] servers = metadata.getChunkServers();
-        for (int i = 0; i &lt; REPLICA_NUM; i++) {
-            if (null == servers[i]) {
-                servers[i] = server;
-                break;
-            }
-        }
-    }
-
-    public void printChunkServerInfos() {
-        System.out.println(&quot;chunserver : chunkname&quot;);
-        for (ChunkServerInfo info : chunkServerInfos) {
-            System.out.println(info.server.getChunkServerName() + &quot; : &quot; + info.chunkNum);
-        }
-    }
-}</code></pre><h4 id="Chunkserver"><a href="#Chunkserver" class="headerlink" title="Chunkserver"></a>Chunkserver</h4><p>chunkserver承担了create、read和write的大部分工作。</p>
-<pre><code>public class ChunkServer {
-    // 由于所有chunkserver都是模拟出来的，所以通过不同的根目录模拟不同chunkserver的磁盘空间
-    private String rootFolder;
-
-    public String getChunkServerName() {
-        return chunkServerName;
-    }
-    private String chunkServerName;
-
-    // 该chunkserver所拥有的chunks
-    private Map&lt;Integer, Chunk&gt; chunks;
-
-    // 以该chunkserver为primary的所有chunk metadatas
-    private Map&lt;Integer, ChunkMetadata&gt; primaries;
-
-    private Master master;
-
-    // 缓冲数据，用于容纳client push的data
-    private static class BufferedData {
-        int chunkHandle;
-        int offset;
-        ByteBuffer buffer;
-        BufferedData(int chunkHandle, int offset, ByteBuffer buffer) {
-            this.chunkHandle = chunkHandle;
-            this.offset = offset;
-            this.buffer = buffer;
-        }
-    }
-    // 缓冲池，承载缓冲数据
-    private List&lt;BufferedData&gt; bufferedDatas = new ArrayList&lt;&gt;();
-
-    private Logger logger;
-
-    public ChunkServer(String rootFolder, Master master) {
-        this.master = master;
-        this.master.addChunkServers(this);
-        this.rootFolder = rootFolder;
-        chunks = new HashMap&lt;&gt;();
-        primaries = new HashMap&lt;&gt;();
-        chunkServerName = String.format(&quot;chunkserver-%s&quot;, rootFolder);
-        logger = LoggerFactory.getLogger(chunkServerName);
-        File rootDir = new File(rootFolder);
-        if (rootDir.exists()) {
-            // 根目录已经创建，检查内部的chunks
-            checkChunks();
-        } else {
-            // 创建根目录
-            if (!rootDir.mkdir()) {
-                logger.info(&quot;create root folder error&quot;);
-            }
-        }
-        // 将该chunkserver的信息添加至master
-        master.addChunkServerInfo(this, chunks.size());
-    }
-
-
-    private void checkChunks() {
-        File rootDir = new File(rootFolder);
-        File[] files = rootDir.listFiles();
-        if (null == files) {
-            return ;
-        }
-        for (File file : files) {
-            if (file.isFile()) {
-                // chunk的存储形式为123.chunk，123就是该chunk的chunk handle
-                // 所以分割文件名，创建chunk对象，并加入到chunks中
-                String filename = file.getName();
-                int chunkHandle = Integer.parseInt(filename.substring(0, filename.lastIndexOf(&apos;.&apos;)));
-                chunks.put(chunkHandle, new Chunk(chunkHandle, rootFolder));
-                // 报告给master
-                master.reportChunkMetadata(chunkHandle, this);
-            }
-        }
-    }
-
-    // 响应create请求
-    public boolean create(int chunkHandle) {
-        if (!chunks.containsKey(chunkHandle)) {
-            // 创建chunk
-            Chunk chunk = new Chunk(chunkHandle, rootFolder);
-            chunks.put(chunkHandle, chunk);
-        }
-        if (primaries.containsKey(chunkHandle)) {
-            // 该chunkserver是这个chunk的primary
-            ChunkMetadata metadata = primaries.get(chunkHandle);
-            for (ChunkServer server : metadata.getChunkServers()) {
-                // 让其他的chunkserver发起create操作
-                if (this != server &amp;&amp; !server.create(chunkHandle)) {
-                    return false;
-                }
-            }
-            // 新chunk在3个chunkserver上创建成功，汇报给master
-            master.addChunkMetatdat(metadata);
-            logger.info(&quot;primary create new chunk({}.chunk)&quot;, chunkHandle);
-            return true;
-        }
-        logger.info(&quot;secondary create new chunk({}.chunk)&quot;, chunkHandle);
-        return true;
-    }
-
-    public int getChunkNum() {
-        return chunks.size();
-    }
-
-    // 读操作
-    public ByteBuffer read(int chunkHandle, int offset, int len) {
-        if (!chunks.containsKey(chunkHandle)) {
-            logger.error(&quot;the file does not exist&quot;);
-            return null;
-        }
-        Chunk chunk = chunks.get(chunkHandle);
-        return chunk.read(offset, len);
-    }
-
-    // 供client推送缓存数据
-    public boolean push(int chunkHandle, int offset, ByteBuffer buffer) {
-        BufferedData bufferedData = new BufferedData(chunkHandle, offset, buffer);
-        if (!bufferedDatas.contains(bufferedData)) {
-            bufferedDatas.add(bufferedData);
-            logger.info(&quot;receive pushed data success&quot;);
-        }
-        return true;
-    }
-
-    // 从缓存池中找到对应的缓存数据
-    private BufferedData getBufferedData(int chunkHandle, int offset) {
-        BufferedData retData = null;
-        for (BufferedData data : bufferedDatas) {
-            // search data in buffer
-            if (chunkHandle == data.chunkHandle &amp;&amp; offset == data.offset) {
-                retData = data;
-                break;
-            }
-        }
-        if (null != retData) {
-            // remove data in buffer
-            bufferedDatas.remove(retData);
-        }
-        return retData;
-    }
-
-    // 执行写操作
-    public boolean write(int chunkHandle, int offset) {
-        BufferedData bufferedData = getBufferedData(chunkHandle, offset);
-        if (null == bufferedData) {
-            logger.error(&quot;can&apos;t find buffered data ({}:{})&quot;, chunkHandle, offset);
-            return false;
-        }
-        Chunk chunk = chunks.get(chunkHandle);
-        bufferedData.buffer.rewind();
-        if (!chunk.write(offset, bufferedData.buffer)) {
-            logger.error(&quot;{}&apos;s {} write data error&quot;,
-                    chunkHandle,
-                    primaries.containsKey(chunkHandle) ? &quot;primary&quot; : &quot;secondary&quot;);
-            return false;
-        }
-        if (primaries.containsKey(chunkHandle)) {
-            // primary已经写入，让其他chunkserver执行写操作
-            ChunkMetadata metadata = primaries.get(chunkHandle);
-            ChunkServer[] servers = metadata.getChunkServers();
-            for (int i = 1; i &lt; Master.REPLICA_NUM; i++) {
-                if (!servers[i].write(chunkHandle, offset)) {
-                    // 如果有一个chunkserver写失败，则本次写请求失败
-                    logger.error(&quot;secondary write error&quot;);
-                    return false;
-                }
-            }
-            logger.info(&quot;primary write success&quot;);
-            return true;
-        }
-        logger.info(&quot;secondary write success&quot;);
-        return true;
-    }
-
-    // 成为对应chunk的primary
-    public void becomePrimary(ChunkMetadata metadata) {
-        primaries.put(metadata.getChunkHandle(), metadata);
-    }
-}</code></pre><h3 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h3><p>测试上述create，write，read流程。</p>
-<pre><code>public class Demo {
-    public static void main(String[] args) {
-        // 1个master，1个client，10个chunkserver
-        Master master = new Master();
-        Client client = new Client(master);
-        List&lt;ChunkServer&gt; servers = new ArrayList&lt;&gt;();
-        for (int i = 0; i &lt; 10; i++) {
-            servers.add(new ChunkServer(String.valueOf(i), master));
-        }
-
-        // 创建文件测试
-        client.create(&quot;first.txt&quot;);
-        client.create(&quot;second.txt&quot;);
-        client.create(&quot;third.txt&quot;);
-        client.create(&quot;fourth.txt&quot;);
-
-        // master.printChunkServerInfos();
-
-        // 写测试
-        String writeData = &quot;abcdefg,hijklmn&quot;;
-        client.write(&quot;fourth.txt&quot;, 1800, ByteBuffer.wrap(writeData.getBytes(StandardCharsets.UTF_8)));
-
-        // 读测试
-        ByteBuffer buffer = client.read(&quot;fourth.txt&quot;, 1800, 5);
-    }
-}</code></pre><p>结果应该如下所示：<br><img src="/images/gfs/gfsdemo_result.png" alt=""></p>
-
+<h1 id="GFS-Demo"><a href="#GFS-Demo" class="headerlink" title="GFS Demo"></a>GFS Demo</h1><p>根据GFS的论文思想，我用java语言实现了一个简单GFS Demo，整个demo放弃了网络通信和一些细节实现，主要就是直观描述了create，write，read调用的过程，该demo已经放在了我的github上，链接地址是<a href="https://github.com/twdlll/gfsdemo" target="_blank" rel="noopener">gfs demo</a>。下面的代码展示都略过了不重要的代码。</p>
+<h2 id="GFS-Demo-Element"><a href="#GFS-Demo-Element" class="headerlink" title="GFS Demo Element"></a>GFS Demo Element</h2><p>这里我在element包下创建了三个类，ChunkRequest，ChunkMetaData和Chunk。</p>
+<h3 id="ChunkRequest"><a href="#ChunkRequest" class="headerlink" title="ChunkRequest"></a>ChunkRequest</h3><p>ChunkRequest主要包括文件名和对应的chunk index。当client收到外部的读写请求时，client计算出原始offset对应的chunk index，并和filename组装成ChunkRequest，通过ChunkRequest向master发起请求，获取对应chunk的metadata。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChunkRequest</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> String filename;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> chunkIndex;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">getFilename</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> filename;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getChunkIndex</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> chunkIndex;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ChunkRequest</span><span class="params">(String filename, <span class="keyword">int</span> chunkIndex)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.filename = filename;</span><br><span class="line">    <span class="keyword">this</span>.chunkIndex = chunkIndex;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ChunkMetadata"><a href="#ChunkMetadata" class="headerlink" title="ChunkMetadata"></a>ChunkMetadata</h3><p>这里设定的metadata的大小是1024KB, 这里的metadata没有论文里那么细致，仅仅是简单地记录了chunk handle和存放的chunkserver。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChunkMetadata</span> </span>&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> CHUNK_SIZE = <span class="number">1</span> &lt;&lt; <span class="number">10</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> chunkHandle;</span><br><span class="line">  <span class="keyword">private</span> ChunkServer[] chunkServers;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ChunkMetadata</span><span class="params">(<span class="keyword">int</span> chunkHandle, ChunkServer[] chunkServers)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.chunkHandle = chunkHandle;</span><br><span class="line">    <span class="keyword">this</span>.chunkServers = chunkServers;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Chunk"><a href="#Chunk" class="headerlink" title="Chunk"></a>Chunk</h3><p>chunk本质上也是一个文件，这这里chunk是一个最大容量为1024KB的文件。同时chunk也是read和write动作的真正执行者。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Chunk</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> chunkHandle;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">final</span> String filename;</span><br><span class="line">  <span class="keyword">private</span> FileChannel fileChannel;</span><br><span class="line">  <span class="keyword">private</span> Logger logger;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getChunkHandle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> chunkHandle;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setChunkHandle</span><span class="params">(<span class="keyword">int</span> chunkHandle)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.chunkHandle = chunkHandle;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">getFilename</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> filename;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Chunk</span><span class="params">(<span class="keyword">int</span> chunkHandle, String prefix)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.chunkHandle = chunkHandle;</span><br><span class="line">    filename = String.format(<span class="string">"%s/%d.chunk"</span>, prefix, <span class="keyword">this</span>.chunkHandle);</span><br><span class="line">    logger = LoggerFactory.getLogger(filename);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      fileChannel = <span class="keyword">new</span> RandomAccessFile(filename, <span class="string">"rw"</span>).getChannel();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">      logger.error(<span class="string">"open chunk error"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> ByteBuffer <span class="title">read</span><span class="params">(<span class="keyword">int</span> offset, <span class="keyword">int</span> len)</span> </span>&#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> offset, ByteBuffer byteBuffer)</span> </span>&#123;&#125;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="GFS-Demo-Role"><a href="#GFS-Demo-Role" class="headerlink" title="GFS Demo Role"></a>GFS Demo Role</h2><p>role包下是整个demo的重点，包括了Master，Client和Chunkserver。这里副本的个数设为3。另外，这里的create和write都需要primary的参与。</p>
+<h3 id="Client"><a href="#Client" class="headerlink" title="Client"></a>Client</h3><p>client受外部调用，通过与master和chunkserver的交互完成读写任务。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 对应的master</span></span><br><span class="line">  <span class="keyword">private</span> Master master;</span><br><span class="line">  <span class="comment">// metadata缓存</span></span><br><span class="line">  <span class="keyword">private</span> Map&lt;ChunkRequest, ChunkMetadata&gt; chunkMetadataCache = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">  <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(Client<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Client</span><span class="params">(Master master)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.master = master;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 根据原始文件的offset，计算对应的chunk index</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">computeChunkIndex</span><span class="params">(<span class="keyword">int</span> offset)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> offset / ChunkMetadata.CHUNK_SIZE ;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 根据文件名，原始offset和请求类型获取对应chunk的metadata</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> ChunkMetadata <span class="title">getChunkMetadata</span><span class="params">(String filename, <span class="keyword">int</span> offset, <span class="keyword">int</span> request)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> chunkIndex = computeChunkIndex(offset);</span><br><span class="line">    <span class="comment">// 封装成ChunkRequest</span></span><br><span class="line">    ChunkRequest chunkRequest = <span class="keyword">new</span> ChunkRequest(filename, chunkIndex);	</span><br><span class="line">    <span class="comment">// 现在缓存中查找是否有对应的metadata</span></span><br><span class="line">    ChunkMetadata metadata = chunkMetadataCache.getOrDefault(chunkRequest, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == metadata) &#123;</span><br><span class="line">      <span class="comment">// 缓存中没有，就去向master请求metadata</span></span><br><span class="line">      metadata = master.getChunkMetadata(chunkRequest, request);</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">null</span> == metadata) &#123;</span><br><span class="line">        logger.info(<span class="string">"get chunk's metadata error"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 将得到的metadata更新至缓存</span></span><br><span class="line">      chunkMetadataCache.put(chunkRequest, metadata);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> metadata;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 创建文件API</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">create</span><span class="params">(String filename)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取metadata，创建文件被认为是创建该文件的第一个chunk</span></span><br><span class="line">    ChunkMetadata metadata = getChunkMetadata(filename, <span class="number">0</span>, Master.REQUEST_CREATE);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == metadata) &#123;</span><br><span class="line">      <span class="comment">// 失败主要是文件已被创建</span></span><br><span class="line">      logger.info(<span class="string">"create file &#123;&#125; error"</span>, filename);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 第一个server是primary</span></span><br><span class="line">    ChunkServer[] servers = metadata.getChunkServers();</span><br><span class="line">    <span class="comment">// 向primary发送create请求</span></span><br><span class="line">    <span class="keyword">boolean</span> success = servers[<span class="number">0</span>].create(metadata.getChunkHandle());</span><br><span class="line">    <span class="keyword">if</span> (success) &#123;</span><br><span class="line">      logger.info(<span class="string">"create file &#123;&#125; success"</span>, filename);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      logger.info(<span class="string">"create file &#123;&#125; error"</span>, filename);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> success;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 读API</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> ByteBuffer <span class="title">read</span><span class="params">(String filename, <span class="keyword">int</span> offset, <span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">    ChunkMetadata metadata = getChunkMetadata(filename, offset, Master.REQUEST_READ);</span><br><span class="line">    <span class="comment">// 读不需要primary的参与，所以随机选一个副本进行读操作</span></span><br><span class="line">    <span class="keyword">int</span> selectIndex = <span class="keyword">new</span> Random().nextInt(Master.REPLICA_NUM);</span><br><span class="line">    <span class="keyword">return</span> metadata.getChunkServers()[selectIndex].read(metadata.getChunkHandle(), offset % ChunkMetadata.CHUNK_SIZE, len);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 写API</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">write</span><span class="params">(String filename, <span class="keyword">int</span> offset, ByteBuffer buffer)</span> </span>&#123;</span><br><span class="line">    ChunkMetadata metadata = getChunkMetadata(filename, offset, Master.REQUEST_WRITE);</span><br><span class="line">    <span class="comment">// 将原始offset转化为chunk内部的offset</span></span><br><span class="line">    offset = offset % ChunkMetadata.CHUNK_SIZE;</span><br><span class="line">    ChunkServer[] servers = metadata.getChunkServers();</span><br><span class="line">    <span class="comment">// 先将数据推送到3个副本所在的chunkserver</span></span><br><span class="line">    logger.info(<span class="string">"begin push data"</span>);</span><br><span class="line">    <span class="keyword">for</span> (ChunkServer server : servers) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!server.push(metadata.getChunkHandle(), offset, buffer)) &#123;</span><br><span class="line">        logger.error(<span class="string">"push data error"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    logger.info(<span class="string">"push data success"</span>);</span><br><span class="line">    <span class="comment">// 向primary发起写请求</span></span><br><span class="line">    <span class="keyword">boolean</span> finish = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> ((finish = servers[<span class="number">0</span>].write(metadata.getChunkHandle(), offset))) &#123;</span><br><span class="line">      logger.info(<span class="string">"write data success"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      logger.error(<span class="string">"write data error"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> finish;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h3><p>master主要负责响应client的metadata请求，已经primary lease的授权，这里的lease无有效期限制。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Master</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 实时地记录了每个chunkserver的负载情况</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ChunkServerInfo</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">ChunkServerInfo</span>&gt;</span>&#123;</span><br><span class="line">    ChunkServer server;</span><br><span class="line">    <span class="keyword">int</span> chunkNum = <span class="number">0</span>;</span><br><span class="line">    ChunkServerInfo(ChunkServer server, <span class="keyword">int</span> chunkNum) &#123;</span><br><span class="line">      <span class="keyword">this</span>.server = server;</span><br><span class="line">      <span class="keyword">this</span>.chunkNum = chunkNum;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(ChunkServerInfo o)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> Integer.compare(chunkNum, o.chunkNum);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 不同的请求定义</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REQUEST_CREATE = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REQUEST_READ = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REQUEST_WRITE = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 存储chunk metadata信息，映射关系是 （chunk handle) -&gt; (chunk metadata)</span></span><br><span class="line">  <span class="keyword">private</span> Map&lt;Integer, ChunkMetadata&gt; chunkMetadataMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 副本数量</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> REPLICA_NUM = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 包含所有的chunkserver</span></span><br><span class="line">  <span class="keyword">private</span> List&lt;ChunkServer&gt; chunkServers = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 用于创建新块的时候选择</span></span><br><span class="line">  <span class="keyword">private</span> List&lt;ChunkServerInfo&gt; chunkServerInfos = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Master</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 添加新的chunkserver</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChunkServers</span><span class="params">(ChunkServer server)</span> </span>&#123;</span><br><span class="line">    chunkServers.add(server);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 添加新的chunkserver信息</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChunkServerInfo</span><span class="params">(ChunkServer server, <span class="keyword">int</span> chunkNum)</span> </span>&#123;</span><br><span class="line">    ChunkServerInfo info = <span class="keyword">new</span> ChunkServerInfo(server, chunkNum);</span><br><span class="line">    chunkServerInfos.add(info);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// chunkhandle由chunkRequest的filename和chunk index计算得到</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">computeChunkHandle</span><span class="params">(ChunkRequest chunkRequest)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> chunkRequest.getFilename().hashCode() * <span class="number">100</span> + chunkRequest.getChunkIndex();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 响应client的请求，返回对应chunk的metadata</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> ChunkMetadata <span class="title">getChunkMetadata</span><span class="params">(ChunkRequest chunkRequest, <span class="keyword">int</span> request)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> chunkHandle = computeChunkHandle(chunkRequest);</span><br><span class="line">    ChunkMetadata metadata = chunkMetadataMap.getOrDefault(chunkHandle, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == metadata) &#123;</span><br><span class="line">      <span class="keyword">if</span> (REQUEST_CREATE == request) &#123;</span><br><span class="line">        <span class="comment">// 对于create请求，显然对应chunk是不存在的，所以创建一个新的metadata</span></span><br><span class="line">        metadata = createChunkMetadata(chunkRequest);</span><br><span class="line">        <span class="comment">// 将第一个chunkserver设置成primary</span></span><br><span class="line">        metadata.getChunkServers()[<span class="number">0</span>].becomePrimary(metadata);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (REQUEST_READ == request) &#123;</span><br><span class="line">        <span class="comment">// 对于读请求，如果对应的chunk不存在，那显然就不能读，返回null</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 对于写请求，chunk不存在有两种情况</span></span><br><span class="line">        <span class="comment">// 1. 该chunk对应的文件未存在，此时拒绝写请求</span></span><br><span class="line">        <span class="comment">// 2. 该chunk对应的文件存在，但是文件中的当前chunk不存在，此时应该创建chunk</span></span><br><span class="line">        <span class="comment">// 对于第2种情况，比如abc.txt已经创建了（也就是说该文件的chunk0已经存在了），但是要写chunk1的内容时</span></span><br><span class="line">        <span class="comment">// 发现chunk1未创建，所以要先创建chunk1，然后回应client的write请求</span></span><br><span class="line">        ChunkRequest fileRequest = <span class="keyword">new</span> ChunkRequest(chunkRequest.getFilename(), <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">int</span> fileChunkHandle = computeChunkHandle(fileRequest);</span><br><span class="line">        <span class="keyword">if</span> (chunkMetadataMap.containsKey(fileChunkHandle)) &#123;</span><br><span class="line">          <span class="comment">// chunk对应的文件已经创建,创建新chunk的metadata</span></span><br><span class="line">          metadata = createChunkMetadata(chunkRequest);</span><br><span class="line">          <span class="comment">// 使第一个chunkserver成为primary</span></span><br><span class="line">          metadata.getChunkServers()[<span class="number">0</span>].becomePrimary(metadata);</span><br><span class="line">          <span class="comment">// 让primary完成chunk的创建工作</span></span><br><span class="line">          metadata.getChunkServers()[<span class="number">0</span>].create(metadata.getChunkHandle());</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (REQUEST_CREATE == request) &#123;</span><br><span class="line">        <span class="comment">// chunk的metadata已经存在，但是还要求创建，则返回null</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 无论是读还是写，都授予第一个chunkserver为primary</span></span><br><span class="line">        <span class="comment">// 实际上读的话不需要primary，这里只是为了实现方便</span></span><br><span class="line">        metadata.getChunkServers()[<span class="number">0</span>].becomePrimary(metadata);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> metadata;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 创建新chunk的metadata，这里的metadata不直接加入到chunkMetadataMap里</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> ChunkMetadata <span class="title">createChunkMetadata</span><span class="params">(ChunkRequest chunkRequest)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> chunkHandle = computeChunkHandle(chunkRequest);</span><br><span class="line">    <span class="comment">// select chunkservers</span></span><br><span class="line">    ChunkServer[] servers = <span class="keyword">new</span> ChunkServer[REPLICA_NUM];</span><br><span class="line">    Collections.sort(chunkServerInfos);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; REPLICA_NUM; i++) &#123;</span><br><span class="line">      servers[i] = chunkServerInfos.get(i).server;</span><br><span class="line">    &#125;</span><br><span class="line">    ChunkMetadata metadata = <span class="keyword">new</span> ChunkMetadata(chunkHandle, servers);</span><br><span class="line">    <span class="keyword">return</span> metadata;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 当chunserver完成新chunk的创建后，将调用这个方法将新的metadata添加至master中</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addChunkMetatdat</span><span class="params">(ChunkMetadata metadata)</span> </span>&#123;</span><br><span class="line">    chunkMetadataMap.put(metadata.getChunkHandle(), metadata);</span><br><span class="line">    <span class="comment">// 更新各个chunserver的信息，用于负载均衡</span></span><br><span class="line">    Set&lt;ChunkServer&gt; servers = <span class="keyword">new</span> HashSet&lt;&gt;(Arrays.asList(metadata.getChunkServers()));</span><br><span class="line">    <span class="keyword">for</span> (ChunkServerInfo info : chunkServerInfos) &#123;</span><br><span class="line">      <span class="keyword">if</span> (servers.contains(info.server)) &#123;</span><br><span class="line">        info.chunkNum++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 当chunserver启动时，会检查自身拥有的chunk，并汇报给master</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reportChunkMetadata</span><span class="params">(<span class="keyword">int</span> chunkHandle, ChunkServer server)</span> </span>&#123;</span><br><span class="line">    ChunkMetadata metadata = chunkMetadataMap.getOrDefault(chunkHandle, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == metadata) &#123;</span><br><span class="line">      <span class="comment">// 更新chunkMetadataMap</span></span><br><span class="line">      metadata = <span class="keyword">new</span> ChunkMetadata(chunkHandle, <span class="keyword">new</span> ChunkServer[REPLICA_NUM]);</span><br><span class="line">      chunkMetadataMap.put(chunkHandle, metadata);</span><br><span class="line">    &#125;</span><br><span class="line">    ChunkServer[] servers = metadata.getChunkServers();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; REPLICA_NUM; i++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">null</span> == servers[i]) &#123;</span><br><span class="line">        servers[i] = server;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printChunkServerInfos</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"chunserver : chunkname"</span>);</span><br><span class="line">    <span class="keyword">for</span> (ChunkServerInfo info : chunkServerInfos) &#123;</span><br><span class="line">      System.out.println(info.server.getChunkServerName() + <span class="string">" : "</span> + info.chunkNum);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Chunkserver"><a href="#Chunkserver" class="headerlink" title="Chunkserver"></a>Chunkserver</h3><p>chunkserver承担了create、read和write的大部分工作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChunkServer</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 由于所有chunkserver都是模拟出来的，所以通过不同的根目录模拟不同chunkserver的磁盘空间</span></span><br><span class="line">  <span class="keyword">private</span> String rootFolder;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">getChunkServerName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> chunkServerName;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">private</span> String chunkServerName;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 该chunkserver所拥有的chunks</span></span><br><span class="line">  <span class="keyword">private</span> Map&lt;Integer, Chunk&gt; chunks;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 以该chunkserver为primary的所有chunk metadatas</span></span><br><span class="line">  <span class="keyword">private</span> Map&lt;Integer, ChunkMetadata&gt; primaries;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> Master master;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 缓冲数据，用于容纳client push的data</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">BufferedData</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> chunkHandle;</span><br><span class="line">    <span class="keyword">int</span> offset;</span><br><span class="line">    ByteBuffer buffer;</span><br><span class="line">    BufferedData(<span class="keyword">int</span> chunkHandle, <span class="keyword">int</span> offset, ByteBuffer buffer) &#123;</span><br><span class="line">      <span class="keyword">this</span>.chunkHandle = chunkHandle;</span><br><span class="line">      <span class="keyword">this</span>.offset = offset;</span><br><span class="line">      <span class="keyword">this</span>.buffer = buffer;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 缓冲池，承载缓冲数据</span></span><br><span class="line">  <span class="keyword">private</span> List&lt;BufferedData&gt; bufferedDatas = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> Logger logger;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ChunkServer</span><span class="params">(String rootFolder, Master master)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.master = master;</span><br><span class="line">    <span class="keyword">this</span>.master.addChunkServers(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">this</span>.rootFolder = rootFolder;</span><br><span class="line">    chunks = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    primaries = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    chunkServerName = String.format(<span class="string">"chunkserver-%s"</span>, rootFolder);</span><br><span class="line">    logger = LoggerFactory.getLogger(chunkServerName);</span><br><span class="line">    File rootDir = <span class="keyword">new</span> File(rootFolder);</span><br><span class="line">    <span class="keyword">if</span> (rootDir.exists()) &#123;</span><br><span class="line">      <span class="comment">// 根目录已经创建，检查内部的chunks</span></span><br><span class="line">      checkChunks();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 创建根目录</span></span><br><span class="line">      <span class="keyword">if</span> (!rootDir.mkdir()) &#123;</span><br><span class="line">        logger.info(<span class="string">"create root folder error"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 将该chunkserver的信息添加至master</span></span><br><span class="line">    master.addChunkServerInfo(<span class="keyword">this</span>, chunks.size());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">checkChunks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    File rootDir = <span class="keyword">new</span> File(rootFolder);</span><br><span class="line">    File[] files = rootDir.listFiles();</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == files) &#123;</span><br><span class="line">      <span class="keyword">return</span> ;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (File file : files) &#123;</span><br><span class="line">      <span class="keyword">if</span> (file.isFile()) &#123;</span><br><span class="line">        <span class="comment">// chunk的存储形式为123.chunk，123就是该chunk的chunk handle</span></span><br><span class="line">        <span class="comment">// 所以分割文件名，创建chunk对象，并加入到chunks中</span></span><br><span class="line">        String filename = file.getName();</span><br><span class="line">        <span class="keyword">int</span> chunkHandle = Integer.parseInt(filename.substring(<span class="number">0</span>, filename.lastIndexOf(<span class="string">'.'</span>)));</span><br><span class="line">        chunks.put(chunkHandle, <span class="keyword">new</span> Chunk(chunkHandle, rootFolder));</span><br><span class="line">        <span class="comment">// 报告给master</span></span><br><span class="line">        master.reportChunkMetadata(chunkHandle, <span class="keyword">this</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 响应create请求</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">create</span><span class="params">(<span class="keyword">int</span> chunkHandle)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!chunks.containsKey(chunkHandle)) &#123;</span><br><span class="line">      <span class="comment">// 创建chunk</span></span><br><span class="line">      Chunk chunk = <span class="keyword">new</span> Chunk(chunkHandle, rootFolder);</span><br><span class="line">      chunks.put(chunkHandle, chunk);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (primaries.containsKey(chunkHandle)) &#123;</span><br><span class="line">      <span class="comment">// 该chunkserver是这个chunk的primary</span></span><br><span class="line">      ChunkMetadata metadata = primaries.get(chunkHandle);</span><br><span class="line">      <span class="keyword">for</span> (ChunkServer server : metadata.getChunkServers()) &#123;</span><br><span class="line">        <span class="comment">// 让其他的chunkserver发起create操作</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != server &amp;&amp; !server.create(chunkHandle)) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 新chunk在3个chunkserver上创建成功，汇报给master</span></span><br><span class="line">      master.addChunkMetatdat(metadata);</span><br><span class="line">      logger.info(<span class="string">"primary create new chunk(&#123;&#125;.chunk)"</span>, chunkHandle);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    logger.info(<span class="string">"secondary create new chunk(&#123;&#125;.chunk)"</span>, chunkHandle);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getChunkNum</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> chunks.size();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 读操作</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> ByteBuffer <span class="title">read</span><span class="params">(<span class="keyword">int</span> chunkHandle, <span class="keyword">int</span> offset, <span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!chunks.containsKey(chunkHandle)) &#123;</span><br><span class="line">      logger.error(<span class="string">"the file does not exist"</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Chunk chunk = chunks.get(chunkHandle);</span><br><span class="line">    <span class="keyword">return</span> chunk.read(offset, len);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 供client推送缓存数据</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">push</span><span class="params">(<span class="keyword">int</span> chunkHandle, <span class="keyword">int</span> offset, ByteBuffer buffer)</span> </span>&#123;</span><br><span class="line">    BufferedData bufferedData = <span class="keyword">new</span> BufferedData(chunkHandle, offset, buffer);</span><br><span class="line">    <span class="keyword">if</span> (!bufferedDatas.contains(bufferedData)) &#123;</span><br><span class="line">      bufferedDatas.add(bufferedData);</span><br><span class="line">      logger.info(<span class="string">"receive pushed data success"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 从缓存池中找到对应的缓存数据</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> BufferedData <span class="title">getBufferedData</span><span class="params">(<span class="keyword">int</span> chunkHandle, <span class="keyword">int</span> offset)</span> </span>&#123;</span><br><span class="line">    BufferedData retData = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">for</span> (BufferedData data : bufferedDatas) &#123;</span><br><span class="line">      <span class="comment">// search data in buffer</span></span><br><span class="line">      <span class="keyword">if</span> (chunkHandle == data.chunkHandle &amp;&amp; offset == data.offset) &#123;</span><br><span class="line">        retData = data;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> != retData) &#123;</span><br><span class="line">      <span class="comment">// remove data in buffer</span></span><br><span class="line">      bufferedDatas.remove(retData);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> retData;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 执行写操作</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> chunkHandle, <span class="keyword">int</span> offset)</span> </span>&#123;</span><br><span class="line">    BufferedData bufferedData = getBufferedData(chunkHandle, offset);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == bufferedData) &#123;</span><br><span class="line">      logger.error(<span class="string">"can't find buffered data (&#123;&#125;:&#123;&#125;)"</span>, chunkHandle, offset);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Chunk chunk = chunks.get(chunkHandle);</span><br><span class="line">    bufferedData.buffer.rewind();</span><br><span class="line">    <span class="keyword">if</span> (!chunk.write(offset, bufferedData.buffer)) &#123;</span><br><span class="line">      logger.error(<span class="string">"&#123;&#125;'s &#123;&#125; write data error"</span>,</span><br><span class="line">          chunkHandle,</span><br><span class="line">          primaries.containsKey(chunkHandle) ? <span class="string">"primary"</span> : <span class="string">"secondary"</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (primaries.containsKey(chunkHandle)) &#123;</span><br><span class="line">      <span class="comment">// primary已经写入，让其他chunkserver执行写操作</span></span><br><span class="line">      ChunkMetadata metadata = primaries.get(chunkHandle);</span><br><span class="line">      ChunkServer[] servers = metadata.getChunkServers();</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; Master.REPLICA_NUM; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!servers[i].write(chunkHandle, offset)) &#123;</span><br><span class="line">          <span class="comment">// 如果有一个chunkserver写失败，则本次写请求失败</span></span><br><span class="line">          logger.error(<span class="string">"secondary write error"</span>);</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      logger.info(<span class="string">"primary write success"</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    logger.info(<span class="string">"secondary write success"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 成为对应chunk的primary</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">becomePrimary</span><span class="params">(ChunkMetadata metadata)</span> </span>&#123;</span><br><span class="line">    primaries.put(metadata.getChunkHandle(), metadata);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h2><p>测试上述create，write，read流程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 1个master，1个client，10个chunkserver</span></span><br><span class="line">    Master master = <span class="keyword">new</span> Master();</span><br><span class="line">    Client client = <span class="keyword">new</span> Client(master);</span><br><span class="line">    List&lt;ChunkServer&gt; servers = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">      servers.add(<span class="keyword">new</span> ChunkServer(String.valueOf(i), master));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建文件测试</span></span><br><span class="line">    client.create(<span class="string">"first.txt"</span>);</span><br><span class="line">    client.create(<span class="string">"second.txt"</span>);</span><br><span class="line">    client.create(<span class="string">"third.txt"</span>);</span><br><span class="line">    client.create(<span class="string">"fourth.txt"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// master.printChunkServerInfos();</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 写测试</span></span><br><span class="line">    String writeData = <span class="string">"abcdefg,hijklmn"</span>;</span><br><span class="line">    client.write(<span class="string">"fourth.txt"</span>, <span class="number">1800</span>, ByteBuffer.wrap(writeData.getBytes(StandardCharsets.UTF_8)));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 读测试</span></span><br><span class="line">    ByteBuffer buffer = client.read(<span class="string">"fourth.txt"</span>, <span class="number">1800</span>, <span class="number">5</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果如下所示：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/gfs/gfsdemo_result.webp" width="800" loading="lazy">
+</center>
       
     </div>
     
@@ -1206,7 +751,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#The-Google-File-System"><span class="nav-number">1.</span> <span class="nav-text">The Google File System</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GFS论文理解"><span class="nav-number">1.1.</span> <span class="nav-text">GFS论文理解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GFS-Architecture"><span class="nav-number">1.1.1.</span> <span class="nav-text">GFS Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Single-Master"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">Single Master</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Chunk-Size"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">Chunk Size</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Metadata"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">Metadata</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#System-Interactions"><span class="nav-number">1.1.2.</span> <span class="nav-text">System Interactions</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#leases-and-Mutation-Order"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">leases and Mutation Order</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Data-Flow"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">Data Flow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Atomic-Record-Appends"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">Atomic Record Appends</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Consistency-Model"><span class="nav-number">1.1.2.4.</span> <span class="nav-text">Consistency Model</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Master-Operation"><span class="nav-number">1.1.3.</span> <span class="nav-text">Master Operation</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Namespace-Management-and-Locking"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">Namespace Management and Locking</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Replica-Placement"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">Replica Placement</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Creation-Re-replicaton-Rebalancing"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">Creation, Re-replicaton, Rebalancing</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Garbage-Collection"><span class="nav-number">1.1.3.4.</span> <span class="nav-text">Garbage Collection</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#High-Availability"><span class="nav-number">1.1.4.</span> <span class="nav-text">High Availability</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GFS-Demo"><span class="nav-number">1.2.</span> <span class="nav-text">GFS Demo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GFS-Demo-Element"><span class="nav-number">1.2.1.</span> <span class="nav-text">GFS Demo Element</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ChunkRequest"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">ChunkRequest</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ChunkMetadata"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">ChunkMetadata</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Chunk"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">Chunk</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GFS-Demo-Role"><span class="nav-number">1.2.2.</span> <span class="nav-text">GFS Demo Role</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Client"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">Client</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Master"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">Master</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Chunkserver"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">Chunkserver</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Demo"><span class="nav-number">1.2.3.</span> <span class="nav-text">Demo</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#GFS论文理解"><span class="nav-number">1.</span> <span class="nav-text">GFS论文理解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GFS-Architecture"><span class="nav-number">1.1.</span> <span class="nav-text">GFS Architecture</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Single-Master"><span class="nav-number">1.1.1.</span> <span class="nav-text">Single Master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Chunk-Size"><span class="nav-number">1.1.2.</span> <span class="nav-text">Chunk Size</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Metadata"><span class="nav-number">1.1.3.</span> <span class="nav-text">Metadata</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#System-Interactions"><span class="nav-number">1.2.</span> <span class="nav-text">System Interactions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#leases-and-Mutation-Order"><span class="nav-number">1.2.1.</span> <span class="nav-text">leases and Mutation Order</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Data-Flow"><span class="nav-number">1.2.2.</span> <span class="nav-text">Data Flow</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Atomic-Record-Appends"><span class="nav-number">1.2.3.</span> <span class="nav-text">Atomic Record Appends</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Consistency-Model"><span class="nav-number">1.2.4.</span> <span class="nav-text">Consistency Model</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Master-Operation"><span class="nav-number">1.3.</span> <span class="nav-text">Master Operation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Namespace-Management-and-Locking"><span class="nav-number">1.3.1.</span> <span class="nav-text">Namespace Management and Locking</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Replica-Placement"><span class="nav-number">1.3.2.</span> <span class="nav-text">Replica Placement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Creation-Re-replicaton-Rebalancing"><span class="nav-number">1.3.3.</span> <span class="nav-text">Creation, Re-replicaton, Rebalancing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Garbage-Collection"><span class="nav-number">1.3.4.</span> <span class="nav-text">Garbage Collection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#High-Availability"><span class="nav-number">1.4.</span> <span class="nav-text">High Availability</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GFS-Demo"><span class="nav-number">2.</span> <span class="nav-text">GFS Demo</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GFS-Demo-Element"><span class="nav-number">2.1.</span> <span class="nav-text">GFS Demo Element</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ChunkRequest"><span class="nav-number">2.1.1.</span> <span class="nav-text">ChunkRequest</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ChunkMetadata"><span class="nav-number">2.1.2.</span> <span class="nav-text">ChunkMetadata</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Chunk"><span class="nav-number">2.1.3.</span> <span class="nav-text">Chunk</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GFS-Demo-Role"><span class="nav-number">2.2.</span> <span class="nav-text">GFS Demo Role</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Client"><span class="nav-number">2.2.1.</span> <span class="nav-text">Client</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Master"><span class="nav-number">2.2.2.</span> <span class="nav-text">Master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Chunkserver"><span class="nav-number">2.2.3.</span> <span class="nav-text">Chunkserver</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Demo"><span class="nav-number">2.3.</span> <span class="nav-text">Demo</span></a></li></ol></li></ol></div>
             
 
           </div>
