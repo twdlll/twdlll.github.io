@@ -127,7 +127,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;idea&#x2F;idea_dirs.png">
 <meta property="og:image" content="&#x2F;images&#x2F;idea&#x2F;encode.png">
-<meta property="og:updated_time" content="2020-12-20T15:24:47.125Z">
+<meta property="og:updated_time" content="2021-02-10T12:57:23.967Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;idea&#x2F;idea_dirs.png">
 
@@ -347,8 +347,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-12-20T23:24:47+08:00">
-                2020-12-20
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-10T20:57:23+08:00">
+                2021-02-10
               </time>
             
           </span>
@@ -443,7 +443,7 @@
 <h1 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h1><p>为了设置UTF-8，可以在File-&gt;Settings里按照下图进行设置：<br><img src="/images/idea/encode.png" alt=""></p>
 <h1 id="无法下载源码"><a href="#无法下载源码" class="headerlink" title="无法下载源码"></a>无法下载源码</h1><p>在打开.class文件，然后点击download source选项，但却出现cannot download sources  </p>
 <p><strong>解决方法一</strong>：进入pom文件目录，然后下载所有依赖源码</p>
-<pre><code>mvn dependency:resolve -Dclassifier=sources</code></pre><p><strong>解决方法二</strong>:进入pom文件目录，下载指定依赖源码，多个工件用逗号隔开</p>
+<pre><code>mvn dependency:resolve -Dclassifier=sources</code></pre><p><strong>解决方法二</strong>：进入pom文件目录，下载指定依赖源码，多个工件用逗号隔开</p>
 <pre><code>mvn dependency:sources -DincludeArtifactIds=junit,logback-classic</code></pre>
       
     </div>
