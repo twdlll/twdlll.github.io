@@ -129,7 +129,7 @@
 <meta property="og:image" content="&#x2F;images&#x2F;pnpl&#x2F;policy.png">
 <meta property="og:image" content="&#x2F;images&#x2F;pnpl&#x2F;start.png">
 <meta property="og:image" content="&#x2F;images&#x2F;pnpl&#x2F;mininet.png">
-<meta property="og:updated_time" content="2020-04-19T11:55:31.413Z">
+<meta property="og:updated_time" content="2021-02-11T12:29:25.998Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;pnpl&#x2F;pnpl_architecture.png">
 
@@ -349,8 +349,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-19T19:55:31+08:00">
-                2020-04-19
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-11T20:29:25+08:00">
+                2021-02-11
               </time>
             
           </span>
@@ -433,9 +433,15 @@
 </ul>
 <p>可以看到，SDN是灵活的，通过向交换机下发新流表就可以使网络适配新协议，配置轻松简单。另外，相对于传统网络的分布式架构（每个网络设备都是单独个体，单独处理流入的数据包），SDN是集中式架构，能提供网络的统一视图，对于网络资源的分配和优化具有巨大的潜力。<br>个人认为，将传统网络全部替换为SDN网络是不现实的，SDN的最合适的应用场景还是数据中心（Fackbook和Google都在他们的数据中心使用了SDN网络），不管是流量工程还是某些特殊场景，都可以通过灵活配置得以实现。<br>而POF协议是一种SDN控制器与交换机之间的交互协议，其最大特点就是将数据包中的各个域都表达为（offset，length），使得交换机能够处理自定义协议。</p>
 <h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p>pnpl可以通过用户提供的数据包头部规范和策略来处理自定义协议，具体可看<a href="https://www.sciencedirect.com/science/article/abs/pii/S138912861830968X" target="_blank" rel="noopener">PNPL论文</a></p>
-<h2 id="pnpl"><a href="#pnpl" class="headerlink" title="pnpl"></a>pnpl</h2><p><img src="/images/pnpl/pnpl_architecture.png" alt=""><br>pnpl的架构如图所示，自底向上分别是：</p>
+<h2 id="pnpl"><a href="#pnpl" class="headerlink" title="pnpl"></a>pnpl</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/pnpl/pnpl_architecture.png" width="800" loading="lazy">
+</center>
+pnpl的架构如图所示，自底向上分别是：
+
 <ul>
-<li>最底层是网络通信，这里使用netty来简化网络编程，主要负责将收到的字节流转化为不同类型的POF消息。</li>
+<li>最底层是网络通信，这里使用Netty来简化网络编程，主要负责将收到的字节流转化为不同类型的POF消息。</li>
 <li>Switch代表和控制器连接的交换机，保留该交换机的流表信息，并且执行特定的策略。</li>
 <li>全局组件主要分为：<ul>
 <li>Network：维护虚拟网络元素，如交换机、主机和链路，形成网络拓扑的统一视图。</li>
@@ -513,8 +519,16 @@ start ethernet;</code></pre><p>以上是一个简单的头部规范，指明了�
         }
         return null;
     }
-}</code></pre><p>用户通过编写继承于AbstractPolicyAdapter的策略类，即可调用pnpl提供的api来处理网络数据包，上述代码中的gotoNextHeader和readPacketField分别是进入下一层头部和读取头部中某个域的功能，getHost则是获取某个主机，getPath则是计算两台主机之间的路径，通过这些API，自定义策略就能对数据包完成处理。<br><img src="/images/pnpl/policy.png" alt=""><br>Ipv4Forward的继承关系如图所示，其中AbstractNetworkApiContext主要提供获取网络实体（如Switch、Host）的api和获取网络对象间路径的api等，AbstractPacketApiContext则是提供对数据包操作的api，如进入下个头部和读取特定域的api等，AbstractPolicyAdapter则是提供了一个模板方法，用于将用户提供的f函数转化为流表规则下发给交换机。</p>
-<h1 id="运行流程"><a href="#运行流程" class="headerlink" title="运行流程"></a>运行流程</h1><p>整个pnpl的运行关键步骤如下所示：</p>
+}</code></pre><p>用户通过编写继承于AbstractPolicyAdapter的策略类，即可调用pnpl提供的api来处理网络数据包，上述代码中的gotoNextHeader和readPacketField分别是进入下一层头部和读取头部中某个域的功能，getHost则是获取某个主机，getPath则是计算两台主机之间的路径，通过这些API，自定义策略就能对数据包完成处理。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/pnpl/policy.png" width="500" loading="lazy">
+</center>
+Ipv4Forward的继承关系如图所示，其中AbstractNetworkApiContext主要提供获取网络实体（如Switch、Host）的api和获取网络对象间路径的api等，AbstractPacketApiContext则是提供对数据包操作的api，如进入下个头部和读取特定域的api等，AbstractPolicyAdapter则是提供了一个模板方法，用于将用户提供的f函数转化为流表规则下发给交换机。
+# 运行流程
+整个pnpl的运行关键步骤如下所示：
+
 <ol>
 <li>监测交换机的连接，开始进行POF协议的握手，将POF交换机抽象为Switch对象，后续的消息上报都由该对象进行处理。</li>
 <li>Switch启动工作后，首先向LinkDiscovery注册其上的端口，由LinkDiscovery开始链路发现工作。<ol>
@@ -545,12 +559,23 @@ start ethernet;</code></pre><p>以上是一个简单的头部规范，指明了�
 </ol>
 </li>
 </ol>
-<p>pnpl启动(日志系统使用的是SLF4J+logback）：<br><img src="/images/pnpl/start.png" alt=""><br>mininet运行pofswitch：<br><img src="/images/pnpl/mininet.png" alt=""><br>可以看到两个host能相互ping通。</p>
-<h1 id="尚需改进和扩展"><a href="#尚需改进和扩展" class="headerlink" title="尚需改进和扩展"></a>尚需改进和扩展</h1><ol>
-<li>pnpl的处理速度较慢，对于部分代码需要优化。</li>
-<li>对于每次下发的流表需要记录，当相关的拓扑发生变化时，主动删除这部分流表，使网络功能保持正常。</li>
-<li>使pnpl形成分布式集群，包括主控制器的选举和TraceTree恢复，从而具有应对控制器单点故障的能力。</li>
-</ol>
+<p>pnpl启动(日志系统使用的是SLF4J+logback）：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/pnpl/start.png" width="800" loading="lazy">
+</center>
+mininet运行pofswitch：
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/pnpl/mininet.png" width="400" loading="lazy">
+</center>
+可以看到两个host能相互ping通。
+# 尚需改进和扩展
+1. pnpl的处理速度较慢，对于部分代码需要优化。
+2. 对于每次下发的流表需要记录，当相关的拓扑发生变化时，主动删除这部分流表，使网络功能保持正常。
+3. 使pnpl形成分布式集群，包括主控制器的选举和TraceTree恢复，从而具有应对控制器单点故障的能力。
 
       
     </div>
@@ -760,7 +785,7 @@ start ethernet;</code></pre><p>以上是一个简单的头部规范，指明了�
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#动机"><span class="nav-number">1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#架构"><span class="nav-number">3.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pnpl"><span class="nav-number">3.1.</span> <span class="nav-text">pnpl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户"><span class="nav-number">3.2.</span> <span class="nav-text">用户</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#头部规范"><span class="nav-number">3.2.1.</span> <span class="nav-text">头部规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#策略"><span class="nav-number">3.2.2.</span> <span class="nav-text">策略</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#运行流程"><span class="nav-number">4.</span> <span class="nav-text">运行流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#尚需改进和扩展"><span class="nav-number">5.</span> <span class="nav-text">尚需改进和扩展</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#动机"><span class="nav-number">1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#介绍"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#架构"><span class="nav-number">3.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pnpl"><span class="nav-number">3.1.</span> <span class="nav-text">pnpl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用户"><span class="nav-number">3.2.</span> <span class="nav-text">用户</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#头部规范"><span class="nav-number">3.2.1.</span> <span class="nav-text">头部规范</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#策略"><span class="nav-number">3.2.2.</span> <span class="nav-text">策略</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>

@@ -127,7 +127,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;onos_device&#x2F;onos_subsystem.png">
 <meta property="og:image" content="&#x2F;images&#x2F;onos_device&#x2F;devicestore_inherit.png">
-<meta property="og:updated_time" content="2020-03-28T11:28:35.300Z">
+<meta property="og:updated_time" content="2021-02-11T11:58:45.790Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;onos_device&#x2F;onos_subsystem.png">
 
@@ -347,8 +347,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-03-28T19:28:35+08:00">
-                2020-03-28
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-11T19:58:45+08:00">
+                2021-02-11
               </time>
             
           </span>
@@ -535,7 +535,7 @@ public void activate() {
 <li>在该Device的映射表中插入（ProviderId，DeviceDescriptions），并生成相应的DeviceEvent。</li>
 <li>这个DeviceEvent（其分类为DEVICE_DEVICE）先传给其他onos实例（这里仅仅是通知了该事件，而同步信息还是交由反熵任务来完成），再通知代理该事件（之前在DeviceManager中的代理实现接收到消息后，直接交给eventDispatcher）。</li>
 </ol>
-<h1 id="Core层总结"><a href="#Core层总结" class="headerlink" title="Core层总结"></a>Core层总结</h1><p>再其感叹onos的架构，一开始可能不太理解，但是稍许深入就会觉得整个代码结构特别清晰。Manager算是所有子系统的核心中的核心，负责向App层提供服务和接收Provider层的信息。而Store可以形容为Manager的数据库，所有的数据都交给Store存储来同步。Store不仅要反馈信息给Manager，而且需要和其他onos实例的Store进行交互以完成信息同步。<br>另外可以看到，任何子系统都不能独立存在，它们都需要一组公共服务的支持。比如设备子系统就需要ClusterService（获取集群中各个实例信息）、ClusterCommunicationService（帮助onos实例间进行沟通）等。之后我也准备写一篇博文来着重介绍它们。</p>
+<h1 id="Core层总结"><a href="#Core层总结" class="headerlink" title="Core层总结"></a>Core层总结</h1><p>再其感叹onos的架构，一开始可能不太理解，但是稍许深入就会觉得整个代码结构特别清晰。Manager算是所有子系统的核心中的核心，负责向App层提供服务和接收Provider层的信息。而Store可以形容为Manager的数据库，所有的数据都交给Store存储来同步。Store不仅要反馈信息给Manager，而且需要和其他onos实例的Store进行交互以完成信息同步。<br>另外可以看到，任何子系统都不能独立存在，它们都需要一组公共服务的支持。比如设备子系统就需要ClusterService（获取集群中各个实例信息）、ClusterCommunicationService（帮助onos实例间进行沟通）等。</p>
 
       
     </div>

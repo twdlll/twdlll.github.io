@@ -117,17 +117,17 @@
 
 
 
-<meta name="description" content="在初版POF Controller的基础上进行改进，对其架构进行了改进。 架构介绍对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。 Netty线程池Netty线程池负责跟底层交换机进行通信，其主要职责有：  Encode&#x2F;Decode工作：首先编解码工作并不复杂，另外相对于另一种实现（增加编解码组件，专门负责编解码工作），直接集成在Channel中更加简单">
+<meta name="description" content="在初版POF Controller的基础上进行改进，对其架构进行了改进。 架构介绍       对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。 # Netty线程池 Netty线程池负责跟底层交换机进行通信，其主要职责有：   Encode&#x2F;Decode工作：首先编解码工作并不复杂，另外相对于另一种实现（增加编解码组件，专门负责编解码工作），直接集成在C">
 <meta name="keywords" content="sdn,pof">
 <meta property="og:type" content="article">
 <meta property="og:title" content="POF控制器（二）">
 <meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;04&#x2F;19&#x2F;pnpl1&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="在初版POF Controller的基础上进行改进，对其架构进行了改进。 架构介绍对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。 Netty线程池Netty线程池负责跟底层交换机进行通信，其主要职责有：  Encode&#x2F;Decode工作：首先编解码工作并不复杂，另外相对于另一种实现（增加编解码组件，专门负责编解码工作），直接集成在Channel中更加简单">
+<meta property="og:description" content="在初版POF Controller的基础上进行改进，对其架构进行了改进。 架构介绍       对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。 # Netty线程池 Netty线程池负责跟底层交换机进行通信，其主要职责有：   Encode&#x2F;Decode工作：首先编解码工作并不复杂，另外相对于另一种实现（增加编解码组件，专门负责编解码工作），直接集成在C">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="&#x2F;images&#x2F;pnpl1&#x2F;arch.png">
 <meta property="og:image" content="&#x2F;images&#x2F;pnpl1&#x2F;event.png">
-<meta property="og:updated_time" content="2020-04-19T11:57:18.417Z">
+<meta property="og:updated_time" content="2021-02-11T12:30:48.574Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="&#x2F;images&#x2F;pnpl1&#x2F;arch.png">
 
@@ -347,8 +347,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2020-04-19T19:57:18+08:00">
-                2020-04-19
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-11T20:30:48+08:00">
+                2021-02-11
               </time>
             
           </span>
@@ -419,15 +419,28 @@
 
       
         <p>在初版POF Controller的基础上进行改进，对其架构进行了改进。</p>
-<h1 id="架构介绍"><a href="#架构介绍" class="headerlink" title="架构介绍"></a>架构介绍</h1><p><img src="/images/pnpl1/arch.png" alt=""><br>对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。</p>
-<h1 id="Netty线程池"><a href="#Netty线程池" class="headerlink" title="Netty线程池"></a>Netty线程池</h1><p>Netty线程池负责跟底层交换机进行通信，其主要职责有：</p>
+<h1 id="架构介绍"><a href="#架构介绍" class="headerlink" title="架构介绍"></a>架构介绍</h1><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/pnpl1/arch.png" width="900" loading="lazy">
+</center>
+对于Netty接收到的消息通过消息分发机制派发到各个组件再进行处理，可以降低组件间的耦合。
+# Netty线程池
+Netty线程池负责跟底层交换机进行通信，其主要职责有：
+
 <ol>
 <li>Encode/Decode工作：首先编解码工作并不复杂，另外相对于另一种实现（增加编解码组件，专门负责编解码工作），直接集成在Channel中更加简单方便。</li>
 <li>与交换机进行协议握手：对于每个交换机而言，仅与控制器完成一次握手，远小于后续业务处理的工作量，所以也可以放在Channel中。</li>
 <li>响应EchoRequest消息：该消息是控制器与交换机之间的心跳机制，对于该消息无需进行计算，只需要简单发送EchoReply，所以也可由Channel承担。</li>
 <li>生成Event，发送至Event Dispatcher，这也是Netty线程池最重要的作用。</li>
 </ol>
-<p>关于生成的Event类型如下图所示：<br><img src="/images/pnpl1/event.png" alt=""></p>
+<p>关于生成的Event类型如下图所示：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/pnpl1/event.png" width="600" loading="lazy">
+</center>
+
 <h1 id="Event-Dispatcher"><a href="#Event-Dispatcher" class="headerlink" title="Event Dispatcher"></a>Event Dispatcher</h1><p>负责将收到的消息转发出去，对于不同的消息都有单独的DispatchLoop（线程）负责分发，分发方式为FIFO。</p>
 <ul>
 <li>LinkEvent：发送给LinkDiscovery。</li>
@@ -658,7 +671,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#架构介绍"><span class="nav-number">1.</span> <span class="nav-text">架构介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Netty线程池"><span class="nav-number">2.</span> <span class="nav-text">Netty线程池</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Event-Dispatcher"><span class="nav-number">3.</span> <span class="nav-text">Event Dispatcher</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Network"><span class="nav-number">4.</span> <span class="nav-text">Network</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HostDiscovery"><span class="nav-number">5.</span> <span class="nav-text">HostDiscovery</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LinkDiscovery"><span class="nav-number">6.</span> <span class="nav-text">LinkDiscovery</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Worker"><span class="nav-number">7.</span> <span class="nav-text">Worker</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#另外的优化"><span class="nav-number">8.</span> <span class="nav-text">另外的优化</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#架构介绍"><span class="nav-number">1.</span> <span class="nav-text">架构介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Event-Dispatcher"><span class="nav-number">2.</span> <span class="nav-text">Event Dispatcher</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Network"><span class="nav-number">3.</span> <span class="nav-text">Network</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HostDiscovery"><span class="nav-number">4.</span> <span class="nav-text">HostDiscovery</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LinkDiscovery"><span class="nav-number">5.</span> <span class="nav-text">LinkDiscovery</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Worker"><span class="nav-number">6.</span> <span class="nav-text">Worker</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#另外的优化"><span class="nav-number">7.</span> <span class="nav-text">另外的优化</span></a></li></ol></div>
             
 
           </div>
