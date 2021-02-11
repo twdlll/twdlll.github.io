@@ -117,17 +117,15 @@
 
 
 
-<meta name="description" content="这篇博客主要是记录一些比较好用的库。 分析JVM中对象布局：JOLJOL的maven三元组： 12345&amp;lt;dependency&amp;gt;  &amp;lt;groupId&amp;gt;org.openjdk.jol&amp;lt;&#x2F;groupId&amp;gt;  &amp;lt;artifactId&amp;gt;jol-core&amp;lt;&#x2F;artifactId&amp;gt;  &amp;lt;version&amp;gt;0.9&amp;lt;&#x2F;version&amp;gt">
+<meta name="description" content="在应用运行时，日志和异常是发现线上问题的两种有效途径。那么如何打印日志、抛出异常，才能使发现问题变得快捷而有效呢？这就是今天所有讨论的问题。 异常异常可以是程序提供的一种自检手段，也是问题发生的主要感知手段。通常情况下异常和日志相辅相成，当遇到无法处理的异常时，捕获后进行日志打印，进行问题记录。 异常定义通常情况下，语言定义的异常无法满足业务所需。所以，对于不同业务场景，需制定与之相关且完善的异常">
 <meta property="og:type" content="article">
-<meta property="og:title" content="实用库推荐">
-<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2020&#x2F;04&#x2F;15&#x2F;open_lib&#x2F;index.html">
+<meta property="og:title" content="异常和日志使用思考">
+<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2021&#x2F;02&#x2F;10&#x2F;exception-log&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="这篇博客主要是记录一些比较好用的库。 分析JVM中对象布局：JOLJOL的maven三元组： 12345&amp;lt;dependency&amp;gt;  &amp;lt;groupId&amp;gt;org.openjdk.jol&amp;lt;&#x2F;groupId&amp;gt;  &amp;lt;artifactId&amp;gt;jol-core&amp;lt;&#x2F;artifactId&amp;gt;  &amp;lt;version&amp;gt;0.9&amp;lt;&#x2F;version&amp;gt">
+<meta property="og:description" content="在应用运行时，日志和异常是发现线上问题的两种有效途径。那么如何打印日志、抛出异常，才能使发现问题变得快捷而有效呢？这就是今天所有讨论的问题。 异常异常可以是程序提供的一种自检手段，也是问题发生的主要感知手段。通常情况下异常和日志相辅相成，当遇到无法处理的异常时，捕获后进行日志打印，进行问题记录。 异常定义通常情况下，语言定义的异常无法满足业务所需。所以，对于不同业务场景，需制定与之相关且完善的异常">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;images&#x2F;open_lib&#x2F;jol.webp">
-<meta property="og:updated_time" content="2021-02-07T08:02:23.403Z">
+<meta property="og:updated_time" content="2021-02-11T10:57:15.141Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;open_lib&#x2F;jol.webp">
 
 
 
@@ -157,13 +155,13 @@
 
 
 
-  <link rel="canonical" href="https//twdlll.github.io/2020/04/15/open_lib/"/>
+  <link rel="canonical" href="https//twdlll.github.io/2021/02/10/exception-log/"/>
 
 
 
 
 
-  <title>实用库推荐 | Twd's Home</title>
+  <title>异常和日志使用思考 | Twd's Home</title>
   
 
 
@@ -300,7 +298,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2020/04/15/open_lib/">
+    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2021/02/10/exception-log/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Twd">
@@ -317,7 +315,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">实用库推荐</h1>
+          <h1 class="post-title" itemprop="name headline">异常和日志使用思考</h1>
         
 
         <div class="post-meta">
@@ -329,8 +327,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-15T00:00:00+08:00">
-                2020-04-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-10T00:00:00+08:00">
+                2021-02-10
               </time>
             
 
@@ -345,8 +343,8 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2021-02-07T16:02:23+08:00">
-                2021-02-07
+              <time title="更新于" itemprop="dateModified" datetime="2021-02-11T18:57:15+08:00">
+                2021-02-11
               </time>
             
           </span>
@@ -364,8 +362,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AE%9E%E7%94%A8%E5%BA%93%E6%8E%A8%E8%8D%90/" itemprop="url" rel="index">
-                    <span itemprop="name">实用库推荐</span>
+                  <a href="/categories/%E4%BB%A3%E7%A0%81%E6%8A%80%E5%B7%A7/" itemprop="url" rel="index">
+                    <span itemprop="name">代码技巧</span>
                   </a>
                 </span>
 
@@ -382,8 +380,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2020/04/15/open_lib/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2020/04/15/open_lib/" itemprop="commentCount"></span>
+                <a href="/2021/02/10/exception-log/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2021/02/10/exception-log/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -416,31 +414,66 @@
       
 
       
-        <p>这篇博客主要是记录一些比较好用的库。</p>
-<h1 id="分析JVM中对象布局：JOL"><a href="#分析JVM中对象布局：JOL" class="headerlink" title="分析JVM中对象布局：JOL"></a>分析JVM中对象布局：JOL</h1><p>JOL的maven三元组：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.openjdk.jol<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jol-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.9<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>使用也非常简单，通过它可以了解对象布局情况，以下是示例代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">long</span> a = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">short</span> b = <span class="number">1</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Object o = <span class="keyword">new</span> Object();</span><br><span class="line">    <span class="comment">// 查看普通对象布局</span></span><br><span class="line">    System.out.println(ClassLayout.parseInstance(o).toPrintable());</span><br><span class="line">    <span class="comment">// 查看Class对象布局</span></span><br><span class="line">    System.out.println(ClassLayout.parseClass(Test<span class="class">.<span class="keyword">class</span>).<span class="title">toPrintable</span>())</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>结果如下：</p>
-<center>
-    <img style="border-radius: 0.3125em;
-    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/open_lib/jol.webp" width="800" loading="lazy">
-</center>
-
+        <p>在应用运行时，日志和异常是发现线上问题的两种有效途径。那么如何打印日志、抛出异常，才能使发现问题变得快捷而有效呢？这就是今天所有讨论的问题。</p>
+<h1 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h1><p>异常可以是程序提供的一种自检手段，也是问题发生的主要感知手段。通常情况下异常和日志相辅相成，当遇到无法处理的异常时，捕获后进行日志打印，进行问题记录。</p>
+<h2 id="异常定义"><a href="#异常定义" class="headerlink" title="异常定义"></a>异常定义</h2><p>通常情况下，语言定义的异常无法满足业务所需。所以，对于不同业务场景，需制定与之相关且完善的异常文档，包括错误码，错误描述和发生场景等。这样，当团队成员就可以根据打印的异常信息定位相关问题。</p>
+<h2 id="异常抛出和捕获"><a href="#异常抛出和捕获" class="headerlink" title="异常抛出和捕获"></a>异常抛出和捕获</h2><p>异常描述了当前程序出现的不符合预期的情况。在抛出异常时，首先要确定抛出的异常匹配当前的异常场景，其次要在合适的地方捕获异常。关于抛出和捕获的一个原则是：</p>
 <ol>
-<li>对象头的mark word部分</li>
-<li>对象头的class ref部分</li>
-<li>对象内部填充（内存对齐，即偏移是数据类型长度的整倍数）</li>
-<li>对象末尾填充（64bit机器上是8字节填充）</li>
-<li>对象中的实例数据（8种基本数据类型和引用）</li>
+<li>提前抛出</li>
+<li>延迟捕获</li>
 </ol>
-<h1 id="标准工具库Apache-Commons-Lang"><a href="#标准工具库Apache-Commons-Lang" class="headerlink" title="标准工具库Apache Commons Lang"></a>标准工具库Apache Commons Lang</h1><p>标准库为其核心类没有提供足够的操纵方法。针对于此，Apache Commons Lang提供了这些额外的方法，主要集中在以下方面：字符串操作，基础数值操作，对象反射，并发等等。<br>引入依赖:</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.commons<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-lang3<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.11<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>基本使用如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ArrayUtils</span></span><br><span class="line">  <span class="comment">// 内置了各种类型的空数组</span></span><br><span class="line">  <span class="keyword">int</span>[] emptyArray = ArrayUtils.EMPTY_INT_ARRAY;</span><br><span class="line">  <span class="comment">// 提供了包装类和基本类型之间的转换</span></span><br><span class="line">  <span class="keyword">int</span>[] basicArray = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;;</span><br><span class="line">  Integer[] wrapArray = ArrayUtils.toObject(basicArray);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ClassUtils</span></span><br><span class="line">  System.out.println(ClassUtils.getPackageName(String<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line">  System.out.println(ClassUtils.getAllSuperclasses(ArrayList<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line">  System.out.println(ClassUtils.getAllInterfaces(ArrayList<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line"></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>事实上，工具库的选择还有很多，比如google的guava，国内的hutool等。</p>
+<p>也就是说，在发现程序出现不符合预期情况的时候就应该及早抛出异常了。根据抛出异常的类型，也有对应的捕获策略：</p>
+<ul>
+<li>程序能够处理的异常：在合适地点捕获异常，并进行处理</li>
+<li>程序不能够处理的异常：在源头捕获异常，并转化为用户可见的信息，如“系统繁忙，请稍后再试”等提示信息。</li>
+</ul>
+<p>比如用户执行下单操作，首先进入下单业务的代码逻辑，可能包含两个子方法：</p>
+<ol>
+<li>检查库存方法</li>
+<li>下订单方法</li>
+</ol>
+<p>在库存检查方法中，通过微服务访问库存。此时微服务访问超时，所以抛出超时异常。对于该异常，可尝试再重试几次（防止偶尔的网络波动），若重试均失败，则表明当前网络出现故障，不再尝试，而是往上抛出。由下单操作方法捕获异常，并转为“系统繁忙，请稍后再试”提示信息。如果在访问库存时，发现库存不足，该情况无法由程序自行处理，所以抛到上层，由其转为“库存不足，无法下单”信息发送给用户。</p>
+<h1 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h1><p>当应用发生线上问题时，日志是最主要且最先的找到问题的方式。好的日志，能够快速定位问题，使得排查问题变得简单高效。所以如何设计好的日志，应该是程序员必备的基础素养。<br>首先需要明确的是，当今软件开发越来越趋向团体化开发，单兵作战的时代逐渐远去。一个复杂应用通常是由多名程序员共同开发（每人负责一个模块），所以可能会出现这样一种情况：程序员A发现线上出现了一个ERROR日志，但是这个ERROR实际上是由程序员B写的功能模块产生的。这时，这个日志应该起到什么作用呢？</p>
+<ol>
+<li>这个日志能够让程序员A意识到ERROR是由程序员B的代码引起的，并交给程序员B进行解决。</li>
+<li>这个日志能够让程序员A（具有相关业务的大概知识）进行初步排查并解决；解决不了，再转交给B解决。</li>
+</ol>
+<p>显然1是良好日志需要达到的基本条件，而2则是优秀日志的前提条件。事实上，我一直在强调“团队工作”，“任何具有大概业务知识的人都能读懂日志”。这是因为在我看来，日志编写也是一种规范。就像Java有《Java开发手册》，日志也需要有《日志编写手册》，至少在一个团队内部需要达成对一种日志编写模式的共识。</p>
+<h2 id="日志等级"><a href="#日志等级" class="headerlink" title="日志等级"></a>日志等级</h2><p>日志等级用来标明问题的紧急程度。常用的日志框架Logback划分出了以下几类（从轻微到严重）：</p>
+<ol>
+<li>TRACE/DEBUG：这两类日志通常情况下只会在开发环境打印，用于梳理整个业务的链路过程等。个人认为，这两类日志是业务流程的日志化体现，即这两类日志足够映射出一个业务的完整执行流程。</li>
+<li>INFO：这是生产环境下最常用的日志级别，且表明应用正常运行。我认为其面向两类场景：<ul>
+<li>系统：在系统初始化、状态改变、接收请求等情况下打印，表明系统正常运行时的行为轨迹。</li>
+<li>业务：这部分需要视业务而言。对于ToB类业务，用户的某些增删改操作是敏感的，也需要进行记录。</li>
+</ul>
+</li>
+<li>WARN：表明系统出现了问题，但是这些问题主要是由用户操作不当、系统波动、服务超时等引起的。或者是对当前状态的预警，比如磁盘容量超过阈值等。</li>
+<li>ERROR：表明系统出现了急需解决的问题，并且这些问题是由系统自身设计不恰当导致的。</li>
+</ol>
+<p>明确日志等级的含义后，翻阅日志信息时就能对问题类型有个大概了解。</p>
+<h2 id="日志分类"><a href="#日志分类" class="headerlink" title="日志分类"></a>日志分类</h2><p>按功能划分，日志可分为三类：</p>
+<ul>
+<li>诊断日志：请求入口和出口、外部服务调用和返回等。</li>
+<li>统计日志：用户访问统计、计费日志（用户使用流量等）。</li>
+<li>审计日志：管理用户行为等。</li>
+</ul>
+<p>对于不同功能的日志，可以存放至不同日志文件加以区分。</p>
+<h2 id="日志格式"><a href="#日志格式" class="headerlink" title="日志格式"></a>日志格式</h2><p>日志格式也需要明确，除了常用的时间、等级、线程等，对于日志主体内容，我比较喜欢的方式是：[调用栈（当前类.当前方法）]: [业务记录（成功/失败）], [参数] [异常信息]。比如：</p>
+<pre><code>OrderManager.placeOrder: success order, uid = 23233</code></pre><p>就表明用户23233成功下单，且当前位于OrderManager中的placeOrder方法。</p>
+<h2 id="日志内容"><a href="#日志内容" class="headerlink" title="日志内容"></a>日志内容</h2><p>这里对日志中主体内容进行简单定义：</p>
+<ol>
+<li>日志内容有助于定位问题，并尽量简洁且清晰的打印问题出现原因。</li>
+<li>日志内容需要含有足够的上下文信息，帮助问题复现和排查。</li>
+</ol>
+<p>总而言之，日志是用来帮助了解系统状态和排查线上问题的，其内容的撰写也要以该原则作为出发点。当然，由于业务的不同特性，需要对日志进行相关适应性改造。</p>
+<h2 id="日志跟踪"><a href="#日志跟踪" class="headerlink" title="日志跟踪"></a>日志跟踪</h2><p>当今应用架构趋向于微服务架构，每一次业务流程的执行都以为着多个微服务相互协作调用。那么如何以全局视角，得到业务的跨服务的完整链路日志就显得尤为重要。比较优雅的解决方法就是通过链路跟踪中间件，如阿里的EagleEye等。该类中间件赋予每条链路唯一标识，并附加于日志记录中，由此可得到整个链路执行过程的所有日志（当然链路跟踪中间件的功能不止如此）。笨点的方法则是，在业务上定义唯一标识，如RequestId，并默认打印。</p>
+<h2 id="日志报警"><a href="#日志报警" class="headerlink" title="日志报警"></a>日志报警</h2><p>对日志设置匹配规则，周期性对日志进行扫描。当日志打印出某个问题时，自动报警，使得报警监控早于用户反馈。</p>
+<h2 id="日志分割和清理"><a href="#日志分割和清理" class="headerlink" title="日志分割和清理"></a>日志分割和清理</h2><p>当日志增长到一定阈值时，就需要进行分割。分割可以按天或按小时，决定因素是方便快速查找日志。另外，过多的日志堆积会耗尽磁盘空间，因此需要定期清理日志，可以清理半个月、两个月前的日志，尽量按照业务需求进行清理。 </p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li><a href="https://www.zhihu.com/question/28254987" target="_blank" rel="noopener">如何优雅地处理异常</a></li>
+<li><a href="https://www.cnblogs.com/jack4738/p/8674793.html" target="_blank" rel="noopener">日志最佳实践</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/27363484" target="_blank" rel="noopener">日志最佳实践v2</a></li>
+</ul>
 
       
     </div>
@@ -461,7 +494,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https//twdlll.github.io/2020/04/15/open_lib/" title="实用库推荐">https//twdlll.github.io/2020/04/15/open_lib/</a>
+    <a href="https//twdlll.github.io/2021/02/10/exception-log/" title="异常和日志使用思考">https//twdlll.github.io/2021/02/10/exception-log/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -483,8 +516,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/04/11/netty/" rel="next" title="Netty源码解析">
-                <i class="fa fa-chevron-left"></i> Netty源码解析
+              <a href="/2021/01/23/oms/" rel="next" title="Spring Cloud初识">
+                <i class="fa fa-chevron-left"></i> Spring Cloud初识
               </a>
             
           </div>
@@ -492,10 +525,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/04/19/pnpl1/" rel="prev" title="POF控制器（二）">
-                POF控制器（二） <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -642,7 +671,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#分析JVM中对象布局：JOL"><span class="nav-number">1.</span> <span class="nav-text">分析JVM中对象布局：JOL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准工具库Apache-Commons-Lang"><span class="nav-number">2.</span> <span class="nav-text">标准工具库Apache Commons Lang</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#异常"><span class="nav-number">1.</span> <span class="nav-text">异常</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#异常定义"><span class="nav-number">1.1.</span> <span class="nav-text">异常定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常抛出和捕获"><span class="nav-number">1.2.</span> <span class="nav-text">异常抛出和捕获</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#日志"><span class="nav-number">2.</span> <span class="nav-text">日志</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#日志等级"><span class="nav-number">2.1.</span> <span class="nav-text">日志等级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志分类"><span class="nav-number">2.2.</span> <span class="nav-text">日志分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志格式"><span class="nav-number">2.3.</span> <span class="nav-text">日志格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志内容"><span class="nav-number">2.4.</span> <span class="nav-text">日志内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志跟踪"><span class="nav-number">2.5.</span> <span class="nav-text">日志跟踪</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志报警"><span class="nav-number">2.6.</span> <span class="nav-text">日志报警</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志分割和清理"><span class="nav-number">2.7.</span> <span class="nav-text">日志分割和清理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
 
           </div>
