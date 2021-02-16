@@ -121,15 +121,15 @@
 <meta name="keywords" content="MapReduce">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MapReduce">
-<meta property="og:url" content="https&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;12&#x2F;11&#x2F;mapreduce&#x2F;index.html">
+<meta property="og:url" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;2019&#x2F;12&#x2F;11&#x2F;mapreduce&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
 <meta property="og:description" content="MapReduce分析之前介绍了Google的GFS，链接为GFS 分析，现在介绍另外一驾马车MapReduce。  MapReduce编程模型MapReduce首先是一个编程模型，通过Map和Reduce函数，利用一个(key1, value1)的输入集合来产生（key2, value2)的输出集合。注意，这里的输入和输出集合的key不一定相同，特意用key1和key2标注出来了。map函数将输">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="&#x2F;images&#x2F;mapreduce&#x2F;execution_overview.png">
-<meta property="og:image" content="&#x2F;images&#x2F;mapreduce&#x2F;map_reduce.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;mapreduce&#x2F;execution_overview.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;mapreduce&#x2F;map_reduce.png">
 <meta property="og:updated_time" content="2019-12-11T14:26:56.085Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="&#x2F;images&#x2F;mapreduce&#x2F;execution_overview.png">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;mapreduce&#x2F;execution_overview.png">
 
 
 
@@ -159,7 +159,7 @@
 
 
 
-  <link rel="canonical" href="https//twdlll.github.io/2019/12/11/mapreduce/"/>
+  <link rel="canonical" href="https://twdlll.github.io/2019/12/11/mapreduce/"/>
 
 
 
@@ -302,7 +302,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https//twdlll.github.io/2019/12/11/mapreduce/">
+    <link itemprop="mainEntityOfPage" href="https://twdlll.github.io/2019/12/11/mapreduce/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Twd">
@@ -418,7 +418,7 @@
       
 
       
-        <h1 id="MapReduce分析"><a href="#MapReduce分析" class="headerlink" title="MapReduce分析"></a>MapReduce分析</h1><p>之前介绍了Google的GFS，链接为<a href="https://twdlll.github.io/2019/12/04/gfs/#more" target="_blank" rel="noopener">GFS 分析</a>，现在介绍另外一驾马车MapReduce。 </p>
+        <h1 id="MapReduce分析"><a href="#MapReduce分析" class="headerlink" title="MapReduce分析"></a>MapReduce分析</h1><p>之前介绍了Google的GFS，链接为<a href="https://twdlll.github.io/2019/12/04/gfs/#more">GFS 分析</a>，现在介绍另外一驾马车MapReduce。 </p>
 <h2 id="MapReduce编程模型"><a href="#MapReduce编程模型" class="headerlink" title="MapReduce编程模型"></a>MapReduce编程模型</h2><p>MapReduce首先是一个编程模型，通过Map和Reduce函数，利用一个(key1, value1)的输入集合来产生（key2, value2)的输出集合。注意，这里的输入和输出集合的key不一定相同，特意用key1和key2标注出来了。map函数将输入集合变为中间集合，reduce函数将中间集合变为输出集合。下面使用一个MapReduce论文上的例子来进行说明：</p>
 <pre><code>map(String key, String value):
     // key : document name
@@ -478,7 +478,7 @@ reduce(String key, Iterator values):
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https//twdlll.github.io/2019/12/11/mapreduce/" title="MapReduce">https//twdlll.github.io/2019/12/11/mapreduce/</a>
+    <a href="/2019/12/11/mapreduce/" title="MapReduce">https://twdlll.github.io/2019/12/11/mapreduce/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -639,12 +639,6 @@ reduce(String key, Iterator values):
           
 
           
-          
-            <div class="cc-license motion-element" itemprop="license">
-              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
-                <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
-              </a>
-            </div>
           
 
           
