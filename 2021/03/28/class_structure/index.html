@@ -117,25 +117,25 @@
 
 
 
-<meta name="description" content="本篇博客主要学习了JVM生成的Java字节码。 字节码概要Java设计之初有个非常著名的口号“一次编写，到处运行”，虽然如今有很多新语言都实现了这个特性（如Python，Go等），但在那个年代这个口号无疑带来了巨大的意义。那么是什么让Java实现了跨平台的能力呢？答案就在字节码。通过各种不同平台的Java虚拟机，编译得到的字节码文件能够处处运行。Jvm编译Java代码时得到的字节码文件是以Clas">
+<meta name="description" content="本篇博客主要学习了JVM生成的Class文件结构。 字节码概要Java设计之初有个非常著名的口号“一次编写，到处运行”，虽然如今有很多新语言都实现了这个特性（如Python，Go等），但在那个年代这个口号无疑带来了巨大的意义。那么是什么让Java实现了跨平台的能力呢？答案就在字节码。通过各种不同平台的Java虚拟机，编译得到的字节码文件能够处处运行。Jvm编译Java代码时得到的字节码文件是以Cl">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JVM之字节码">
-<meta property="og:url" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;2021&#x2F;03&#x2F;28&#x2F;classcode&#x2F;index.html">
+<meta property="og:title" content="JVM之类文件结构">
+<meta property="og:url" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;2021&#x2F;03&#x2F;28&#x2F;class_structure&#x2F;index.html">
 <meta property="og:site_name" content="Twd&#39;s Home">
-<meta property="og:description" content="本篇博客主要学习了JVM生成的Java字节码。 字节码概要Java设计之初有个非常著名的口号“一次编写，到处运行”，虽然如今有很多新语言都实现了这个特性（如Python，Go等），但在那个年代这个口号无疑带来了巨大的意义。那么是什么让Java实现了跨平台的能力呢？答案就在字节码。通过各种不同平台的Java虚拟机，编译得到的字节码文件能够处处运行。Jvm编译Java代码时得到的字节码文件是以Clas">
+<meta property="og:description" content="本篇博客主要学习了JVM生成的Class文件结构。 字节码概要Java设计之初有个非常著名的口号“一次编写，到处运行”，虽然如今有很多新语言都实现了这个特性（如Python，Go等），但在那个年代这个口号无疑带来了巨大的意义。那么是什么让Java实现了跨平台的能力呢？答案就在字节码。通过各种不同平台的Java虚拟机，编译得到的字节码文件能够处处运行。Jvm编译Java代码时得到的字节码文件是以Cl">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;class_structure.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;class_demo.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;constant_pool.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;constant_pool_demo.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;access_flag.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;field_acc_flag.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;method_acc_flag.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;init_code.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;attribute.png">
-<meta property="og:updated_time" content="2021-03-28T13:42:17.309Z">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;class_structure.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;class_demo.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;constant_pool.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;constant_pool_demo.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;access_flag.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;field_acc_flag.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;method_acc_flag.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;init_code.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;attribute.png">
+<meta property="og:updated_time" content="2021-03-28T13:53:48.660Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;class_structure.png">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;class_structure&#x2F;class_structure.png">
 
 
 
@@ -165,13 +165,13 @@
 
 
 
-  <link rel="canonical" href="https://twdlll.github.io/2021/03/28/classcode/"/>
+  <link rel="canonical" href="https://twdlll.github.io/2021/03/28/class_structure/"/>
 
 
 
 
 
-  <title>JVM之字节码 | Twd's Home</title>
+  <title>JVM之类文件结构 | Twd's Home</title>
   
 
 
@@ -308,7 +308,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://twdlll.github.io/2021/03/28/classcode/">
+    <link itemprop="mainEntityOfPage" href="https://twdlll.github.io/2021/03/28/class_structure/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Twd">
@@ -325,7 +325,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">JVM之字节码</h1>
+          <h1 class="post-title" itemprop="name headline">JVM之类文件结构</h1>
         
 
         <div class="post-meta">
@@ -353,7 +353,7 @@
               
                 <span class="post-meta-item-text">更新于&#58;</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2021-03-28T21:42:17+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2021-03-28T21:53:48+08:00">
                 2021-03-28
               </time>
             
@@ -390,8 +390,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2021/03/28/classcode/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2021/03/28/classcode/" itemprop="commentCount"></span>
+                <a href="/2021/03/28/class_structure/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2021/03/28/class_structure/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -424,7 +424,7 @@
       
 
       
-        <p>本篇博客主要学习了JVM生成的Java字节码。</p>
+        <p>本篇博客主要学习了JVM生成的Class文件结构。</p>
 <h1 id="字节码概要"><a href="#字节码概要" class="headerlink" title="字节码概要"></a>字节码概要</h1><p>Java设计之初有个非常著名的口号“一次编写，到处运行”，虽然如今有很多新语言都实现了这个特性（如Python，Go等），但在那个年代这个口号无疑带来了巨大的意义。那么是什么让Java实现了跨平台的能力呢？答案就在字节码。通过各种不同平台的Java虚拟机，编译得到的字节码文件能够处处运行。<br>Jvm编译Java代码时得到的字节码文件是以Class为单位的。Class文件是一组以8个字节为基础单位的二进制流，各个数据项严格按照顺序紧凑排列在一起。对于8个字节以上空间的数据项，Class会拆成若干个8个字节并按照高位在前的顺序排列，并且Class文件的字节序是大端序。Class文件使用两种伪结构来存储数据：</p>
 <ul>
 <li>无符号数：如u1、u2、u4、u8分别代表1、2、4、8个字节，可用来描述数字、引用、数量值或utf-8编码构成的字符串值。</li>
@@ -434,7 +434,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/class_structure.png" width="550" loading="lazy">
+    src="/images/class_structure/class_structure.png" width="550" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图1.1 Class文件结构</div>
@@ -460,7 +460,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/class_demo.png" width="700" loading="lazy">
+    src="/images/class_structure/class_demo.png" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图2.1 16进制表示</div>
@@ -492,7 +492,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/constant_pool.png" width="300" loading="lazy">
+    src="/images/class_structure/constant_pool.png" width="300" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图3.1 Jdk8表结构</div>
@@ -515,7 +515,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/constant_pool_demo.png" width="700" loading="lazy">
+    src="/images/class_structure/constant_pool_demo.png" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图3.2 示例class的常量池</div>
@@ -536,7 +536,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/access_flag.png" width="700" loading="lazy">
+    src="/images/class_structure/access_flag.png" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图3.3 访问标志规范</div>
@@ -552,7 +552,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/field_acc_flag.png" width="700" loading="lazy">
+    src="/images/class_structure/field_acc_flag.png" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图3.4 字段访问标志规范</div>
@@ -567,7 +567,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/method_acc_flag.png" width="700" loading="lazy">
+    src="/images/class_structure/method_acc_flag.png" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图3.5 方法访问标志规范</div>
@@ -582,7 +582,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/init_code.png" width="700" loading="lazy">
+    src="/images/class_structure/init_code.png" width="700" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图3.6 &ltinit&gt的Code属性</div>
@@ -592,7 +592,7 @@
 <center>
     <img style="display:block;border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="/images/classcode/attribute.png" width="900" loading="lazy">
+    src="/images/class_structure/attribute.png" width="900" loading="lazy">
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
     color: #999;">图3.7 Jdk8预定义的属性类型</div>
@@ -623,7 +623,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="/2021/03/28/classcode/" title="JVM之字节码">https://twdlll.github.io/2021/03/28/classcode/</a>
+    <a href="/2021/03/28/class_structure/" title="JVM之类文件结构">https://twdlll.github.io/2021/03/28/class_structure/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
