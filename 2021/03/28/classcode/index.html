@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本篇博客主要学习了JVM生成的Java字节码。 字节码概要Java设计之初有个非常著名的口号“一次编写，到处运行”，虽然如今有很多新语言都实现了这个特性（如Python，Go等），但在那个年代这个口号无疑带来了巨大的意义。那么是什么让Java实现了跨平台的能力呢？答案就在字节码。通过各种不同平台的Java虚拟机，编译得到的字节码文件能够处处运行。Jvm编译Java代码时得到的字节码文件是以Clas">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM之字节码">
+<meta property="og:url" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;2021&#x2F;03&#x2F;28&#x2F;classcode&#x2F;index.html">
+<meta property="og:site_name" content="Twd&#39;s Home">
+<meta property="og:description" content="本篇博客主要学习了JVM生成的Java字节码。 字节码概要Java设计之初有个非常著名的口号“一次编写，到处运行”，虽然如今有很多新语言都实现了这个特性（如Python，Go等），但在那个年代这个口号无疑带来了巨大的意义。那么是什么让Java实现了跨平台的能力呢？答案就在字节码。通过各种不同平台的Java虚拟机，编译得到的字节码文件能够处处运行。Jvm编译Java代码时得到的字节码文件是以Clas">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;class_structure.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;class_demo.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;constant_pool.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;constant_pool_demo.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;access_flag.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;field_acc_flag.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;method_acc_flag.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;init_code.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;attribute.png">
+<meta property="og:updated_time" content="2021-03-28T13:42:17.309Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;classcode&#x2F;class_structure.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://twdlll.github.io/2021/03/28/classcode/"/>
+
+
+
+
+
+  <title>JVM之字节码 | Twd's Home</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Twd's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://twdlll.github.io/2021/03/28/classcode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Twd">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Twd's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JVM之字节码</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-28T00:00:00+08:00">
+                2021-03-28
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2021-03-28T21:42:17+08:00">
+                2021-03-28
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2021/03/28/classcode/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2021/03/28/classcode/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇博客主要学习了JVM生成的Java字节码。</p>
+<h1 id="字节码概要"><a href="#字节码概要" class="headerlink" title="字节码概要"></a>字节码概要</h1><p>Java设计之初有个非常著名的口号“一次编写，到处运行”，虽然如今有很多新语言都实现了这个特性（如Python，Go等），但在那个年代这个口号无疑带来了巨大的意义。那么是什么让Java实现了跨平台的能力呢？答案就在字节码。通过各种不同平台的Java虚拟机，编译得到的字节码文件能够处处运行。<br>Jvm编译Java代码时得到的字节码文件是以Class为单位的。Class文件是一组以8个字节为基础单位的二进制流，各个数据项严格按照顺序紧凑排列在一起。对于8个字节以上空间的数据项，Class会拆成若干个8个字节并按照高位在前的顺序排列，并且Class文件的字节序是大端序。Class文件使用两种伪结构来存储数据：</p>
+<ul>
+<li>无符号数：如u1、u2、u4、u8分别代表1、2、4、8个字节，可用来描述数字、引用、数量值或utf-8编码构成的字符串值。</li>
+<li>表：由多个无符号数或者其他表作为数据项构成的符合数据类型。为了方便辨认，表的后缀都是“_info”结尾。</li>
+</ul>
+<p>Class文件的结构如下图所示：</p>
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/class_structure.png" width="550" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图1.1 Class文件结构</div>
+</center>
+
+<p>这里简单介绍下各个数据项的含义：</p>
+<ol>
+<li>magic：值是固定的，0xCAFEBABE（咖啡宝贝）</li>
+<li>minor_version：次版本号</li>
+<li>major_version：主版本号</li>
+<li>constant_pool_count：该值-1为常量池数量</li>
+<li>constant_pool：常量池</li>
+<li>access_flags：掩码标识，表明访问权限和该类/接口的属性。</li>
+<li>this_class、super_class、interfaces_count和interfaces：分别表示类索引、父类索引和接口索引集合，并通过这三者确定当前Class的继承关系。</li>
+<li>fields_count和fields：表明了声明的变量，包括了类变量和实例变量。</li>
+<li>methods_count和methods：表明了声明的方法。</li>
+<li>attributes_count和attributes：属性表集合。</li>
+</ol>
+<h1 id="简单的代码示例"><a href="#简单的代码示例" class="headerlink" title="简单的代码示例"></a>简单的代码示例</h1><p>下面将使用一个简单的类来说明Java类文件机制。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> twd;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> a;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello World"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对该java类进行编译，得到对应的class文件，其16进制显示如下：</p>
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/class_demo.png" width="700" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图2.1 16进制表示</div>
+</center>
+
+<h1 id="详细说明"><a href="#详细说明" class="headerlink" title="详细说明"></a>详细说明</h1><p>下面将结合示例代码和对应class文件进行各字段的详细说明。</p>
+<h2 id="magic"><a href="#magic" class="headerlink" title="magic"></a>magic</h2><p>魔法值，长度为4字节，固定为cafe babe。</p>
+<h2 id="次版本号和主版本号"><a href="#次版本号和主版本号" class="headerlink" title="次版本号和主版本号"></a>次版本号和主版本号</h2><p>次版本号和主版本号的长度均为2字节，次版本号再Jdk1.2到JDK12之前均未被使用（均为0），主版本号则指明了相应的JDK大版本号。两者在该示例中的值分别为0x0000和0x0034（十进制为52，对应JDK8）。</p>
+<h2 id="常量池数量和常量池"><a href="#常量池数量和常量池" class="headerlink" title="常量池数量和常量池"></a>常量池数量和常量池</h2><p>紧接着的2字节为（常量池数量-1），该示例中常量池数量为0x0021-1，即有32项索引。注意，在设计之初就把索引0空出来是有特殊考虑的，如果后面某些指向常量池的索引值的数据在特定情况下<br>需要表达“不引用任何一个常量池项目”的含义， 可以把索引值设置为0来表示。</p>
+<p>常量池中的常量可分为两大类型：</p>
+<ul>
+<li>字面量：如文本字符串、声明为final的值等。</li>
+<li>符号引用：属于编译原理方面的概念，又可继续往下细分<ul>
+<li>被模块导出或开放的包：package</li>
+<li>类和接口的全限定名</li>
+<li>字段的名称和描述符</li>
+<li>方法的名称和描述符</li>
+<li>方法句柄和方法类型</li>
+<li>动态调用点和动态常量</li>
+</ul>
+</li>
+</ul>
+<p>当虚拟机进行类加载时，会从Class常量池获得对应的符号引用，并在类创建时或运行时解析、翻译到具体的内存地址。</p>
+<p>常量池数量后为具体的常量。常量的格式由两部分组成：</p>
+<ul>
+<li>u1类型的标志位：代表当前常量属于哪种常量类型</li>
+<li>特定的常量表结构：特定于不同常量类型的表结构</li>
+</ul>
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/constant_pool.png" width="300" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图3.1 Jdk8表结构</div>
+</center>
+
+<p>最初常量表中共有11种结构各不相同的表结构数据，Jdk8中共有14中常量池类型（如图3.1所示）。截止Jdk13，已经有了17种表结构。接下来仅介绍在示例代码中出现的常量表结构，如果想更详细地了解，可阅读<a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html" target="_blank" rel="noopener">Java虚拟机规范</a>。</p>
+<p>第一个常量表结构的标志为0x0a，即为CONSTANT_Methodref_info，其格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CONSTANT_Methodref_info &#123;</span><br><span class="line">    u1 tag;</span><br><span class="line">    u2 class_index;         // 指向常量池中对应CONSTANT_Class_info（必须是类）的索引</span><br><span class="line">    u2 name_and_type_index; // 指向常量池中对应CONSTANT_NameAndType（方法）的索引</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例中对应的class_index为0x0006（6），name_and_type_index为0x0013（19）。</p>
+<p>第二个常量表结构的标志为0x09，即为CONSTANT_Fieldref，其格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CONSTANT_Fieldref_info &#123;</span><br><span class="line">    u1 tag;</span><br><span class="line">    u2 class_index;         // 指向常量池中对应CONSTANT_Class_info（类或接口）的索引</span><br><span class="line">    u2 name_and_type_index; // 指向常量池中对应CONSTANT_NameAndType（域）的索引</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例中对应的class_index为0x0014（20），name_and_type_index为0x0015（21）。</p>
+<p>第三个常量表结构的标志为0x08，即为CONSTANT_String_info，其格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CONSTANT_String_info &#123;</span><br><span class="line">    u1 tag;</span><br><span class="line">    u2 string_index;    // 指向常量池中对应CONSTANT_Utf8_info的索引</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例中对应的string_index为0x0016（22）。</p>
+<p>后续的常量池不一一介绍，先直接通过javap输出对应的常量池信息。</p>
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/constant_pool_demo.png" width="700" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图3.2 示例class的常量池</div>
+</center>
+
+<p>再介绍下之前没出现的几个常量表结构。其中第五个常量表结构为CONSTANT_Class_info。其格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CONSTANT_Class_info &#123;</span><br><span class="line">    u1 tag;</span><br><span class="line">    u2 name_index; // 指向常量池中对应CONSTANT_Utf8_info的索引，即类或接口的名字</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，第五个常量的name_index为25，指向twd.Test这个类名。</p>
+<p>第七个常量表类型为CONSTANT_Utf8_info，其格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CONSTANT_Utf8_info &#123;</span><br><span class="line">    u1 tag;</span><br><span class="line">    u2 length;</span><br><span class="line">    u1 bytes[length];   // 采用utf-8编码</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再来看下第19个常量表类型，是CONSTANT_NameAndType_info，其格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CONSTANT_NameAndType_info &#123;</span><br><span class="line">    u1 tag;</span><br><span class="line">    u2 name_index;          // 指向对应的CONSTANT_Utf8_info的索引，表示字段名或方法名</span><br><span class="line">    u2 descriptor_index;    // 指向对应的CONSTANT_Utf8_info的索引，表示对字段或方法的描述</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该常量指的是类的构造函数&lt;init&gt;，()V表示无参且无返回值。</p>
+<h2 id="访问标志"><a href="#访问标志" class="headerlink" title="访问标志"></a>访问标志</h2><p>接下来是2字节的访问标识，示例中值为0x0021。根据下面的访问标志定义可示例Class的标识为ACC_PUBLIC和ACC_SUPER。</p>
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/access_flag.png" width="700" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图3.3 访问标志规范</div>
+</center>
+
+<h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><p>接下来是各种索引：类索引（this_class）、父类索引（super_class）和接口集。</p>
+<h3 id="类索引"><a href="#类索引" class="headerlink" title="类索引"></a>类索引</h3><p>其值为0x0005，指向twd.Test这个CONSTANT_Class_info。</p>
+<h3 id="父类索引"><a href="#父类索引" class="headerlink" title="父类索引"></a>父类索引</h3><p>其值为0x0006，表示父类为java.lang.Object。</p>
+<h3 id="接口集"><a href="#接口集" class="headerlink" title="接口集"></a>接口集</h3><p>在这里接口数量为0x0000，所以无实现接口。</p>
+<h2 id="字段表"><a href="#字段表" class="headerlink" title="字段表"></a>字段表</h2><p>示例中字段表数量为0x0001，后续使用field_info表示每个字段。field_info的格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">field_info &#123;</span><br><span class="line">    u2             access_flags;</span><br><span class="line">    u2             name_index;</span><br><span class="line">    u2             descriptor_index;</span><br><span class="line">    u2             attributes_count;</span><br><span class="line">    attribute_info attributes[attributes_count];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/field_acc_flag.png" width="700" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图3.4 字段访问标志规范</div>
+</center>
+
+
+<p>这里对应的值为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">access_flags:0x0002，即ACC_PRIVATE</span><br><span class="line">name_index  :0x0007，即a</span><br><span class="line">descriptor_index:0x0008，即I，为int的字段描述符</span><br><span class="line">attributes_count:0x0000，无属性</span><br></pre></td></tr></table></figure>
+
+<p>显然该字段对应的是代码中的<code>private int a</code>。</p>
+<h2 id="方法表"><a href="#方法表" class="headerlink" title="方法表"></a>方法表</h2><p>示例中方法表数量为0x0002，表示有两个方法。每个方法的格式与field_info一样。</p>
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/method_acc_flag.png" width="700" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图3.5 方法访问标志规范</div>
+</center>
+
+<p>第一个方法对应的值为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">access_flags:0x0001，即ACC_PUBLIC</span><br><span class="line">name_index  :0x0009，即&lt;init&gt;，即为构造方法。</span><br><span class="line">descriptor_index:0x000a，即()V。</span><br><span class="line">attributes_count:0x0001，有一个属性。</span><br></pre></td></tr></table></figure>
+
+<p>对于属性，其对应的格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">attribute_info &#123;</span><br><span class="line">    u2 attribute_name_index;</span><br><span class="line">    u4 attribute_length;</span><br><span class="line">    u1 info[attribute_length];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该属性的attribute_name_index为0x000b，即常量池中第11个常量Code，其长度为0x0000002f，对应的内容如下：</p>
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/init_code.png" width="700" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图3.6 &ltinit&gt的Code属性</div>
+</center>
+
+<h2 id="属性表"><a href="#属性表" class="headerlink" title="属性表"></a>属性表</h2><p>属性表用来描述某些专有信息，可出现在类文件、字段表和方法表中。用户可自定义属性格式，虚拟机会在运行时忽略它不认识的属性。在Jdk8中，预定义了23个属性：</p>
+<center>
+    <img style="display:block;border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/classcode/attribute.png" width="900" loading="lazy">
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">图3.7 Jdk8预定义的属性类型</div>
+</center>
+
+<p>比较常见的属性有Code（附在方法表中，主要表示方法执行代码的字节码形式）、Exceptions等，想要详细了解的可参考《深入理解Java虚拟机》的6.3.7。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li>深入理解Java虚拟机（第三版）</li>
+<li><a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html" target="_blank" rel="noopener">Java虚拟机规范</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Twd
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="/2021/03/28/classcode/" title="JVM之字节码">https://twdlll.github.io/2021/03/28/classcode/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/02/10/exception-log/" rel="next" title="异常和日志使用思考">
+                <i class="fa fa-chevron-left"></i> 异常和日志使用思考
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar/me.jpg"
+                alt="Twd" />
+            
+              <p class="site-author-name" itemprop="name">Twd</p>
+              <p class="site-description motion-element" itemprop="description">There is no royal road to learning.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#字节码概要"><span class="nav-number">1.</span> <span class="nav-text">字节码概要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简单的代码示例"><span class="nav-number">2.</span> <span class="nav-text">简单的代码示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#详细说明"><span class="nav-number">3.</span> <span class="nav-text">详细说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#magic"><span class="nav-number">3.1.</span> <span class="nav-text">magic</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#次版本号和主版本号"><span class="nav-number">3.2.</span> <span class="nav-text">次版本号和主版本号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常量池数量和常量池"><span class="nav-number">3.3.</span> <span class="nav-text">常量池数量和常量池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问标志"><span class="nav-number">3.4.</span> <span class="nav-text">访问标志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引"><span class="nav-number">3.5.</span> <span class="nav-text">索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#类索引"><span class="nav-number">3.5.1.</span> <span class="nav-text">类索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#父类索引"><span class="nav-number">3.5.2.</span> <span class="nav-text">父类索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接口集"><span class="nav-number">3.5.3.</span> <span class="nav-text">接口集</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字段表"><span class="nav-number">3.6.</span> <span class="nav-text">字段表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法表"><span class="nav-number">3.7.</span> <span class="nav-text">方法表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属性表"><span class="nav-number">3.8.</span> <span class="nav-text">属性表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Twd</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'TtRlsLz0KF6yKVNroXaFGeDs-MdYXbMMI',
+        appKey: 'gFGuOgmO60qCcysb3tRiOUST',
+        placeholder: '快来发表你的评论吧',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
