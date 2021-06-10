@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Spring Cloud初识 讲了Spring Cloud，本篇博客则对Spring Cloud Alibaba进行介绍。 由来为什么有了Spring Cloud，还要再整个新轮子Spring Cloud Alibaba呢？一切源于Netflix项目的停止更新，进入维护状态。大家都知道，Spring Cloud是在Netflix开源的一系列微服务核心技术栈上进行封装整合得到的，因此Netflix停">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Cloud Alibaba初识">
+<meta property="og:url" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;2021&#x2F;06&#x2F;10&#x2F;spring-cloud-alibaba&#x2F;index.html">
+<meta property="og:site_name" content="Twd&#39;s Home">
+<meta property="og:description" content="Spring Cloud初识 讲了Spring Cloud，本篇博客则对Spring Cloud Alibaba进行介绍。 由来为什么有了Spring Cloud，还要再整个新轮子Spring Cloud Alibaba呢？一切源于Netflix项目的停止更新，进入维护状态。大家都知道，Spring Cloud是在Netflix开源的一系列微服务核心技术栈上进行封装整合得到的，因此Netflix停">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;spring-cloud-alibaba&#x2F;nacos-register&amp;discovery.webp">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;spring-cloud-alibaba&#x2F;ribbon1.webp">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;spring-cloud-alibaba&#x2F;ribbon2.webp">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;spring-cloud-alibaba&#x2F;nacos-config.webp">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;spring-cloud-alibaba&#x2F;nacos-config-log.webp">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;spring-cloud-alibaba&#x2F;sentinel-gui.webp">
+<meta property="og:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;spring-cloud-alibaba&#x2F;sentinel-rules.webp">
+<meta property="og:updated_time" content="2021-06-10T15:35:12.156Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;twdlll.github.io&#x2F;images&#x2F;spring-cloud-alibaba&#x2F;nacos-register&amp;discovery.webp">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://twdlll.github.io/2021/06/10/spring-cloud-alibaba/"/>
+
+
+
+
+
+  <title>Spring Cloud Alibaba初识 | Twd's Home</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Twd's Home</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://twdlll.github.io/2021/06/10/spring-cloud-alibaba/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Twd">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar/me.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Twd's Home">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring Cloud Alibaba初识</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-06-10T00:00:00+08:00">
+                2021-06-10
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2021-06-10T23:35:12+08:00">
+                2021-06-10
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2021/06/10/spring-cloud-alibaba/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2021/06/10/spring-cloud-alibaba/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://twdlll.github.io/2021/01/23/oms/#more">Spring Cloud初识</a> 讲了Spring Cloud，本篇博客则对Spring Cloud Alibaba进行介绍。</p>
+<h1 id="由来"><a href="#由来" class="headerlink" title="由来"></a>由来</h1><p>为什么有了Spring Cloud，还要再整个新轮子Spring Cloud Alibaba呢？一切源于Netflix项目的停止更新，进入维护状态。大家都知道，Spring Cloud是在Netflix开源的一系列微服务核心技术栈上进行封装整合得到的，因此Netflix停止更新对于SpringCloud的打击是不言而喻的。</p>
+<p>那么Netflix为什么停止更新旗下开源框架呢？简单来讲，就是这些项目的更新需要消耗大量的时间精力，然而没有直接的利益收入。当技术热情的潮水慢慢退去，剩下的就是贫瘠的现实，最终走向终结。Spring Cloud Alibaba就在这时候出现了。有人认为其目的是为了推广阿里云，但不管怎么说，Spring Cloud Alibaba是一套优质的微服务解决方案。</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Spring Cloud Alibaba同样包含一堆组件，如Nacos、Sentinel、Seata等。Spring Cloud Alibaba的主要特性如下：</p>
+<ul>
+<li>流量控制和服务降级：通过Sentinel完成流量控制、服务熔断和系统自适应保护。</li>
+<li>服务注册和发现：使用Nacos完成服务注册和发现，并且在Nacos中集成了Ribbon以达到客户端负载均衡效果。</li>
+<li>分布式配置：使用Nacos作为数据仓库。</li>
+<li>事件驱动：通过RocketMQ搭建高性能且可扩展的事件驱动的微服务。</li>
+<li>消息总线：使用RocketMQ连接分布式系统节点。</li>
+<li>分布式事务：使用Seata提供高性能且方便使用的分布式事务</li>
+<li>Dubbo Rpc：使用Dubbo Rpc扩展了Spring Cloud中服务调用的通信协议。</li>
+</ul>
+<p>接下来将介绍各组件，包括其功能特点和简单使用。</p>
+<h1 id="Nacos"><a href="#Nacos" class="headerlink" title="Nacos"></a>Nacos</h1><p>Nacos不仅支持服务注册和发现，还提供了配置功能。同时支持三种部署模式：</p>
+<ul>
+<li>单机模式：用于测试和单机试用。</li>
+<li>集群模式：用于生产环境，确保高可用性。</li>
+<li>多集群模式：用于多数据中心场景。</li>
+</ul>
+<p>另外Nacos支持持久化存储，其内置数据源为Derby，外置数据源支持Mysql。以下仅展示Nacos的基本功能，首先均需要通过startup.sh/cmd启动nacos。</p>
+<h2 id="Nacos服务注册和发现"><a href="#Nacos服务注册和发现" class="headerlink" title="Nacos服务注册和发现"></a>Nacos服务注册和发现</h2><p>在服务注册和发现上，Nacos的使用与Eureka类似，但是不需要像Eureka单独跑一个应用作为注册中心。<a href="https://spring-cloud-alibaba-group.github.io/github-pages/hoxton/en-us/index.html#_how_to_introduce_nacos_discovery_for_service_registrationdiscovery" target="_blank" rel="noopener">Nacos服务注册和发现</a>详细介绍了其使用过程。</p>
+<h3 id="Nacos服务注册"><a href="#Nacos服务注册" class="headerlink" title="Nacos服务注册"></a>Nacos服务注册</h3><p>启动类代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@EnableDiscoveryClient</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosProvider9001</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;server.port&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String serverPort;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">( String[] args )</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(NacosProvider9001<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RestController</span></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EchoController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@GetMapping</span>(value = <span class="string">"/echo/&#123;str&#125;"</span>)</span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">echo</span><span class="params">(@PathVariable String str)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> String.format(<span class="string">"Hello Nacos discovery from %s : %s"</span>, serverPort, str);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对应application.yml内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">    port: 9002</span><br><span class="line"></span><br><span class="line">spring:</span><br><span class="line">    application:</span><br><span class="line">        name: nacos-provider-echo</span><br><span class="line">    cloud:</span><br><span class="line">        nacos:</span><br><span class="line">            discovery:</span><br><span class="line">                server-addr: 127.0.0.1:8848</span><br><span class="line"></span><br><span class="line">management:</span><br><span class="line">    endpoints:</span><br><span class="line">        web:</span><br><span class="line">            exposure:</span><br><span class="line">                include: &apos;*&apos;</span><br></pre></td></tr></table></figure>
+
+<p>按照同样的配置和代码（注意端口设置，我个人设置的是9001和9002）启动两个服务。</p>
+<h3 id="Nacos服务发现"><a href="#Nacos服务发现" class="headerlink" title="Nacos服务发现"></a>Nacos服务发现</h3><p>启动类代码为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@EnableDiscoveryClient</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosConsumer10001</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RestController</span></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosController</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Autowired</span></span><br><span class="line">        <span class="keyword">private</span> RestTemplate restTemplate;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Value</span>(<span class="string">"$&#123;spring.application.name&#125;"</span>)</span><br><span class="line">        <span class="keyword">private</span> String appName;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@GetMapping</span>(<span class="string">"/echo/app-name"</span>)</span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">echoAppName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            String path = String.format(<span class="string">"http://%s/echo/%s"</span>, <span class="string">"nacos-provider-echo"</span>, appName);</span><br><span class="line">            System.out.println(<span class="string">"request path:"</span> + path);</span><br><span class="line">            <span class="keyword">return</span> restTemplate.getForObject(path, String<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@LoadBalanced</span>   <span class="comment">// 使用负载均衡功能</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RestTemplate <span class="title">restTemplate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> RestTemplate();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(NacosConsumer10001<span class="class">.<span class="keyword">class</span>,<span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意，由于Nacos集成了Ribbon，所以可以使用其负载均衡机制。服务发现者的application.yml内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">    port: 10001</span><br><span class="line"></span><br><span class="line">spring:</span><br><span class="line">    application:</span><br><span class="line">        name: nacos-consumer</span><br><span class="line">cloud:</span><br><span class="line">    nacos:</span><br><span class="line">        discovery:</span><br><span class="line">            server-addr: 127.0.0.1:8848</span><br></pre></td></tr></table></figure>
+
+<h3 id="最终效果"><a href="#最终效果" class="headerlink" title="最终效果"></a>最终效果</h3><p>Nacos的服务列表中有两个服务，分别来自服务提供者和服务消费者。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/spring-cloud-alibaba/nacos-register&discovery.webp" width="900" loading="lazy">
+    <br>
+    <div style="color:orange; border-bottom: 1px solid #d9d9d9;
+    display: inline-block;
+    color: #999;">Nacos服务列表</div>
+</center>
+
+<p>对服务消费者使用<code>http://localhost:10001/echo/app-name</code>进行测试，其效果如下（同时体现了负载均衡效果）：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/spring-cloud-alibaba/ribbon1.webp" width="500" loading="lazy">
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/spring-cloud-alibaba/ribbon2.webp" width="500" loading="lazy">
+    <br>
+</center>
+
+<h2 id="Nacos配置中心"><a href="#Nacos配置中心" class="headerlink" title="Nacos配置中心"></a>Nacos配置中心</h2><p>Nacos还能够作为配置中心，并支持动态配置。</p>
+<h3 id="动态配置"><a href="#动态配置" class="headerlink" title="动态配置"></a>动态配置</h3><p>在Nacos中使用图形界面创建配置：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/spring-cloud-alibaba/nacos-config.webp" width="900" loading="lazy">
+</center>
+
+<p>需要注意的是Data Id需要按照一定规则设置：即<code>${spring.application.name}-${profile}. ${file-extension:properties}</code>。因此图中的Data Id为nacos-config-dev.yaml。</p>
+<p>新建应用，启动类代码为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NacosConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ConfigurableApplicationContext applicationContext = SpringApplication.run(NacosConfig<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="comment">// 不断获取配置信息，并打印</span></span><br><span class="line">            String configInfo = applicationContext.getEnvironment().getProperty(<span class="string">"config.info"</span>);</span><br><span class="line">            String currentEnv = applicationContext.getEnvironment().getProperty(<span class="string">"current.env"</span>);</span><br><span class="line">            System.err.println(<span class="string">"config.info = "</span> + configInfo + <span class="string">", current.env = "</span> + currentEnv);</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其yml配置为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">server:</span><br><span class="line">    port: 5566</span><br><span class="line"></span><br><span class="line">spring:</span><br><span class="line">    profiles:</span><br><span class="line">        active: test # 选择不同的环境</span><br><span class="line">application:</span><br><span class="line">    name: nacos-config</span><br><span class="line">cloud:</span><br><span class="line">    nacos:</span><br><span class="line">        discovery:</span><br><span class="line">            server-addr: 127.0.0.1:8848</span><br><span class="line">        config:</span><br><span class="line">            server-addr: 127.0.0.1:8848</span><br><span class="line">            file-extension: yaml</span><br></pre></td></tr></table></figure>
+
+<p>运行应用，并在Nacos上动态地将<code>config.info</code>修改为version = 2， 可以看到应用的打印信息发生了变化：</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/spring-cloud-alibaba/nacos-config-log.webp" width="600" loading="lazy">
+</center>
+
+<h3 id="分类配置"><a href="#分类配置" class="headerlink" title="分类配置"></a>分类配置</h3><p>Nacos引入了Namespace、Group、Data Id来进行更强大的分类控制功能。</p>
+<blockquote>
+<p>命名空间（Namespace）用于进行租户粒度的配置隔离。不同的命名空间下，可以存在相同的 Group 或 Data ID 的配置。Namespace 的常用场景之一是<strong>不同环境的配置的区分隔离</strong>，例如开发测试环境和生产环境的资源（如配置、服务）隔离等。如未指定Namespace，则默认使用public。</p>
+<p>Group是Nacos 中的一组配置集，是组织配置的维度之一。通过一个有意义的字符串（如 Buy 或 Trade ）对配置集进行分组，从而区分 Data ID 相同的配置集。当您在 Nacos 上创建一个配置时，如果未填写配置分组的名称，则配置分组的名称默认采用 DEFAULT_GROUP 。配置分组的常见场景：<strong>不同的应用或组件使用了相同的配置类型，如 database_url 配置和 MQ_topic 配置</strong>。</p>
+<p>Data Id是Nacos 中的某个配置集的 ID。配置集 ID 是组织划分配置的维度之一。Data ID 通常用于组织划分系统的配置集。一个系统或者应用可以包含多个配置集，<strong>每个配置集都可以被一个有意义的名称标识</strong>。Data ID 通常采用类 Java 包（如 com.taobao.tc.refund.log.level）的命名规则保证全局唯一性。此命名规则非强制。</p>
+</blockquote>
+<p>三者组合使用能够达到细粒度配置的效果，从范围角度看：Namespace &gt; Group &gt; Data Id。通过在配置中选择不同的group和namespace即可选择不同的配置集。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">config:</span><br><span class="line">    server-addr: 127.0.0.1:8848</span><br><span class="line">    file-extension: yaml</span><br><span class="line">    group: xx</span><br><span class="line">    namespace: xx</span><br></pre></td></tr></table></figure>
+
+<p>对于Nacos更详细的文档可见<a href="https://nacos.io/zh-cn/docs/what-is-nacos.html" target="_blank" rel="noopener">Nacos官网</a>。</p>
+<h1 id="Sentinel"><a href="#Sentinel" class="headerlink" title="Sentinel"></a>Sentinel</h1><p>随着微服务的流行，服务和服务之间的稳定性变得越来越重要。Sentinel 是面向分布式服务架构的流量控制组件，主要以流量为切入点，从流量控制、熔断降级、系统自适应保护等多个维度来帮助您保障微服务的稳定性。</p>
+<p>Sentinel分为两部分：</p>
+<ul>
+<li>核心库（客户端）：不依赖其他库或框架，可以嵌入到应用中。</li>
+<li>控制台（Dashboard）：基于SpringBoot开发，可直接运行，提供图形化界面。</li>
+</ul>
+<h2 id="Sentinel基本展示"><a href="#Sentinel基本展示" class="headerlink" title="Sentinel基本展示"></a>Sentinel基本展示</h2><p>通过添加Sentinel依赖，并且在yml文件中加入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">spring:</span><br><span class="line">    cloud:</span><br><span class="line">        sentinel:</span><br><span class="line">            transport:</span><br><span class="line">                dashboard: localhost:8080</span><br><span class="line">                port: 8719</span><br></pre></td></tr></table></figure>
+
+<p>即可在Sentinel控制台看到微服务流量访问情况。</p>
+<center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/spring-cloud-alibaba/sentinel-gui.webp" width="900" loading="lazy">
+</center>
+
+<h2 id="Sentinel配置"><a href="#Sentinel配置" class="headerlink" title="Sentinel配置"></a>Sentinel配置</h2><center>
+    <img style="border-radius: 0.3125em;
+    box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
+    src="/images/spring-cloud-alibaba/sentinel-rules.webp" width="900" loading="lazy">
+</center>
+
+<p>Sentinel允许为不同资源配置不同规则：</p>
+<ul>
+<li>流控：针对流量访问进行控制，允许从QPS或线程数维度进行流量控制，提供多种流控模式（直接、关联、链路）和流控效果（直接失败、Warm Up和排队等待）。</li>
+<li>降级：熔断降级，允许多种降级策略（RT、异常比例和异常数）。相比Hystrix，Sentinel没有半开状态。</li>
+<li>热点：可对热点资源的访问进行限制。</li>
+<li>…</li>
+</ul>
+<p>Sentinel能够对应用异常和控制台配置违规进行相应兜底处理。除此之外，Sentinel还支持系统规则等功能。通过配置，能够灵活地使用Sentinel对微服务进行稳定性方面的设置。对于Sentinel更详细的文档可见<a href="https://sentinelguard.io/zh-cn/" target="_blank" rel="noopener">Sentinel官网</a>。</p>
+<h1 id="Seata"><a href="#Seata" class="headerlink" title="Seata"></a>Seata</h1><p>Seata是用于分布式事务（协调多数据源的数据一致问题）的框架。Seata基于两阶段提交协议，采用一个Transaction Id和三个组件模型来协调分布式事务处理过。</p>
+<ul>
+<li>Transaction Id：全局唯一的事务Id</li>
+<li>三个组件：<ul>
+<li>事务协调者（Transaction Coordinator，TC）：维护全局和分支事务的状态，驱动全局事务提交或回滚。</li>
+<li>事务管理器（Transaction Manager，TM）：定义全局事务的范围：开始全局事务、提交或回滚全局事务。</li>
+<li>资源管理器（Resource Manager，RM）：管理分支事务处理的资源，与TC交谈以注册分支事务和报告分支事务的状态，并驱动分支事务提交或回滚。</li>
+</ul>
+</li>
+</ul>
+<p>Seata支持多种事务模式（AT，TCC，Saga，XA）。这里简单描述下AT模式下Seata的处理过程，假设服务A、B（服务A同时是该事务的发起者）要执行一个分布式事务，过程如下：</p>
+<ol>
+<li>服务A的TM向TC申请开启一个全局事务，全局事务创建成功后会生成一个全局唯一的XID。</li>
+<li>服务A执行自身业务逻辑，并生成undo日志（用于回滚），同时RM向TC注册分支事务（该分支事务被纳入XID对应全局事务的管辖）。执行成功则提交本地事务。</li>
+<li>当服务A执行到远程调用（调用指向B）时，由服务B执行业务逻辑，生成undo日志，并由服务B的RM向TC注册分支事务，将其纳入全局事务的管辖。执行成功则提交本地事务。</li>
+<li>远程调用成功，由服务A的TM向TC提交全局事务的提交决议。</li>
+<li>TC提交该全局事务，并清除相关资源（会话、各服务undo日志等），完成提交。</li>
+</ol>
+<p>对于Seata的其他情况可参考<a href="http://seata.io/zh-cn/docs/overview/what-is-seata.html" target="_blank" rel="noopener">Seata官网</a>。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li><a href="https://spring-cloud-alibaba-group.github.io/github-pages/hoxton/en-us/index.html#_how_to_introduce_nacos_discovery_for_service_registrationdiscovery" target="_blank" rel="noopener">Nacos服务注册和发现</a></li>
+<li><a href="https://nacos.io/zh-cn/docs/what-is-nacos.html" target="_blank" rel="noopener">Nacos官网</a></li>
+<li><a href="https://sentinelguard.io/zh-cn/" target="_blank" rel="noopener">Sentinel官网</a></li>
+<li><a href="http://seata.io/zh-cn/docs/overview/what-is-seata.html" target="_blank" rel="noopener">Seata官网</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Twd
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="/2021/06/10/spring-cloud-alibaba/" title="Spring Cloud Alibaba初识">https://twdlll.github.io/2021/06/10/spring-cloud-alibaba/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/03/28/class_structure/" rel="next" title="JVM之类文件结构">
+                <i class="fa fa-chevron-left"></i> JVM之类文件结构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar/me.jpg"
+                alt="Twd" />
+            
+              <p class="site-author-name" itemprop="name">Twd</p>
+              <p class="site-description motion-element" itemprop="description">There is no royal road to learning.</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#由来"><span class="nav-number">1.</span> <span class="nav-text">由来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Nacos"><span class="nav-number">3.</span> <span class="nav-text">Nacos</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Nacos服务注册和发现"><span class="nav-number">3.1.</span> <span class="nav-text">Nacos服务注册和发现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Nacos服务注册"><span class="nav-number">3.1.1.</span> <span class="nav-text">Nacos服务注册</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nacos服务发现"><span class="nav-number">3.1.2.</span> <span class="nav-text">Nacos服务发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最终效果"><span class="nav-number">3.1.3.</span> <span class="nav-text">最终效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nacos配置中心"><span class="nav-number">3.2.</span> <span class="nav-text">Nacos配置中心</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态配置"><span class="nav-number">3.2.1.</span> <span class="nav-text">动态配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分类配置"><span class="nav-number">3.2.2.</span> <span class="nav-text">分类配置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Sentinel"><span class="nav-number">4.</span> <span class="nav-text">Sentinel</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Sentinel基本展示"><span class="nav-number">4.1.</span> <span class="nav-text">Sentinel基本展示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sentinel配置"><span class="nav-number">4.2.</span> <span class="nav-text">Sentinel配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Seata"><span class="nav-number">5.</span> <span class="nav-text">Seata</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2019 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Twd</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'TtRlsLz0KF6yKVNroXaFGeDs-MdYXbMMI',
+        appKey: 'gFGuOgmO60qCcysb3tRiOUST',
+        placeholder: '快来发表你的评论吧',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
